@@ -1,0 +1,251 @@
+You are an expert full-stack AI agent. Build a complete MVP platform (Web + Mobile) for “Media Trend”.
+Do NOT focus on colors, UI styling, or design references. Prioritize functionality, structure, roles, flows, and data.
+
+========================================================
+PRODUCT SUMMARY
+========================================================
+Build a “Demo-first” platform:
+- The user types OR speaks their store idea.
+- An AI assistant asks only the minimum missing questions (max 6–8).
+- The platform instantly generates a fully interactive DEMO ecommerce store (no signup required) and shows it.
+- Only after the demo is visible, the user logs in to continue and submits a request that reaches Media Trend.
+- Media Trend team follows up and completes real activation (payments, shipping, warehousing).
+
+Business model (non-negotiable):
+- Unlimited products (no limits).
+- No monthly/yearly subscriptions.
+- Commission on sales only.
+- Checkout remains DEMO until required integrations are activated.
+
+Primary markets:
+- Kuwait & Saudi (global-ready).
+Languages:
+- English first, but keep i18n-ready for Arabic (RTL) later.
+
+========================================================
+REQUIRED PORTALS (SEPARATE ENTRY)
+========================================================
+1) Public website (marketing site)
+2) Customer Portal (web + mobile) for user dashboard
+3) Admin Portal (web only) for internal team
+
+Hard rules:
+- Customers must never access admin routes.
+- Admin must log in through a separate admin login.
+- Customer login must be separate from admin login.
+
+========================================================
+CORE USER FLOW (MANDATORY)
+========================================================
+A) DEMO FIRST (no signup upfront)
+1) User lands on Home.
+2) User enters store idea by:
+   - typing (text)
+   - or speaking (voice)
+3) AI asks up to 6–8 short questions (only what’s missing).
+4) System generates StoreConfig JSON and creates a DEMO store record (guest):
+   - store.ownerId = null
+   - store.sessionId = guestSessionId
+   - store.status = DEMO
+5) Redirect user directly to the demo store URL:
+   /s/[storeSlug]?demo=1
+6) Demo store is fully interactive:
+   - Home, Shop, Categories, Product detail, Cart, Checkout (demo), Policies, Order tracking (demo)
+
+B) LOGIN ONLY AFTER DEMO IS VISIBLE
+7) Demo store page must show a prominent CTA:
+   “Continue / Activate”
+8) Clicking CTA redirects to Customer Portal login/signup:
+   /portal/login or /portal/signup
+9) After login:
+   - attach store to user:
+     store.ownerId = user.id
+     store.sessionId = null
+   - redirect to customer dashboard store page:
+     /portal/stores/[storeId]
+
+C) SUBMIT REQUEST TO MEDIA TREND (MANDATORY)
+10) In /portal/stores/[storeId], show a stepper “Complete Request”:
+   Step 1: confirm store basics (name, country, contact)
+   Step 2: select what to activate:
+     - payments activation
+     - shipping activation
+     - warehousing activation (optional)
+   Step 3: collect required info:
+     - contact name
+     - phone/whatsapp
+     - email (optional)
+     - business details (brief)
+     - pickup address (for shipping)
+     - notes
+   Step 4: submit request
+
+11) On submit:
+   - create Lead record containing all inputs + demo store link
+   - create Ticket records for each selected activation
+   - set ticket status = Pending
+   - set store status = Pending_Activation
+   - show confirmation “Request received; our team will contact you”
+   - provide a WhatsApp click-to-chat button (configurable number)
+
+D) ACTIVATION RULE
+12) Checkout must remain DEMO until:
+   paymentsStatus = live AND shippingStatus = live
+   (warehousing optional)
+
+========================================================
+ADDITIONAL SERVICES (SEPARATE, NOT AUTO-BUILD)
+========================================================
+Add two standalone services that generate an AI brief and then submit a request (requires login):
+1) “Ad Campaign Launch” (all platforms)
+2) “Social Account Management”
+
+Service behavior:
+- Public service page explains the service + CTA “Try AI Planner”
+- AI Planner asks a few questions and outputs a structured brief (JSON):
+  - For ads: goal, budget range, platforms list, country, industry, timeframe
+  - For management: platforms, posting frequency, goals, brand info, market
+- When user clicks “Submit Request”:
+  - requires /portal/login if not logged in
+  - creates Lead + Ticket:
+    - ads_launch_request OR account_management_request
+    - status = Pending
+- Admin sees these requests in the same pipeline.
+
+========================================================
+WEB ROUTES (MANDATORY)
+========================================================
+PUBLIC SITE
+- / (home with AI entry)
+- /services
+- /services/store-builder
+- /services/ads-launch
+- /services/account-management
+- /work
+- /partners
+- /team
+- /insights
+- /insights/[slug]
+- /contact
+- /privacy
+- /terms
+
+STOREFRONT
+- /s/[storeSlug] (demo or live storefront)
+
+CUSTOMER PORTAL (SEPARATE)
+- /portal (portal landing)
+- /portal/login
+- /portal/signup
+- /portal/dashboard
+- /portal/stores
+- /portal/stores/[storeId]
+- /portal/requests
+- /portal/support
+
+ADMIN PORTAL (SEPARATE)
+- /admin/login
+- /admin (dashboard)
+- /admin/requests
+- /admin/stores
+- /admin/users
+- /admin/integrations
+- /admin/content/pages
+- /admin/blog
+- /admin/support
+- /admin/settings
+- /admin/audit
+
+========================================================
+MOBILE APP (CUSTOMER ONLY, MVP)
+========================================================
+Build a mobile app that connects to the same backend API:
+- Customer login/signup
+- Dashboard: store list + statuses
+- Store details + “Complete Request” stepper
+- Submit ads/account-management requests
+- Support tickets
+Admin is web-only for MVP.
+
+Voice input on mobile:
+- Option A: text-only mobile MVP
+- Option B: record audio and send to server STT endpoint to convert to text
+
+========================================================
+AI REQUIREMENTS (MUST OUTPUT JSON, NOT HTML)
+========================================================
+AI assistant outputs StoreConfig JSON for the demo store.
+Implement server endpoints:
+- POST /api/ai/store-chat
+  Input: message + chat history + partial answers
+  Output: either next question(s) OR final StoreConfig JSON
+  Constraint: max 6–8 questions total
+
+- POST /api/ai/campaign-brief
+  Output: structured JSON brief + estimated KPI ranges (clearly labeled as estimates)
+
+- POST /api/ai/account-management-brief
+  Output: structured JSON brief
+
+(Optional)
+- POST /api/ai/stt  (audio -> text)
+
+========================================================
+ADMIN CAPABILITIES (MUST HAVE)
+========================================================
+Admin dashboard must support:
+1) Incoming requests:
+   - Leads pipeline: New -> Contacted -> Qualified -> Closed
+   - Tickets workflow: Pending -> Approved -> InSetup -> Live -> Rejected
+   - Request details: customer contact, store link, notes
+2) Store management:
+   - store statuses, integration statuses, notes
+   - commissionRatePercent per store
+3) Integrations center (modular):
+   - provider catalog placeholders (payment/shipping/warehouse)
+   - country mapping defaults
+   - credentials storage via env/secrets
+   - activation checklists
+   - basic logs/audit
+4) Content publishing:
+   - create/publish pages (basic CMS)
+   - create/publish blog posts/articles
+5) Support:
+   - view/respond/update support tickets
+
+========================================================
+DATA MODEL (MINIMUM TABLES / COLLECTIONS)
+========================================================
+Users: id, email/phone, role(USER|ADMIN), createdAt
+Stores:
+- ownerId?, sessionId?, slug, storeConfigJson,
+- status: DEMO | PENDING_ACTIVATION | LIVE | SUSPENDED
+- paymentsStatus/shippingStatus/warehousingStatus:
+  not_requested | pending | approved | live
+- commissionRatePercent
+Products:
+- storeId, name, description, price, images, createdAt (unlimited)
+Leads:
+- type: store_activation | ads_launch | account_mgmt
+- userId?, storeId?, contact fields, payloadJson, status pipeline
+Tickets:
+- type: payments_activation | shipping_activation | warehousing_activation | ads_launch_request | account_management_request
+- status workflow + notesJson
+SupportTickets:
+- subject, message, status, priority, assignedTo
+Content:
+- pages, blog posts, partners/team/work items
+Audit + Logs:
+- audit_logs, integration_events, webhook_events (MVP stubs ok)
+
+========================================================
+DELIVERABLE
+========================================================
+Ship a working MVP with:
+- Demo-first store creation
+- Separate customer portal and admin portal logins
+- Request submission that reaches admin pipeline
+- Activation workflows + gating
+- Ads launch and account management service requests
+- Support tickets
+- Clean code structure and a README for setup and env vars
