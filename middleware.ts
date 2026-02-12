@@ -2,17 +2,24 @@ import { NextResponse } from "next/server"
 import type { NextRequest } from "next/server"
 
 export function middleware(request: NextRequest) {
-  // Only check admin routes, not the login page
-  if (
-    request.nextUrl.pathname === "/admin" ||
-    (request.nextUrl.pathname.startsWith("/admin/") && !request.nextUrl.pathname.startsWith("/admin/login"))
-  ) {
-    // Check for admin session cookie
-    const adminSession = request.cookies.get("admin-session")
+  const { pathname } = request.nextUrl
 
-    if (!adminSession || adminSession.value !== "authenticated") {
-      // Redirect to login if not authenticated
+  // Protect admin routes (except login)
+  if (
+    pathname === "/admin" ||
+    (pathname.startsWith("/admin/") && !pathname.startsWith("/admin/login"))
+  ) {
+    const session = request.cookies.get("mt-session")
+    if (!session) {
       return NextResponse.redirect(new URL("/admin/login", request.url))
+    }
+  }
+
+  // Protect customer portal routes
+  if (pathname.startsWith("/portal")) {
+    const session = request.cookies.get("mt-session")
+    if (!session) {
+      return NextResponse.redirect(new URL("/login", request.url))
     }
   }
 
@@ -20,5 +27,5 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*"],
+  matcher: ["/admin/:path*", "/portal/:path*"],
 }
