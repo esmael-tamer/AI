@@ -2,8 +2,6 @@ import type React from "react"
 import "./globals.css"
 import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
-import Plasma from "@/components/plasma"
-import { Suspense } from "react"
 
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" })
 
@@ -38,20 +36,8 @@ export default function RootLayout({
       <head>
         <link rel="icon" href="/icons/favicon-dark.svg" type="image/svg+xml" />
       </head>
-      <body className="font-sans">
-        <Suspense fallback={null}>
-          <div className="fixed inset-0 z-0 bg-black">
-            <Plasma
-              color="#8b5cf6"
-              speed={0.8}
-              direction="forward"
-              scale={1.5}
-              opacity={0.4}
-              mouseInteractive={true}
-            />
-          </div>
-          <div className="relative z-10">{children}</div>
-        </Suspense>
+      <body className="font-sans bg-black text-white min-h-screen">
+        {children}
       </body>
     </html>
   )

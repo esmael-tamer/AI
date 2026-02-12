@@ -9,9 +9,9 @@ const navLinks = [
   {
     label: "Services",
     children: [
-      { href: "/services/store-builder", label: "AI Store Builder" },
-      { href: "/services/hosting", label: "Premium Hosting" },
-      { href: "/services/payments", label: "Payment Integration" },
+      { href: "/builder", label: "AI Store Builder" },
+      { href: "/services/ad-campaigns", label: "Ad Campaigns" },
+      { href: "/services/account-management", label: "Account Management" },
     ],
   },
   { href: "/work", label: "Our Work" },
@@ -27,18 +27,16 @@ export default function MTHeader() {
   return (
     <header className="fixed top-0 left-0 right-0 z-50">
       <div className="mx-auto max-w-7xl px-4 pt-4">
-        <nav className="liquid-glass-header rounded-2xl px-6 py-3 flex items-center justify-between">
-          {/* Logo */}
+        <nav className="rounded-2xl px-6 py-3 flex items-center justify-between bg-black/60 backdrop-blur-xl border border-white/10">
           <Link href="/" className="flex items-center gap-2 group">
             <div className="w-8 h-8 rounded-lg bg-[#a3e635] flex items-center justify-center">
               <span className="text-black font-bold text-sm">MT</span>
             </div>
-            <span className="text-foreground font-semibold text-lg tracking-tight">
+            <span className="text-white font-semibold text-lg tracking-tight">
               Media <span className="text-[#a3e635]">Trend</span>
             </span>
           </Link>
 
-          {/* Desktop Nav */}
           <div className="hidden lg:flex items-center gap-1">
             {navLinks.map((link) =>
               link.children ? (
@@ -48,17 +46,17 @@ export default function MTHeader() {
                   onMouseEnter={() => setOpenDropdown(link.label)}
                   onMouseLeave={() => setOpenDropdown(null)}
                 >
-                  <button className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors flex items-center gap-1 rounded-lg hover:bg-white/5">
+                  <button className="px-3 py-2 text-sm text-white/60 hover:text-white transition-colors flex items-center gap-1 rounded-lg hover:bg-white/5">
                     {link.label}
                     <ChevronDown className="w-3 h-3" />
                   </button>
                   {openDropdown === link.label && (
-                    <div className="absolute top-full left-0 mt-1 liquid-glass rounded-xl py-2 min-w-[200px]">
+                    <div className="absolute top-full left-0 mt-1 rounded-xl py-2 min-w-[200px] bg-black/80 backdrop-blur-xl border border-white/10">
                       {link.children.map((child) => (
                         <Link
                           key={child.href}
                           href={child.href}
-                          className="block px-4 py-2 text-sm text-muted-foreground hover:text-foreground hover:bg-white/5 transition-colors"
+                          className="block px-4 py-2 text-sm text-white/60 hover:text-white hover:bg-white/5 transition-colors"
                         >
                           {child.label}
                         </Link>
@@ -70,7 +68,7 @@ export default function MTHeader() {
                 <Link
                   key={link.href}
                   href={link.href!}
-                  className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors rounded-lg hover:bg-white/5"
+                  className="px-3 py-2 text-sm text-white/60 hover:text-white transition-colors rounded-lg hover:bg-white/5"
                 >
                   {link.label}
                 </Link>
@@ -78,11 +76,10 @@ export default function MTHeader() {
             )}
           </div>
 
-          {/* Desktop CTA */}
           <div className="hidden lg:flex items-center gap-3">
             <Link
               href="/login"
-              className="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+              className="px-4 py-2 text-sm text-white/60 hover:text-white transition-colors"
             >
               Login
             </Link>
@@ -94,19 +91,17 @@ export default function MTHeader() {
             </Link>
           </div>
 
-          {/* Mobile Toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="lg:hidden p-2 text-foreground"
+            className="lg:hidden p-2 text-white"
             aria-label="Toggle menu"
           >
             {mobileOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
           </button>
         </nav>
 
-        {/* Mobile Menu */}
         {mobileOpen && (
-          <div className="lg:hidden mt-2 liquid-glass rounded-2xl p-4">
+          <div className="lg:hidden mt-2 rounded-2xl p-4 bg-black/80 backdrop-blur-xl border border-white/10">
             <div className="flex flex-col gap-1">
               {navLinks.map((link) =>
                 link.children ? (
@@ -115,7 +110,7 @@ export default function MTHeader() {
                       onClick={() =>
                         setOpenDropdown(openDropdown === link.label ? null : link.label)
                       }
-                      className="w-full text-left px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground flex items-center justify-between rounded-lg hover:bg-white/5"
+                      className="w-full text-left px-3 py-2.5 text-sm text-white/60 hover:text-white flex items-center justify-between rounded-lg hover:bg-white/5"
                     >
                       {link.label}
                       <ChevronDown
@@ -129,7 +124,7 @@ export default function MTHeader() {
                             key={child.href}
                             href={child.href}
                             onClick={() => setMobileOpen(false)}
-                            className="block px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
+                            className="block px-3 py-2 text-sm text-white/60 hover:text-white"
                           >
                             {child.label}
                           </Link>
@@ -142,7 +137,7 @@ export default function MTHeader() {
                     key={link.href}
                     href={link.href!}
                     onClick={() => setMobileOpen(false)}
-                    className="px-3 py-2.5 text-sm text-muted-foreground hover:text-foreground rounded-lg hover:bg-white/5"
+                    className="px-3 py-2.5 text-sm text-white/60 hover:text-white rounded-lg hover:bg-white/5"
                   >
                     {link.label}
                   </Link>
@@ -153,7 +148,7 @@ export default function MTHeader() {
               <Link
                 href="/login"
                 onClick={() => setMobileOpen(false)}
-                className="px-4 py-2.5 text-sm text-center text-muted-foreground hover:text-foreground rounded-xl border border-white/10"
+                className="px-4 py-2.5 text-sm text-center text-white/60 hover:text-white rounded-xl border border-white/10"
               >
                 Login
               </Link>

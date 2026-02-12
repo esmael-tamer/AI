@@ -1,300 +1,124 @@
-"use client"
-
-import { useEffect, useState } from "react"
 import Link from "next/link"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card"
-import { CheckCircle2 } from "lucide-react"
-import { ExamplesDialog } from "./examples-dialog"
+import { Check } from "lucide-react"
 
-type Feature = { text: string; muted?: boolean }
-
-const ACCENT = "#C6FF3A"
-
-function FeatureItem({ text, muted = false }: Feature) {
-  return (
-    <li className="flex items-start gap-2">
-      <CheckCircle2 className="mt-0.5 h-4 w-4" style={{ color: ACCENT }} />
-      <span className={`text-sm ${muted ? "text-neutral-300" : "text-neutral-100"}`}>{text}</span>
-    </li>
-  )
-}
-
-type Currency = "INR" | "USD"
-
-const PRICES: Record<Currency, { startup: string; pro: string; premium: string; save: string }> = {
-  INR: {
-    startup: "₹25,000/-",
-    pro: "₹55,000/-",
-    premium: "₹1,70,500/-",
-    save: "Save Flat ₹1,500/-",
+const plans = [
+  {
+    name: "Starter",
+    price: "$0",
+    period: "/mo",
+    description: "Perfect for getting started with your first online store.",
+    features: [
+      "1 Store",
+      "Up to 50 Products",
+      "Basic Analytics",
+      "Standard Support",
+      "Free SSL Certificate",
+      "Mobile Responsive",
+    ],
+    cta: "Get Started Free",
+    highlight: false,
   },
-  USD: {
-    startup: "$299",
-    pro: "$699",
-    premium: "$2,049",
-    save: "Save $20",
+  {
+    name: "Professional",
+    price: "$49",
+    period: "/mo",
+    description: "For growing businesses that need more power and flexibility.",
+    features: [
+      "5 Stores",
+      "Unlimited Products",
+      "Advanced Analytics",
+      "Priority Support",
+      "Custom Domain",
+      "AI Recommendations",
+      "Multi-currency",
+      "Ad Campaign Tools",
+    ],
+    cta: "Start Free Trial",
+    highlight: true,
+    badge: "Most Popular",
   },
-}
-
-function guessLocalCurrency(): Currency {
-  const lang = typeof navigator !== "undefined" ? navigator.language : ""
-  const tz = typeof Intl !== "undefined" ? Intl.DateTimeFormat().resolvedOptions().timeZone : ""
-  if (/-(IN|PK|BD)\b/i.test(lang) || /(Kolkata|Karachi|Dhaka)/i.test(tz || "")) return "INR"
-  return "USD"
-}
-
-const startupVideos = [
-  "H1h5dHpp1Nw",
-  "HXARcSSdfMU",
-  "fd8zraQ1JdE",
-  "ARQyF2FA3Ec",
-  "dEZfHADlFtw",
-  "wuyfdfKO6Rc",
-  "VakkmhtrUA0",
-  "o8DoIg9yNGk",
-  "rtReBkFt-To",
-]
-const proVideos = [
-  "ASV2myPRfKA",
-  "eTfS2lqwf6A",
-  "KALbYHmGV4I",
-  "Go0AA9hZ4as",
-  "sB7RZ9QCOAg",
-  "TK2WboJOJaw",
-  "5Xq7UdXXOxI",
-  "kMjWCidQSK0",
-  "RKKdQvwKOhQ",
-]
-const premiumVideos = [
-  "v2AC41dglnM",
-  "pRpeEdMmmQ0",
-  "3AtDnEC4zak",
-  "JRfuAukYTKg",
-  "LsoLEjrDogU",
-  "RB-RcX5DS5A",
-  "hTWKbfoikeg",
-  "YQHsXMglC9A",
-  "09R8_2nJtjg",
+  {
+    name: "Enterprise",
+    price: "$199",
+    period: "/mo",
+    description: "Advanced features for large-scale e-commerce operations.",
+    features: [
+      "Unlimited Stores",
+      "Unlimited Products",
+      "Enterprise Analytics",
+      "24/7 Dedicated Support",
+      "Custom Integrations",
+      "AI Store Builder Pro",
+      "White Label Option",
+      "API Access",
+      "Account Manager",
+    ],
+    cta: "Contact Sales",
+    highlight: false,
+  },
 ]
 
 export function Pricing() {
-  const [openPlan, setOpenPlan] = useState<null | "Startup" | "Pro" | "Premium">(null)
-  const [currency, setCurrency] = useState<Currency>("USD")
-
-  useEffect(() => {
-    let cancelled = false
-    async function load() {
-      try {
-        const res = await fetch("/api/geo", { cache: "no-store" })
-        if (!res.ok) throw new Error("geo failed")
-        const data = await res.json()
-        if (!cancelled) setCurrency(data?.currency === "INR" ? "INR" : "USD")
-      } catch {
-        if (!cancelled) setCurrency(guessLocalCurrency())
-      }
-    }
-    load()
-    return () => {
-      cancelled = true
-    }
-  }, [])
-
   return (
-    <section id="pricing" className="text-white" itemScope itemType="https://schema.org/PriceSpecification">
-      <div className="container mx-auto px-4 py-16 sm:py-20">
-        <div className="mx-auto max-w-3xl text-center">
-          <div
-            className="mx-auto mb-4 inline-flex items-center rounded-full px-3 py-1 text-xs font-medium text-white"
-            style={{ backgroundColor: "rgba(0, 0, 0, 0.6)", border: `1px solid ${ACCENT}` }}
-          >
-            Our Pricing and Packages
-          </div>
-          <h2 className="text-4xl font-extrabold tracking-tight sm:text-5xl" itemProp="name">
-            Our Pricing.
+    <section className="py-24 px-4 bg-black">
+      <div className="max-w-6xl mx-auto">
+        <div className="text-center mb-16">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white uppercase tracking-tight">
+            Our Pricing
           </h2>
-          <p className="mx-auto mt-2 max-w-xl text-sm text-neutral-300" itemProp="description">
-            No hidden fees. Just world-class animation that fits your budget.
+          <p className="mt-4 text-lg text-white/40 max-w-xl mx-auto">
+            No hidden fees. Just world-class tools to build and grow your e-commerce business.
           </p>
-          <div className="mt-6">
-            <Button
-              asChild
-              className="rounded-full px-5 text-neutral-900 hover:brightness-95"
-              style={{ backgroundColor: "#f2f2f2" }}
-            >
-              <Link href="https://wa.link/rc25na" target="_blank">
-                Contact now
-              </Link>
-            </Button>
-          </div>
         </div>
 
-        <div className="mt-10 grid gap-6 lg:grid-cols-3">
-          {/* Startup */}
-          <Card
-            className="relative overflow-hidden rounded-2xl liquid-glass shadow-[0_12px_40px_rgba(0,0,0,0.3)] transition-all duration-300"
-            itemScope
-            itemType="https://schema.org/Offer"
-          >
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {plans.map((plan) => (
             <div
-              className="absolute right-4 top-11 rounded-full px-2 py-0.5 text-[10px]"
-              style={{ backgroundColor: "#1f1f1f", color: "#d4d4d4" }}
+              key={plan.name}
+              className={`relative rounded-2xl p-8 bg-[#0a0a0a] border ${
+                plan.highlight
+                  ? "border-[#a3e635]/30 shadow-[0_0_30px_rgba(163,230,53,0.1)]"
+                  : "border-white/10"
+              }`}
             >
-              {PRICES[currency].save}
-            </div>
-            <CardHeader className="space-y-3 pb-4">
-              <div className="text-sm font-semibold text-neutral-100" itemProp="name">
-                Startup
-              </div>
-              <div className="flex items-end gap-2 text-white">
-                <div className="text-xl font-bold tracking-tight" itemProp="price">
-                  {PRICES[currency].startup}
+              {plan.badge && (
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 px-4 py-1 bg-[#a3e635] text-black text-xs font-bold rounded-full uppercase tracking-wide">
+                  {plan.badge}
                 </div>
-                <span className="pb-0.5 text-[11px] text-neutral-300">per video</span>
-                <meta itemProp="priceCurrency" content={currency} />
-              </div>
-              <Button
-                type="button"
-                onClick={() => setOpenPlan("Startup")}
-                onTouchStart={() => setOpenPlan("Startup")}
-                className="w-full rounded-full px-4 py-2 text-sm font-medium transition-colors"
-                style={{ backgroundColor: "#0a0a0a", color: "#ffffff", border: "1px solid #333" }}
-              >
-                View Example
-              </Button>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <ul className="grid gap-2" itemProp="description">
-                {[
-                  "10–15s Reel/Teaser (1 SKU)",
-                  "Simple background + lighting",
-                  "1 revision",
-                  "Delivered in 10 days",
-                  "Social reel/ad-ready visuals",
-                  "3D Modelling - Included",
-                ].map((f, i) => (
-                  <FeatureItem key={i} text={f} />
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter />
-          </Card>
+              )}
 
-          {/* Pro */}
-          <Card
-            className="relative overflow-hidden rounded-2xl liquid-glass shadow-[0_12px_40px_rgba(0,0,0,0.3)] transition-all duration-300"
-            itemScope
-            itemType="https://schema.org/Offer"
-          >
-            <CardHeader className="space-y-3 pb-4">
-              <div className="text-sm font-semibold text-neutral-100" itemProp="name">
-                Pro
-              </div>
-              <div className="flex items-end gap-2 text-white">
-                <div className="text-xl font-bold tracking-tight" itemProp="price">
-                  {PRICES[currency].pro}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-white mb-2">{plan.name}</h3>
+                <div className="flex items-end gap-1">
+                  <span className="text-4xl font-bold text-white">{plan.price}</span>
+                  <span className="text-white/40 text-sm mb-1">{plan.period}</span>
                 </div>
-                <span className="pb-0.5 text-[11px] text-neutral-300">per video</span>
-                <meta itemProp="priceCurrency" content={currency} />
+                <p className="mt-3 text-sm text-white/40">{plan.description}</p>
               </div>
-              <Button
-                type="button"
-                onClick={() => setOpenPlan("Pro")}
-                onTouchStart={() => setOpenPlan("Pro")}
-                className="w-full rounded-full px-4 py-2 text-sm font-medium transition-colors"
-                style={{ backgroundColor: "#0a0a0a", color: "#ffffff", border: "1px solid #333" }}
-              >
-                View Example
-              </Button>
-            </CardHeader>
-            <CardContent className="pt-0">
-              <ul className="grid gap-2" itemProp="description">
-                {[
-                  "20–25s Animation (1 SKU)",
-                  "Fixed Shot-list (no surprises)",
-                  "Creative background + pro graphics",
-                  "2 structured revisions",
-                  "Delivered in 3 weeks",
-                  "3D Modelling - Included",
-                ].map((f, i) => (
-                  <FeatureItem key={i} text={f} />
-                ))}
-              </ul>
-            </CardContent>
-            <CardFooter />
-          </Card>
 
-          {/* Premium */}
-          <Card
-            className="relative overflow-hidden rounded-2xl liquid-glass-enhanced shadow-[0_16px_50px_rgba(0,0,0,0.4)] transition-all duration-300"
-            itemScope
-            itemType="https://schema.org/Offer"
-          >
-            <CardHeader className="relative space-y-3 pb-4">
-              <div className="text-sm font-semibold text-neutral-100" itemProp="name">
-                Premium
-              </div>
-              <div className="flex items-end gap-2 text-white">
-                <div className="text-xl font-bold tracking-tight" itemProp="price">
-                  {PRICES[currency].premium}
-                </div>
-                <span className="pb-0.5 text-[11px] text-neutral-300">per video</span>
-                <meta itemProp="priceCurrency" content={currency} />
-              </div>
-              <Button
-                type="button"
-                onClick={() => setOpenPlan("Premium")}
-                onTouchStart={() => setOpenPlan("Premium")}
-                className="w-full rounded-full px-4 py-2 text-sm font-medium transition-colors"
-                style={{ backgroundColor: "#0a0a0a", color: "#ffffff", border: "1px solid #333" }}
-              >
-                View Example
-              </Button>
-            </CardHeader>
-            <CardContent className="relative pt-0">
-              <ul className="grid gap-2" itemProp="description">
-                {[
-                  "30–40s Animation (up to 5 SKUs)",
-                  "Advanced storyboard + shot design",
-                  "Delivered in 4 week",
-                  "Lighting, Camera Animation, Depth effects",
-                  "Up to 3 structured revisions",
-                  "3D Modelling - Included",
-                ].map((f, i) => (
-                  <li key={i} className="flex items-start gap-2">
-                    <CheckCircle2 className="mt-0.5 h-4 w-4" style={{ color: ACCENT }} />
-                    <span className="text-sm text-neutral-100">{f}</span>
+              <ul className="space-y-3 mb-8">
+                {plan.features.map((feature) => (
+                  <li key={feature} className="flex items-center gap-3">
+                    <Check className="w-4 h-4 text-[#a3e635] shrink-0" />
+                    <span className="text-sm text-white/60">{feature}</span>
                   </li>
                 ))}
               </ul>
-            </CardContent>
-            <CardFooter />
-          </Card>
+
+              <Link
+                href={plan.name === "Enterprise" ? "/contact" : "/builder"}
+                className={`block text-center w-full py-3 rounded-full text-sm font-semibold transition-all ${
+                  plan.highlight
+                    ? "bg-[#a3e635] text-black hover:bg-[#bef264]"
+                    : "border border-white/20 text-white hover:bg-white/5"
+                }`}
+              >
+                {plan.cta}
+              </Link>
+            </div>
+          ))}
         </div>
       </div>
-
-      {/* Modals */}
-      <ExamplesDialog
-        open={openPlan === "Startup"}
-        onOpenChange={(v) => setOpenPlan(v ? "Startup" : null)}
-        planName="Startup Plan"
-        price={PRICES[currency].startup}
-        videoIds={startupVideos}
-      />
-      <ExamplesDialog
-        open={openPlan === "Pro"}
-        onOpenChange={(v) => setOpenPlan(v ? "Pro" : null)}
-        planName="Pro Plan"
-        price={PRICES[currency].pro}
-        videoIds={proVideos}
-      />
-      <ExamplesDialog
-        open={openPlan === "Premium"}
-        onOpenChange={(v) => setOpenPlan(v ? "Premium" : null)}
-        planName="Premium Plan"
-        price={PRICES[currency].premium}
-        videoIds={premiumVideos}
-      />
     </section>
   )
 }
