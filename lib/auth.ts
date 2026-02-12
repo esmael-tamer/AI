@@ -5,14 +5,12 @@ import type { User } from "./db"
 const SESSION_COOKIE = "mt-session"
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7 // 7 days
 
-// Simple session token generation
 function generateToken(): string {
   const array = new Uint8Array(32)
   crypto.getRandomValues(array)
   return Array.from(array, (b) => b.toString(16).padStart(2, "0")).join("")
 }
 
-// Simple password hashing using Web Crypto API (no bcrypt dependency needed)
 async function hashPassword(password: string): Promise<string> {
   const encoder = new TextEncoder()
   const data = encoder.encode(password + "mediatrend-salt-2024")
@@ -28,17 +26,17 @@ async function verifyPassword(password: string, hash: string): Promise<boolean> 
 }
 
 export async function createUser(
-  name: string,
   email: string,
   password: string,
   role: "admin" | "customer" = "customer",
+  nameAr?: string,
+  nameEn?: string,
   phone?: string,
-  companyName?: string
 ): Promise<User | null> {
   const passwordHash = await hashPassword(password)
   const result = await sql`
-    INSERT INTO users (name, email, password_hash, role, phone, company_name)
-    VALUES (${name}, ${email}, ${passwordHash}, ${role}, ${phone || null}, ${companyName || null})
+    INSERT INTO users (email, password_hash, role, name_ar, name_en, phone)
+    VALUES (${email}, ${passwordHash}, ${role}, ${nameAr || null}, ${nameEn || null}, ${phone || null})
     ON CONFLICT (email) DO NOTHING
     RETURNING *
   `
@@ -46,7 +44,7 @@ export async function createUser(
 }
 
 export async function login(email: string, password: string): Promise<{ user: User; token: string } | null> {
-  const result = await sql`SELECT * FROM users WHERE email = ${email} AND is_active = true`
+  const result = await sql`SELECT * FROM users WHERE email = ${email}`
   const user = result[0] as User | undefined
   if (!user) return null
 
@@ -55,7 +53,6 @@ export async function login(email: string, password: string): Promise<{ user: Us
 
   const token = generateToken()
 
-  // Store session in cookie
   const cookieStore = await cookies()
   cookieStore.set(SESSION_COOKIE, `${user.id}:${token}`, {
     httpOnly: true,
@@ -81,7 +78,7 @@ export async function getSession(): Promise<User | null> {
   const [userId] = session.value.split(":")
   if (!userId) return null
 
-  const result = await sql`SELECT * FROM users WHERE id = ${parseInt(userId)} AND is_active = true`
+  const result = await sql`SELECT * FROM users WHERE id = ${parseInt(userId)}`
   return (result[0] as User) || null
 }
 

@@ -4,7 +4,8 @@ export const sql = neon(process.env.DATABASE_URL!)
 
 export type User = {
   id: number
-  name: string
+  name_ar: string | null
+  name_en: string | null
   email: string
   password_hash: string
   phone: string | null
@@ -23,6 +24,7 @@ export type Store = {
   name_en: string | null
   store_config: Record<string, unknown>
   status: "draft" | "pending" | "live" | "suspended"
+  plan: string
   commission_rate_percent: number
   payments_status: "inactive" | "pending" | "active"
   shipping_status: "inactive" | "pending" | "active"
