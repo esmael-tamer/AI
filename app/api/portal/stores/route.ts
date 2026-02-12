@@ -12,7 +12,7 @@ export async function GET() {
     }
 
     const stores = await sql`
-      SELECT id, name_ar, name_en, slug, status, plan, created_at
+      SELECT id, name_ar, name_en, slug, status, plan, payments_status, shipping_status, warehousing_status, created_at
       FROM stores
       WHERE owner_id = ${userId}
       ORDER BY created_at DESC
