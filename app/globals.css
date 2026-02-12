@@ -225,32 +225,88 @@
     drop-shadow(-0.5px 0 1px rgba(0, 0, 255, 0.04));
 }
 
-/* Logo Marquee Animations - Seamless Infinite Loop */
-@keyframes scroll-right {
+/* Logo Marquee Animations - Seamless Infinite Loop (overzaki-style) */
+@keyframes marquee-scroll {
   0% {
-    transform: translateX(-33.333%);
+    transform: translateX(0);
   }
   100% {
-    transform: translateX(0%);
+    transform: translateX(-50%);
   }
 }
 
-@keyframes scroll-left {
+@keyframes marquee-scroll-reverse {
   0% {
-    transform: translateX(0%);
+    transform: translateX(-50%);
   }
   100% {
-    transform: translateX(-33.333%);
+    transform: translateX(0);
   }
 }
 
-.animate-scroll-right {
-  animation: scroll-right 45s linear infinite;
+.animate-marquee {
+  animation: marquee-scroll 25s linear infinite;
 }
 
-.animate-scroll-left {
-  animation: scroll-left 45s linear infinite;
+.animate-marquee-reverse {
+  animation: marquee-scroll-reverse 25s linear infinite;
 }
+
+.animate-marquee:hover,
+.animate-marquee-reverse:hover {
+  animation-play-state: paused;
+}
+
+/* Scroll Reveal Animations */
+.reveal {
+  opacity: 0;
+  transform: translateY(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-left {
+  opacity: 0;
+  transform: translateX(-40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-left.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-right {
+  opacity: 0;
+  transform: translateX(40px);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-right.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.reveal-scale {
+  opacity: 0;
+  transform: scale(0.92);
+  transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.reveal-scale.visible {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.reveal-delay-1 { transition-delay: 100ms; }
+.reveal-delay-2 { transition-delay: 200ms; }
+.reveal-delay-3 { transition-delay: 300ms; }
+.reveal-delay-4 { transition-delay: 400ms; }
+.reveal-delay-5 { transition-delay: 500ms; }
 
 /* Hide v0 preview badge (preview-only; not present in production) */
 a[aria-label="Built with v0"],

@@ -2,6 +2,7 @@
 
 import Link from "next/link"
 import { useLang } from "@/lib/i18n"
+import ScrollReveal from "@/components/scroll-reveal"
 
 export default function MTFooter() {
   const { t } = useLang()
@@ -35,48 +36,50 @@ export default function MTFooter() {
   return (
     <footer className="border-t border-white/[0.06] bg-[#0a0a0a]">
       <div className="max-w-6xl mx-auto px-4 py-20">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
-          <div className="col-span-2 md:col-span-1">
-            <Link href="/" className="flex items-center gap-2.5 mb-5">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-lime-400 to-emerald-500 flex items-center justify-center">
-                <span className="text-black font-black text-sm">MT</span>
-              </div>
-              <span className="text-white font-bold">Media Trend</span>
-            </Link>
-            <p className="text-sm text-white/25 leading-relaxed mb-4">
-              {t(
-                "Building the future of e-commerce, one store at a time.",
-                "نبني مستقبل التجارة الإلكترونية، متجر تلو الآخر."
-              )}
-            </p>
-            <a
-              href="https://wa.me/9656566179840"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 text-sm text-green-400/70 hover:text-green-400 transition-colors"
-            >
-              {t("WhatsApp: +9656566179840", "تواصل واتساب: +9656566179840")}
-            </a>
-          </div>
-
-          {Object.entries(footerLinks).map(([category, links]) => (
-            <div key={category}>
-              <h3 className="text-xs font-semibold text-white/50 mb-4 uppercase tracking-widest">{category}</h3>
-              <ul className="space-y-2.5">
-                {links.map((link) => (
-                  <li key={link.label}>
-                    <Link
-                      href={link.href}
-                      className="text-sm text-white/25 hover:text-lime-400/70 transition-colors duration-300"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
+        <ScrollReveal>
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
+            <div className="col-span-2 md:col-span-1">
+              <Link href="/" className="flex items-center gap-2.5 mb-5">
+                <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-lime-400 to-emerald-500 flex items-center justify-center">
+                  <span className="text-black font-black text-sm">MT</span>
+                </div>
+                <span className="text-white font-bold">Media Trend</span>
+              </Link>
+              <p className="text-sm text-white/25 leading-relaxed mb-4">
+                {t(
+                  "Building the future of e-commerce, one store at a time.",
+                  "نبني مستقبل التجارة الإلكترونية، متجر تلو الآخر."
+                )}
+              </p>
+              <a
+                href="https://wa.me/9656566179840"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 text-sm text-green-400/70 hover:text-green-400 transition-colors"
+              >
+                {t("WhatsApp: +9656566179840", "تواصل واتساب: +9656566179840")}
+              </a>
             </div>
-          ))}
-        </div>
+
+            {Object.entries(footerLinks).map(([category, links]) => (
+              <div key={category}>
+                <h3 className="text-xs font-semibold text-white/50 mb-4 uppercase tracking-widest">{category}</h3>
+                <ul className="space-y-2.5">
+                  {links.map((link) => (
+                    <li key={link.label}>
+                      <Link
+                        href={link.href}
+                        className="text-sm text-white/25 hover:text-lime-400/70 transition-colors duration-300"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </ScrollReveal>
 
         <div className="mt-16 pt-8 border-t border-white/[0.04] flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-white/20">

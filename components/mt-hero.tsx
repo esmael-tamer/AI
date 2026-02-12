@@ -3,13 +3,20 @@
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowRight, Sparkles, Mic, Send, MessageCircle } from "lucide-react"
-import { useState } from "react"
+import { useState, useEffect, useRef } from "react"
 import { useLang } from "@/lib/i18n"
 
 export default function MTHero() {
   const { t, isAr } = useLang()
   const router = useRouter()
   const [idea, setIdea] = useState("")
+  const sectionRef = useRef<HTMLDivElement>(null)
+  const [visible, setVisible] = useState(false)
+
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(true), 100)
+    return () => clearTimeout(timer)
+  }, [])
 
   function handleGenerate(e?: React.FormEvent) {
     e?.preventDefault()
@@ -17,7 +24,7 @@ export default function MTHero() {
   }
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center px-4 pt-28 pb-20 bg-[#0a0a0a] overflow-hidden">
+    <section ref={sectionRef} className="relative min-h-screen flex items-center justify-center px-4 pt-28 pb-20 bg-[#0a0a0a] overflow-hidden">
       <div className="absolute inset-0 pointer-events-none">
         <div className="absolute top-20 left-1/4 w-[600px] h-[600px] bg-lime-400/[0.07] rounded-full blur-[150px]" />
         <div className="absolute bottom-20 right-1/4 w-[400px] h-[400px] bg-emerald-400/[0.05] rounded-full blur-[120px]" />
@@ -30,14 +37,16 @@ export default function MTHero() {
       }} />
 
       <div className="max-w-5xl mx-auto text-center relative">
-        <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-lime-400/10 border border-lime-400/20 mb-8 backdrop-blur-sm">
-          <Sparkles className="w-4 h-4 text-lime-400" />
-          <span className="text-lime-400 text-sm font-medium">
-            {t("AI-Powered Platform", "منصة مدعومة بالذكاء الاصطناعي")}
-          </span>
+        <div className={`transition-all duration-700 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
+          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-lime-400/10 border border-lime-400/20 mb-8 backdrop-blur-sm">
+            <Sparkles className="w-4 h-4 text-lime-400" />
+            <span className="text-lime-400 text-sm font-medium">
+              {t("AI-Powered Platform", "منصة مدعومة بالذكاء الاصطناعي")}
+            </span>
+          </div>
         </div>
 
-        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight">
+        <h1 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight transition-all duration-700 delay-150 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           {isAr ? (
             <>
               <span className="block">ابنِ متجرك الإلكتروني</span>
@@ -53,14 +62,14 @@ export default function MTHero() {
           )}
         </h1>
 
-        <p className="mt-6 text-base sm:text-lg text-white/40 max-w-2xl mx-auto leading-relaxed">
+        <p className={`mt-6 text-base sm:text-lg text-white/40 max-w-2xl mx-auto leading-relaxed transition-all duration-700 delay-300 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           {t(
             "Type or speak your idea. Our AI generates an interactive demo store with no signup. If you like it, log in and submit your request so our team can activate payments, shipping, and fulfillment.",
             "اكتب أو تكلم بفكرتك، ومساعدنا الذكي يجهّز لك متجر تجريبي تفاعلي بدون تسجيل. لو عجبك، سجّل دخولك وكمّل الطلب عشان يوصلنا ونفعّل لك الدفع والشحن والتخزين."
           )}
         </p>
 
-        <div className="mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.06]">
+        <div className={`mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.06] transition-all duration-700 delay-[400ms] ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
           <span className="text-xs sm:text-sm text-lime-400/70 font-medium">
             {t(
               "No subscriptions — commission on sales only (after activation)",
@@ -69,7 +78,7 @@ export default function MTHero() {
           </span>
         </div>
 
-        <form onSubmit={handleGenerate} className="mt-10 max-w-2xl mx-auto">
+        <form onSubmit={handleGenerate} className={`mt-10 max-w-2xl mx-auto transition-all duration-700 delay-500 ease-out ${visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"}`}>
           <div className="flex items-center gap-2 bg-white/[0.06] border border-white/10 rounded-2xl px-4 py-3 backdrop-blur-xl hover:border-white/15 transition-all focus-within:border-lime-400/30">
             <input
               type="text"
@@ -105,7 +114,7 @@ export default function MTHero() {
           </p>
         </form>
 
-        <div className="mt-8 flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className={`mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 transition-all duration-700 delay-[600ms] ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
           <button
             onClick={() => router.push("/builder")}
             className="group flex items-center gap-2 px-8 py-3.5 bg-lime-400 text-black font-bold text-base rounded-full hover:bg-lime-300 transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(163,230,53,0.3)]"
