@@ -136,18 +136,6 @@ export default function LoginPage() {
           </div>
         </div>
 
-        {/* Demo credentials */}
-        <div className="mt-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4">
-          <p className="text-zinc-500 text-xs text-center mb-2">
-            {t("Demo credentials", "بيانات تجريبية")}
-          </p>
-          <div className="flex flex-col gap-1 text-center">
-            <p className="text-zinc-400 text-xs">
-              Admin: <span className="text-lime-400">admin@mediatrend.sa</span>{" "}
-              / <span className="text-lime-400">admin123</span>
-            </p>
-          </div>
-        </div>
       </div>
     </div>
   );

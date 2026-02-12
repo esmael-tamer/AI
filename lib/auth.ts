@@ -1,4 +1,5 @@
 import { cookies } from "next/headers"
+import { NextResponse } from "next/server"
 import { sql } from "./db"
 import type { User } from "./db"
 
@@ -11,18 +12,42 @@ function generateToken(): string {
   return Array.from(array, (b) => b.toString(16).padStart(2, "0")).join("")
 }
 
-async function hashPassword(password: string): Promise<string> {
+export async function hashPassword(password: string): Promise<string> {
+  const salt = generateToken().slice(0, 32)
   const encoder = new TextEncoder()
-  const data = encoder.encode(password + "mediatrend-salt-2024")
+  const data = encoder.encode(password + salt)
   const hash = await crypto.subtle.digest("SHA-256", data)
-  return Array.from(new Uint8Array(hash))
+  const hashHex = Array.from(new Uint8Array(hash))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("")
+  return `${salt}:${hashHex}`
 }
 
-async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  const inputHash = await hashPassword(password)
-  return inputHash === hash
+export async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
+  if (!storedHash) return false
+
+  if (!storedHash.includes(":")) {
+    // Legacy format (old SHA-256 with static salt)
+    const encoder = new TextEncoder()
+    const data = encoder.encode(password + "mediatrend-salt-2024")
+    const hash = await crypto.subtle.digest("SHA-256", data)
+    const hashHex = Array.from(new Uint8Array(hash))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
+    if (hashHex === storedHash) return true
+    // Also check if stored as plain text (from broken signup)
+    return password === storedHash
+  }
+
+  const [salt, hash] = storedHash.split(":")
+  if (!salt || !hash) return false
+  const encoder = new TextEncoder()
+  const data = encoder.encode(password + salt)
+  const computed = await crypto.subtle.digest("SHA-256", data)
+  const computedHex = Array.from(new Uint8Array(computed))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("")
+  return computedHex === hash
 }
 
 export async function createUser(
@@ -43,33 +68,6 @@ export async function createUser(
   return (result[0] as User) || null
 }
 
-export async function login(email: string, password: string): Promise<{ user: User; token: string } | null> {
-  const result = await sql`SELECT * FROM users WHERE email = ${email}`
-  const user = result[0] as User | undefined
-  if (!user) return null
-
-  const valid = await verifyPassword(password, user.password_hash)
-  if (!valid) return null
-
-  const token = generateToken()
-
-  const cookieStore = await cookies()
-  cookieStore.set(SESSION_COOKIE, `${user.id}:${token}`, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    maxAge: SESSION_MAX_AGE,
-    path: "/",
-  })
-
-  return { user, token }
-}
-
-export async function logout(): Promise<void> {
-  const cookieStore = await cookies()
-  cookieStore.delete(SESSION_COOKIE)
-}
-
 export async function getSession(): Promise<User | null> {
   const cookieStore = await cookies()
   const session = cookieStore.get(SESSION_COOKIE)
@@ -78,7 +76,13 @@ export async function getSession(): Promise<User | null> {
   const [userId] = session.value.split(":")
   if (!userId) return null
 
-  const result = await sql`SELECT * FROM users WHERE id = ${parseInt(userId)}`
+  const id = parseInt(userId)
+  if (isNaN(id)) return null
+
+  const result = await sql`
+    SELECT id, name_ar, name_en, email, phone, role, lang_pref, created_at, updated_at
+    FROM users WHERE id = ${id}
+  `
   return (result[0] as User) || null
 }
 
@@ -98,4 +102,41 @@ export async function requireAdmin(): Promise<User> {
   return user
 }
 
-export { hashPassword, verifyPassword }
+/**
+ * Helper for API routes: wraps handler with admin authentication check.
+ * Returns 401/403 JSON responses on failure.
+ */
+export async function withAdminAuth(
+  handler: (admin: User) => Promise<NextResponse>,
+): Promise<NextResponse> {
+  try {
+    const admin = await requireAdmin()
+    return handler(admin)
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unauthorized"
+    const status = message === "Forbidden" ? 403 : 401
+    return NextResponse.json({ error: message }, { status })
+  }
+}
+
+/**
+ * Helper for API routes: wraps handler with user authentication check.
+ * Returns 401 JSON response on failure.
+ */
+export async function withAuth(
+  handler: (user: User) => Promise<NextResponse>,
+): Promise<NextResponse> {
+  try {
+    const user = await requireAuth()
+    return handler(user)
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
+  }
+}
+
+export async function logout(): Promise<void> {
+  const cookieStore = await cookies()
+  cookieStore.delete(SESSION_COOKIE)
+  cookieStore.delete("user_id")
+  cookieStore.delete("user_role")
+}
