@@ -2,6 +2,8 @@ import { neon } from "@neondatabase/serverless"
 
 export const sql = neon(process.env.DATABASE_URL!)
 
+export type NeonQueryResult = Record<string, unknown>[]
+
 export type User = {
   id: number
   name_ar: string | null
@@ -23,7 +25,7 @@ export type Store = {
   name_ar: string | null
   name_en: string | null
   store_config: Record<string, unknown>
-  status: "draft" | "pending" | "live" | "suspended"
+  status: "demo" | "pending" | "live" | "suspended"
   plan: string
   commission_rate_percent: number
   payments_status: "inactive" | "pending" | "active"
@@ -57,7 +59,9 @@ export type Lead = {
   phone: string | null
   email: string | null
   country: string | null
+  type: "store_activation" | "ads_launch" | "account_mgmt"
   selected_activations: string[]
+  payload_json: Record<string, unknown>
   notes: string | null
   status: "new" | "contacted" | "qualified" | "closed"
   assigned_to: number | null
@@ -69,7 +73,7 @@ export type Ticket = {
   store_id: number | null
   user_id: number | null
   lead_id: number | null
-  type: "payments" | "shipping" | "warehousing"
+  type: "payments" | "shipping" | "warehousing" | "ads_launch_request" | "account_management_request"
   status: "pending" | "approved" | "in_setup" | "live" | "rejected"
   notes: string | null
   created_at: string
