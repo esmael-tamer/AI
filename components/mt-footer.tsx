@@ -43,12 +43,20 @@ export default function MTFooter() {
               </div>
               <span className="text-white font-bold">Media Trend</span>
             </Link>
-            <p className="text-sm text-white/25 leading-relaxed">
+            <p className="text-sm text-white/25 leading-relaxed mb-4">
               {t(
                 "Building the future of e-commerce, one store at a time.",
                 "نبني مستقبل التجارة الإلكترونية، متجر تلو الآخر."
               )}
             </p>
+            <a
+              href="https://wa.me/9656566179840"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 text-sm text-green-400/70 hover:text-green-400 transition-colors"
+            >
+              {t("WhatsApp: +9656566179840", "تواصل واتساب: +9656566179840")}
+            </a>
           </div>
 
           {Object.entries(footerLinks).map(([category, links]) => (

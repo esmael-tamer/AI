@@ -1,99 +1,69 @@
 "use client"
 
 import Link from "next/link"
-import { Sparkles, Server, CreditCard, BarChart3, HeadphonesIcon, Shield, ArrowRight } from "lucide-react"
+import { Sparkles, Megaphone, Users, ArrowRight } from "lucide-react"
 import { useLang } from "@/lib/i18n"
 
 export default function MTServices() {
-  const { t } = useLang()
+  const { t, isAr } = useLang()
 
   const services = [
     {
       icon: Sparkles,
       title: t("AI Store Builder", "بناء المتاجر بالذكاء الاصطناعي"),
       description: t(
-        "Create your complete store with our intelligent assistant. Answer a few questions and get a fully functional storefront.",
-        "أنشئ متجرك الكامل مع مساعدنا الذكي. أجب عن بعض الأسئلة واحصل على واجهة متجر فعالة."
+        "Instant interactive demo store — then activate payments, shipping, fulfillment",
+        "بناء متجر تجريبي تفاعلي فورًا — ثم تفعيل وربط الدفع والشحن والتخزين"
       ),
+      cta: t("Try now", "جرّب الآن"),
+      href: "/builder",
       highlight: true,
       gradient: "from-lime-400/20 to-emerald-400/5",
     },
     {
-      icon: Server,
-      title: t("Premium Hosting", "استضافة متميزة"),
+      icon: Megaphone,
+      title: t("Ad Campaigns", "إطلاق الحملات الإعلانية"),
       description: t(
-        "Lightning-fast servers with 99.9% uptime guarantee. Your store is always online and blazing fast.",
-        "خوادم فائقة السرعة مع ضمان تشغيل 99.9%. متجرك دائماً متاح وسريع."
+        "Launch ad campaigns on all platforms — AI planner then submit request",
+        "إطلاق حملات إعلانية على جميع المنصات — جرّب مخطط AI ثم أرسل الطلب"
       ),
-      highlight: false,
-      gradient: "from-blue-400/10 to-cyan-400/5",
-    },
-    {
-      icon: CreditCard,
-      title: t("Payment Integration", "تكامل الدفع"),
-      description: t(
-        "Accept payments globally with multi-currency support. Stripe, PayPal, Apple Pay, and local payment methods.",
-        "اقبل المدفوعات عالمياً مع دعم العملات المتعددة. Stripe، PayPal، Apple Pay، وطرق الدفع المحلية."
-      ),
+      cta: t("Create brief", "أنشئ ملخصاً"),
+      href: "/services/ad-campaigns",
       highlight: false,
       gradient: "from-purple-400/10 to-pink-400/5",
     },
     {
-      icon: BarChart3,
-      title: t("Smart Analytics", "تحليلات ذكية"),
+      icon: Users,
+      title: t("Account Management", "إدارة الحسابات"),
       description: t(
-        "Data-driven insights to grow your business. Track visitors, conversions, revenue, and customer behavior.",
-        "رؤى مبنية على البيانات لتنمية عملك. تتبع الزوار والتحويلات والإيرادات وسلوك العملاء."
+        "Account management & content — AI plan then team follow-up",
+        "إدارة الحسابات وصناعة المحتوى — خطة AI ثم متابعة من فريقنا"
       ),
+      cta: t("Create brief", "أنشئ ملخصاً"),
+      href: "/services/account-management",
       highlight: false,
-      gradient: "from-orange-400/10 to-amber-400/5",
-    },
-    {
-      icon: HeadphonesIcon,
-      title: t("24/7 Support", "دعم على مدار الساعة"),
-      description: t(
-        "Expert help whenever you need it. Our support team is available around the clock via chat, email, and phone.",
-        "مساعدة متخصصة في أي وقت. فريق الدعم متاح على مدار الساعة عبر المحادثة والبريد والهاتف."
-      ),
-      highlight: false,
-      gradient: "from-teal-400/10 to-green-400/5",
-    },
-    {
-      icon: Shield,
-      title: t("Enterprise Security", "أمان متقدم"),
-      description: t(
-        "Bank-grade security for your store and customers. SSL encryption, PCI compliance, and fraud protection.",
-        "أمان بمستوى البنوك لمتجرك وعملائك. تشفير SSL، توافق PCI، وحماية من الاحتيال."
-      ),
-      highlight: false,
-      gradient: "from-rose-400/10 to-red-400/5",
+      gradient: "from-blue-400/10 to-cyan-400/5",
     },
   ]
 
   return (
-    <section className="py-28 px-4 bg-[#0a0a0a] relative overflow-hidden">
+    <section id="services" className="py-28 px-4 bg-[#0a0a0a] relative overflow-hidden">
       <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-lime-400/[0.03] rounded-full blur-[150px] pointer-events-none" />
 
       <div className="max-w-6xl mx-auto relative">
         <div className="text-center mb-20">
           <span className="inline-block px-4 py-1.5 bg-white/5 border border-white/[0.06] rounded-full text-white/40 text-xs font-medium uppercase tracking-widest mb-6">
-            {t("Our Platform", "منصتنا")}
+            {t("Our Services", "خدماتنا")}
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white uppercase tracking-tight">
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight">
             {t("Everything You Need to ", "كل ما تحتاجه ")}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 to-emerald-400">
               {t("Succeed", "للنجاح")}
             </span>
           </h2>
-          <p className="mt-4 text-lg text-white/30 max-w-xl mx-auto">
-            {t(
-              "Comprehensive e-commerce solutions powered by cutting-edge technology",
-              "حلول تجارة إلكترونية شاملة مدعومة بأحدث التقنيات"
-            )}
-          </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {services.map((service) => (
             <div
               key={service.title}
@@ -117,20 +87,19 @@ export default function MTServices() {
                   />
                 </div>
                 <h3 className="text-lg font-bold text-white mb-3">{service.title}</h3>
-                <p className="text-sm text-white/35 leading-relaxed">{service.description}</p>
+                <p className="text-sm text-white/35 leading-relaxed mb-6">{service.description}</p>
+                <Link
+                  href={service.href}
+                  className={`inline-flex items-center gap-2 text-sm font-semibold transition-all ${
+                    service.highlight ? "text-lime-400 hover:text-lime-300" : "text-white/50 hover:text-white"
+                  }`}
+                >
+                  {service.cta}
+                  <ArrowRight className={`w-4 h-4 ${isAr ? "rotate-180" : ""}`} />
+                </Link>
               </div>
             </div>
           ))}
-        </div>
-
-        <div className="text-center mt-12">
-          <Link
-            href="/services"
-            className="inline-flex items-center gap-2 text-lime-400 text-sm font-medium hover:gap-3 transition-all"
-          >
-            {t("View all services", "عرض جميع الخدمات")}
-            <ArrowRight className="w-4 h-4" />
-          </Link>
         </div>
       </div>
     </section>

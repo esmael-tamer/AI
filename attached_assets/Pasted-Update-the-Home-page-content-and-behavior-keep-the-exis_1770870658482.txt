@@ -1,0 +1,225 @@
+Update the Home page content and behavior (keep the existing layout/components as much as possible, only change copy + add the missing Store Builder field). Do NOT change colors or visual style.
+
+GOAL:
+Make the homepage match the platform concept:
+“Demo store first → then login → submit activation request → Media Trend contacts the client”
+Target: Kuwait + Saudi (global-ready). Bilingual: Arabic + English.
+
+====================================================
+A) FIX HERO (Top Section) + ADD STORE BUILDER FIELD
+====================================================
+1) Replace the current hero headline/subheadline with these (AR/EN), and REMOVE any irrelevant text like “ابن قائمة مطعم في دقائق”.
+
+HERO TEXT (AR):
+- H1: "ابنِ متجرك الإلكتروني بالذكاء الاصطناعي… وشوفه قدامك خلال دقائق"
+- Sub: "اكتب أو تكلم بفكرتك، ومساعدنا الذكي يجهّز لك متجر تجريبي تفاعلي بدون تسجيل. لو عجبك، سجّل دخولك وكمّل الطلب عشان يوصلنا ونفعّل لك الدفع والشحن والتخزين."
+- Trust line: "بدون اشتراكات — عمولة على المبيعات فقط بعد التفعيل"
+- Primary CTA: "ابدأ البناء مجانًا"
+- Secondary CTA: "شاهد أعمالنا"
+- Optional CTA: "كلم مندوبنا الآلي (صوت/كتابة)"
+
+HERO TEXT (EN):
+- H1: "Build your ecommerce store with AI — see a live demo in minutes"
+- Sub: "Type or speak your idea. Our AI generates an interactive demo store with no signup. If you like it, log in and submit your request so our team can activate payments, shipping, and fulfillment."
+- Trust line: "No subscriptions — commission on sales only (after activation)"
+- Primary CTA: "Start building for free"
+- Secondary CTA: "View our work"
+- Optional CTA: "Talk to our AI agent (voice/text)"
+
+2) ADD a Store Builder input field inside the hero (this is mandatory):
+- A large text input + a microphone button (voice input) + a “Generate” button.
+- Placeholder (AR): "مثال: أبي متجر عطور في الكويت + توصيل سريع + دفع محلي"
+- Placeholder (EN): "Example: Perfume store for Kuwait, fast delivery, local payments"
+- Small note under the input:
+  AR: "حتى ٨ أسئلة قصيرة ثم نعرض المتجر التجريبي."
+  EN: "Up to 8 quick questions, then we generate your demo store."
+- On submit, start the demo-build flow (or navigate to the build flow) and then redirect to the demo store page.
+
+3) Ensure the hero CTAs work:
+- Primary CTA triggers the same action as “Generate” (start building).
+- Secondary CTA scrolls to the Work section.
+- WhatsApp button should use Media Trend official number: +9656566179840 (https://wa.me/9656566179840)
+
+====================================================
+B) UPDATE THE “HOW IT WORKS” SECTION (4 STEPS)
+====================================================
+Add/Update a simple 4-step section after the hero:
+
+AR steps:
+1) "اكتب/تكلم بفكرتك"
+2) "شوف المتجر التجريبي تفاعلي"
+3) "سجّل دخولك وكمّل بيانات الطلب"
+4) "يوصلنا الطلب ونكلمك لتفعيل الدفع والشحن والتخزين"
+
+EN steps:
+1) "Tell us your idea (text/voice)"
+2) "Preview a live demo store"
+3) "Log in and complete your request"
+4) "We contact you to activate payments, shipping, and fulfillment"
+
+====================================================
+C) REPLACE PRICING / PLANS WITH NEW COMMISSION PLANS
+====================================================
+Replace the current 3 pricing cards with these exact plans (AR/EN). Keep the same 3-card layout.
+
+Section title/subtitle:
+AR Title: "باقات العمولة — بدون اشتراكات"
+AR Sub: "المتجر التجريبي متاح للجميع. بعد ما يعجبك المتجر، اختر باقة التفعيل المناسبة ونبدأ الربط والتجهيز."
+EN Title: "Commission Plans — No Subscriptions"
+EN Sub: "Everyone can generate a free demo store. When you’re ready to go live, choose an activation plan and we’ll set up the integrations."
+
+PLAN 1 — 5% (Activation):
+AR Name: "إطلاق — عمولة ٥٪"
+AR Sub: "تفعيل شامل للمتجر + تجهيز الربط الأساسي"
+AR Features:
+- "المتجر + التفعيل"
+- "تكامل الشحن"
+- "خدمة التخزين"
+- "نطاق مخصص"
+- "دعم أولوية"
+AR CTA: "كمّل الطلب للتفعيل"
+
+EN Name: "Launch — 5% Commission"
+EN Sub: "Full store activation + core setup"
+EN Features:
+- "Store + activation"
+- "Shipping integration"
+- "Warehousing / fulfillment"
+- "Custom domain"
+- "Priority support"
+EN CTA: "Continue to activate"
+
+PLAN 2 — 10%:
+AR Name: "نمو — عمولة ١٠٪"
+AR Sub: "كل مزايا ٥٪ + أدوات متابعة أقوى"
+AR Features:
+- "كل ما في باقة ٥٪"
+- "تحليلات متقدمة"
+- "تكامل واتساب"
+AR CTA: "كمّل الطلب للتفعيل"
+
+EN Name: "Growth — 10% Commission"
+EN Sub: "Everything in 5% + deeper tracking"
+EN Features:
+- "Everything in the 5% plan"
+- "Advanced analytics"
+- "WhatsApp integration"
+EN CTA: "Continue to activate"
+
+PLAN 3 — 25% (Managed):
+AR Name: "إدارة شاملة — عمولة ٢٥٪"
+AR Sub: "نحن ندير التشغيل والنمو بالكامل"
+AR Features:
+- "كل مزايا الإطلاق"
+- "مدير حساب مخصص"
+- "إدارة الحملات الإعلانية"
+- "عمليات متجر كاملة"
+- "إدارة المخزون"
+- "فريق خدمة عملاء"
+- "استراتيجية نمو"
+AR CTA: "اطلب إدارة شاملة"
+
+EN Name: "Managed — 25% Commission"
+EN Sub: "We run operations & growth end-to-end"
+EN Features:
+- "All Launch benefits"
+- "Dedicated account manager"
+- "Ad campaign management"
+- "Full store operations"
+- "Inventory management"
+- "Customer support team"
+- "Growth strategy"
+EN CTA: "Request managed setup"
+
+Footnote under plans (small text):
+AR: "العمولة تُطبق بعد تفعيل المتجر وعلى المبيعات الفعلية. نراجع طلبك ونتواصل معك لإكمال الربط."
+EN: "Commission applies after activation and on real sales. We review your request and contact you to complete setup."
+
+IMPORTANT:
+- Demo store creation remains free for everyone (no signup), but activation uses one of these plans.
+
+====================================================
+D) SERVICES STRIP (3 PRIMARY SERVICES)
+====================================================
+Update services on Home (keep cards/sections but use this content):
+
+Service 1: Store Builder (the only auto-build feature)
+AR: "بناء متجر تجريبي تفاعلي فورًا — ثم تفعيل وربط الدفع والشحن والتخزين"
+EN: "Instant interactive demo store — then activate payments, shipping, fulfillment"
+CTA: “Try now” → triggers build flow
+
+Service 2: Ads Launch (separate service)
+AR: "إطلاق حملات إعلانية على جميع المنصات — جرّب مخطط AI ثم أرسل الطلب"
+EN: "Launch ad campaigns on all platforms — AI planner then submit request"
+CTA: “Create brief” → opens AI brief form
+
+Service 3: Account Management (separate service)
+AR: "إدارة الحسابات وصناعة المحتوى — خطة AI ثم متابعة من فريقنا"
+EN: "Account management & content — AI plan then team follow-up"
+CTA: “Create brief” → opens AI brief form
+
+====================================================
+E) HOME SECTIONS ORDER (STACKED + NAV ANCHORS)
+====================================================
+Ensure the Home page includes these sections in this order:
+1) How it works (4 steps)
+2) Services (3 cards)
+3) Work / Case Studies (slider)
+4) Partners (logos slider)
+5) Team / Departments (slider)
+6) FAQ
+7) Final CTA (Start building + WhatsApp)
+
+Add anchors so navbar links scroll to sections correctly.
+
+====================================================
+F) FAQ (HIGH-CONVERTING)
+====================================================
+Add/Update these FAQs (AR/EN):
+
+AR:
+- "هل لازم أسجل عشان أشوف المتجر؟" → "لا، المتجر التجريبي يظهر أولاً بدون تسجيل."
+- "هل فيه اشتراك شهري؟" → "لا، فقط عمولة على المبيعات بعد التفعيل."
+- "متى يصير المتجر Live؟" → "بعد تقديم الطلب وموافقة فريقنا على التفعيل وربط الدفع والشحن."
+- "هل يدعم الكويت والسعودية؟" → "نعم، مع قابلية التوسع لباقي الدول."
+- "هل المنتجات محدودة؟" → "لا، منتجات غير محدودة."
+
+EN:
+- "Do I need to sign up to see the demo?" → "No, the demo store is generated first without signup."
+- "Is there a monthly subscription?" → "No, only commission after activation."
+- "When does the store go live?" → "After you submit the request and our team approves and activates integrations."
+- "Do you support Kuwait & Saudi?" → "Yes, and we’re global-ready."
+- "Are products limited?" → "No, unlimited products."
+
+====================================================
+G) NAVBAR / PORTALS (CONTENT ONLY)
+====================================================
+Keep the current navbar but ensure these items exist:
+AR: الرئيسية / الخدمات / أعمالنا / الفريق / المدونة / تواصل معنا / دخول (بوابة العملاء)
+EN: Home / Services / Work / Team / Insights / Contact / Login (Customer Portal)
+
+Customer portal routes:
+- /portal (customer entry)
+Admin portal:
+- /admin/login (admin only)
+
+====================================================
+H) CONTACT / WHATSAPP
+====================================================
+Every “WhatsApp” button must point to:
+https://wa.me/9656566179840
+
+Add a small contact block on Home footer:
+AR: "تواصل واتساب: +9656566179840"
+EN: "WhatsApp: +9656566179840"
+
+====================================================
+I) IMPORTANT CONTENT CLEANUP
+====================================================
+- Remove any irrelevant text like “ابن قائمة مطعم…”
+- Ensure the whole Home message is ecommerce + marketing platform, focused on Kuwait/Saudi.
+- Keep copy concise, premium, and conversion-focused.
+- Ensure Arabic is correct RTL and English is clear.
+
+DELIVERABLE:
+Apply all changes on the homepage, verify mobile responsiveness, verify Arabic/English toggle works, and ensure the Store Builder input triggers the demo-build flow.

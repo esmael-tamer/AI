@@ -9,69 +9,64 @@ export function Pricing() {
 
   const plans = [
     {
-      name: t("Try Free", "جرّب مجاناً"),
-      price: t("Free", "مجاني"),
+      name: t("Launch — 5% Commission", "إطلاق — عمولة ٥٪"),
+      rate: "5%",
       description: t(
-        "Build your demo store with AI — no signup, no credit card. See what's possible.",
-        "ابنِ متجرك التجريبي بالذكاء الاصطناعي — بدون تسجيل أو بطاقة ائتمان."
+        "Full store activation + core setup",
+        "تفعيل شامل للمتجر + تجهيز الربط الأساسي"
       ),
       features: [
-        t("AI Store Builder", "بناء المتاجر بالذكاء الاصطناعي"),
-        t("Up to 50 Products", "حتى 50 منتج"),
-        t("Demo store preview", "معاينة المتجر التجريبي"),
-        t("Basic analytics", "تحليلات أساسية"),
-        t("Free SSL Certificate", "شهادة SSL مجانية"),
-        t("Mobile responsive", "متوافق مع الجوال"),
-      ],
-      cta: t("Start Building Free", "ابدأ البناء مجاناً"),
-      highlight: false,
-    },
-    {
-      name: t("Launch", "أطلق متجرك"),
-      price: t("0%", "0%"),
-      description: t(
-        "Go live with payments, shipping & warehousing. Pay only commission on actual sales.",
-        "فعّل متجرك مع الدفع والشحن والتخزين. ادفع عمولة فقط على المبيعات الفعلية."
-      ),
-      features: [
-        t("Everything in Free", "كل مزايا المجاني"),
-        t("Activate payments", "تفعيل المدفوعات"),
+        t("Store + activation", "المتجر + التفعيل"),
         t("Shipping integration", "تكامل الشحن"),
-        t("Warehousing service", "خدمة التخزين"),
+        t("Warehousing / fulfillment", "خدمة التخزين"),
         t("Custom domain", "نطاق مخصص"),
         t("Priority support", "دعم أولوية"),
+      ],
+      cta: t("Continue to activate", "كمّل الطلب للتفعيل"),
+      highlight: false,
+      href: "/portal",
+    },
+    {
+      name: t("Growth — 10% Commission", "نمو — عمولة ١٠٪"),
+      rate: "10%",
+      description: t(
+        "Everything in 5% + deeper tracking",
+        "كل مزايا ٥٪ + أدوات متابعة أقوى"
+      ),
+      features: [
+        t("Everything in the 5% plan", "كل ما في باقة ٥٪"),
         t("Advanced analytics", "تحليلات متقدمة"),
         t("WhatsApp integration", "تكامل واتساب"),
       ],
-      cta: t("Activate Your Store", "فعّل متجرك"),
+      cta: t("Continue to activate", "كمّل الطلب للتفعيل"),
       highlight: true,
-      badge: t("Commission Only", "عمولة فقط"),
+      badge: t("Popular", "الأكثر طلباً"),
+      href: "/portal",
     },
     {
-      name: t("Enterprise", "المؤسسات"),
-      price: t("Custom", "حسب الطلب"),
+      name: t("Managed — 25% Commission", "إدارة شاملة — عمولة ٢٥٪"),
+      rate: "25%",
       description: t(
-        "Full-service e-commerce management. We run your store, you grow your brand.",
-        "إدارة تجارة إلكترونية متكاملة. نحن ندير متجرك، وأنت تنمّي علامتك التجارية."
+        "We run operations & growth end-to-end",
+        "نحن ندير التشغيل والنمو بالكامل"
       ),
       features: [
-        t("Everything in Launch", "كل مزايا الإطلاق"),
+        t("All Launch benefits", "كل مزايا الإطلاق"),
         t("Dedicated account manager", "مدير حساب مخصص"),
         t("Ad campaign management", "إدارة الحملات الإعلانية"),
         t("Full store operations", "عمليات متجر كاملة"),
         t("Inventory management", "إدارة المخزون"),
-        t("Customer service team", "فريق خدمة عملاء"),
+        t("Customer support team", "فريق خدمة عملاء"),
         t("Growth strategy", "استراتيجية نمو"),
-        t("White label option", "خيار العلامة البيضاء"),
-        t("API access", "وصول API"),
       ],
-      cta: t("Contact Sales", "تواصل مع المبيعات"),
+      cta: t("Request managed setup", "اطلب إدارة شاملة"),
       highlight: false,
+      href: "/contact",
     },
   ]
 
   return (
-    <section className="py-28 px-4 bg-[#0a0a0a] relative overflow-hidden">
+    <section id="pricing" className="py-28 px-4 bg-[#0a0a0a] relative overflow-hidden">
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[400px] bg-lime-400/[0.04] rounded-full blur-[150px] pointer-events-none" />
 
       <div className="max-w-6xl mx-auto relative">
@@ -79,16 +74,16 @@ export function Pricing() {
           <span className="inline-block px-4 py-1.5 bg-white/5 border border-white/[0.06] rounded-full text-white/40 text-xs font-medium uppercase tracking-widest mb-6">
             {t("Pricing", "الأسعار")}
           </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white uppercase tracking-tight">
-            {t("No subscriptions, ", "بدون اشتراكات، ")}
+          <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight">
+            {t("Commission Plans — ", "باقات العمولة — ")}
             <span className="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 to-emerald-400">
-              {t("just growth", "فقط نمو")}
+              {t("No Subscriptions", "بدون اشتراكات")}
             </span>
           </h2>
-          <p className="mt-4 text-lg text-white/30 max-w-xl mx-auto">
+          <p className="mt-4 text-lg text-white/30 max-w-2xl mx-auto">
             {t(
-              "Build for free, launch with zero upfront costs. We earn when you earn — commission on sales only.",
-              "ابنِ مجاناً، أطلق بدون تكاليف مقدمة. نكسب عندما تكسب — عمولة على المبيعات فقط."
+              "Everyone can generate a free demo store. When you're ready to go live, choose an activation plan and we'll set up the integrations.",
+              "المتجر التجريبي متاح للجميع. بعد ما يعجبك المتجر، اختر باقة التفعيل المناسبة ونبدأ الربط والتجهيز."
             )}
           </p>
         </div>
@@ -113,10 +108,8 @@ export function Pricing() {
               <div className="mb-8">
                 <h3 className="text-lg font-bold text-white mb-3">{plan.name}</h3>
                 <div className="flex items-end gap-1">
-                  <span className="text-4xl font-black text-white">{plan.price}</span>
-                  {plan.price !== t("Custom", "حسب الطلب") && plan.price !== t("Free", "مجاني") && (
-                    <span className="text-white/30 text-sm mb-1">{t("upfront", "مقدم")}</span>
-                  )}
+                  <span className="text-5xl font-black text-white">{plan.rate}</span>
+                  <span className="text-white/30 text-sm mb-2">{t("commission", "عمولة")}</span>
                 </div>
                 <p className="mt-3 text-sm text-white/30 leading-relaxed">{plan.description}</p>
               </div>
@@ -133,7 +126,7 @@ export function Pricing() {
               </ul>
 
               <Link
-                href={plan.name === t("Enterprise", "المؤسسات") ? "/contact" : "/builder"}
+                href={plan.href}
                 className={`group flex items-center justify-center gap-2 w-full py-3.5 rounded-full text-sm font-semibold transition-all ${
                   plan.highlight
                     ? "bg-lime-400 text-black hover:bg-lime-300 hover:shadow-[0_0_20px_rgba(163,230,53,0.3)]"
@@ -146,6 +139,13 @@ export function Pricing() {
             </div>
           ))}
         </div>
+
+        <p className="mt-8 text-center text-xs text-white/20 max-w-2xl mx-auto">
+          {t(
+            "Commission applies after activation and on real sales. We review your request and contact you to complete setup.",
+            "العمولة تُطبق بعد تفعيل المتجر وعلى المبيعات الفعلية. نراجع طلبك ونتواصل معك لإكمال الربط."
+          )}
+        </p>
       </div>
     </section>
   )

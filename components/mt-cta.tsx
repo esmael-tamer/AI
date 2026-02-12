@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { ArrowRight, Sparkles } from "lucide-react"
+import { ArrowRight, Sparkles, MessageCircle } from "lucide-react"
 import { useLang } from "@/lib/i18n"
 
 export default function MTCTA() {
@@ -28,17 +28,17 @@ export default function MTCTA() {
               </span>
             </div>
 
-            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white uppercase tracking-tight leading-tight">
-              {t("Ready to Transform", "جاهز لتحويل")}
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white tracking-tight leading-tight">
+              {t("Ready to Launch", "جاهز لإطلاق")}
               <br />
               <span className="text-transparent bg-clip-text bg-gradient-to-r from-lime-400 to-emerald-400">
-                {t("Your Business?", "عملك؟")}
+                {t("Your Store?", "متجرك؟")}
               </span>
             </h2>
             <p className="mt-5 text-lg text-white/30 max-w-lg mx-auto leading-relaxed">
               {t(
-                "Join thousands of entrepreneurs who launched their stores with Media Trend. Start free, pay only when you sell.",
-                "انضم لآلاف رواد الأعمال الذين أطلقوا متاجرهم مع ميديا تريند. ابدأ مجاناً، وادفع فقط عندما تبيع."
+                "Start with a free demo store, then activate when you're ready. No subscriptions, commission only.",
+                "ابدأ بمتجر تجريبي مجاني، ثم فعّل عندما تكون جاهزاً. بدون اشتراكات، عمولة فقط."
               )}
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
@@ -46,15 +46,18 @@ export default function MTCTA() {
                 href="/builder"
                 className="group flex items-center gap-2 px-10 py-4 bg-lime-400 text-black font-bold text-lg rounded-full hover:bg-lime-300 transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(163,230,53,0.3)]"
               >
-                {t("Start Your Free Store", "ابدأ متجرك المجاني")}
+                {t("Start building for free", "ابدأ البناء مجانًا")}
                 <ArrowRight className={`w-5 h-5 group-hover:translate-x-1 transition-transform ${isAr ? "rotate-180 group-hover:-translate-x-1" : ""}`} />
               </Link>
-              <Link
-                href="/contact"
-                className="px-10 py-4 text-white font-medium text-lg rounded-full border border-white/15 hover:bg-white/5 hover:border-white/25 transition-all"
+              <a
+                href="https://wa.me/9656566179840"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-2 px-8 py-4 text-white font-medium text-lg rounded-full border border-white/15 hover:bg-white/5 hover:border-white/25 transition-all"
               >
-                {t("Talk to Sales", "تواصل مع المبيعات")}
-              </Link>
+                <MessageCircle className="w-5 h-5 text-green-400" />
+                {t("WhatsApp Us", "تواصل واتساب")}
+              </a>
             </div>
           </div>
         </div>

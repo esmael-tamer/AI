@@ -22,9 +22,9 @@ export default function MTHeader() {
         { href: "/services/account-management", label: t("Account Management", "إدارة الحسابات") },
       ],
     },
-    { href: "/work", label: t("Our Work", "أعمالنا") },
+    { href: "/work", label: t("Work", "أعمالنا") },
     { href: "/team", label: t("Team", "الفريق") },
-    { href: "/blog", label: t("Blog", "المدونة") },
+    { href: "/blog", label: t("Insights", "المدونة") },
     { href: "/contact", label: t("Contact", "تواصل معنا") },
   ]
 

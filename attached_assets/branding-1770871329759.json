@@ -1,0 +1,127 @@
+{
+  "colorScheme": "dark",
+  "fonts": [
+    {
+      "family": "Arial",
+      "role": "body"
+    }
+  ],
+  "colors": {
+    "primary": "#0A121D",
+    "accent": "#060311",
+    "background": "#161C24",
+    "textPrimary": "#161C24",
+    "link": "#252C34"
+  },
+  "typography": {
+    "fontFamilies": {
+      "primary": "Arial",
+      "heading": "Arial"
+    },
+    "fontStacks": {
+      "heading": [
+        "__primaryFont_d6de38",
+        "__primaryFont_Fallback_d6de38"
+      ],
+      "body": [
+        "__primaryFont_d6de38",
+        "__primaryFont_Fallback_d6de38"
+      ],
+      "paragraph": [
+        "__primaryFont_d6de38",
+        "__primaryFont_Fallback_d6de38"
+      ]
+    },
+    "fontSizes": {
+      "h1": "60px",
+      "h2": "60px",
+      "body": "16px"
+    }
+  },
+  "spacing": {
+    "baseUnit": 4,
+    "borderRadius": "4px"
+  },
+  "components": {
+    "buttonPrimary": {
+      "background": "#060311",
+      "textColor": "#0A121D",
+      "borderRadius": "25px",
+      "borderRadiusCorners": {
+        "topLeft": "25px",
+        "topRight": "25px",
+        "bottomRight": "25px",
+        "bottomLeft": "25px"
+      },
+      "shadow": "none"
+    },
+    "buttonSecondary": {
+      "background": "#252C34",
+      "textColor": "#919EAB",
+      "borderRadius": "10000px",
+      "borderRadiusCorners": {
+        "topLeft": "10000px",
+        "topRight": "10000px",
+        "bottomRight": "10000px",
+        "bottomLeft": "10000px"
+      },
+      "shadow": "none"
+    }
+  },
+  "images": {
+    "logo": "File saved at: attached_assets/logo.svg",
+    "favicon": "File saved at: attached_assets/favicon.ico",
+    "ogImage": "File saved at: attached_assets/ogImage.jpg",
+    "logoHref": "/ar"
+  },
+  "__framework_hints": [],
+  "__llm_logo_reasoning": {
+    "selectedIndex": 0,
+    "reasoning": "Selected #0 because it is located in the header, is visible, and matches the favicon, indicating it is the main brand logo for 'أوڤر زكي'.",
+    "confidence": 0.95,
+    "source": "llm"
+  },
+  "__llm_button_reasoning": {
+    "primary": {
+      "index": 0,
+      "text": "ابدأ الآن",
+      "reasoning": "Button #0 with text 'ابدأ الآن' is the primary CTA due to its action-oriented text ('Start Now') and dark background color, which stands out as a call-to-action."
+    },
+    "secondary": {
+      "index": 1,
+      "text": "العربية",
+      "reasoning": "Button #1 with text 'العربية' serves as a secondary option due to its neutral background color and less prominent role, likely for language selection."
+    },
+    "confidence": 0.9
+  },
+  "personality": {
+    "tone": "professional",
+    "energy": "medium",
+    "targetAudience": "Arabic-speaking professionals"
+  },
+  "designSystem": {
+    "framework": "material",
+    "componentLibrary": ""
+  },
+  "confidence": {
+    "buttons": 0.9,
+    "colors": 0.9,
+    "overall": 0.9
+  },
+  "__llm_metadata": {
+    "logoSelection": {
+      "llmCalled": true,
+      "llmSucceeded": true,
+      "finalSource": "llm",
+      "rawLogoSelection": {
+        "selectedLogoIndex": 0,
+        "selectedLogoReasoning": "Selected #0 because it is located in the header, is visible, and matches the favicon, indicating it is the main brand logo for 'أوڤر زكي'.",
+        "confidence": 0.95
+      }
+    },
+    "buttonClassification": {
+      "llmCalled": true,
+      "llmSucceeded": true
+    }
+  }
+}
