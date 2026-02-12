@@ -32,6 +32,7 @@ export type BuilderStep = {
   options?: { value: string; label: string; labelAr: string }[]
   field: keyof StoreConfig | "skip"
   placeholder?: string
+  placeholderAr?: string
   validation?: (value: string) => boolean
 }
 
@@ -86,6 +87,7 @@ export const builderSteps: BuilderStep[] = [
     type: "text",
     field: "storeName",
     placeholder: "e.g., Elegance Fashion",
+    placeholderAr: "مثال: أناقة للأزياء",
   },
   {
     id: "store-name-ar",
@@ -126,6 +128,7 @@ export const builderSteps: BuilderStep[] = [
     type: "text",
     field: "description",
     placeholder: "e.g., Premium women's fashion for the modern Arab woman",
+    placeholderAr: "مثال: أزياء نسائية فاخرة للمرأة العربية العصرية",
   },
   {
     id: "theme-color",
