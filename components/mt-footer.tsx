@@ -1,32 +1,37 @@
-import Link from "next/link"
+"use client"
 
-const footerLinks = {
-  Services: [
-    { label: "AI Store Builder", href: "/builder" },
-    { label: "Ad Campaigns", href: "/services/ad-campaigns" },
-    { label: "Account Management", href: "/services/account-management" },
-    { label: "All Services", href: "/services" },
-  ],
-  Company: [
-    { label: "About Us", href: "/about" },
-    { label: "Our Work", href: "/work" },
-    { label: "Team", href: "/team" },
-    { label: "Blog", href: "/blog" },
-  ],
-  Support: [
-    { label: "Contact Us", href: "/contact" },
-    { label: "Help Center", href: "/faq" },
-    { label: "FAQ", href: "/faq" },
-    { label: "Portal", href: "/portal" },
-  ],
-  Legal: [
-    { label: "Terms of Service", href: "/t&c" },
-    { label: "Privacy Policy", href: "/t&c" },
-    { label: "Cookie Policy", href: "/t&c" },
-  ],
-}
+import Link from "next/link"
+import { useLang } from "@/lib/i18n"
 
 export default function MTFooter() {
+  const { t } = useLang()
+
+  const footerLinks = {
+    [t("Services", "الخدمات")]: [
+      { label: t("AI Store Builder", "بناء المتاجر بالذكاء الاصطناعي"), href: "/builder" },
+      { label: t("Ad Campaigns", "الحملات الإعلانية"), href: "/services/ad-campaigns" },
+      { label: t("Account Management", "إدارة الحسابات"), href: "/services/account-management" },
+      { label: t("All Services", "جميع الخدمات"), href: "/services" },
+    ],
+    [t("Company", "الشركة")]: [
+      { label: t("About Us", "من نحن"), href: "/about" },
+      { label: t("Our Work", "أعمالنا"), href: "/work" },
+      { label: t("Team", "الفريق"), href: "/team" },
+      { label: t("Blog", "المدونة"), href: "/blog" },
+    ],
+    [t("Support", "الدعم")]: [
+      { label: t("Contact Us", "تواصل معنا"), href: "/contact" },
+      { label: t("Help Center", "مركز المساعدة"), href: "/faq" },
+      { label: t("FAQ", "الأسئلة الشائعة"), href: "/faq" },
+      { label: t("Portal", "البوابة"), href: "/portal" },
+    ],
+    [t("Legal", "قانوني")]: [
+      { label: t("Terms of Service", "شروط الخدمة"), href: "/t&c" },
+      { label: t("Privacy Policy", "سياسة الخصوصية"), href: "/t&c" },
+      { label: t("Cookie Policy", "سياسة ملفات الارتباط"), href: "/t&c" },
+    ],
+  }
+
   return (
     <footer className="border-t border-white/[0.06] bg-[#0a0a0a]">
       <div className="max-w-6xl mx-auto px-4 py-20">
@@ -38,11 +43,11 @@ export default function MTFooter() {
               </div>
               <span className="text-white font-bold">Media Trend</span>
             </Link>
-            <p className="text-sm text-white/25 leading-relaxed mb-2">
-              Building the future of e-commerce, one store at a time.
-            </p>
-            <p className="text-xs text-white/15" dir="rtl">
-              نبني مستقبل التجارة الإلكترونية، متجر تلو الآخر
+            <p className="text-sm text-white/25 leading-relaxed">
+              {t(
+                "Building the future of e-commerce, one store at a time.",
+                "نبني مستقبل التجارة الإلكترونية، متجر تلو الآخر."
+              )}
             </p>
           </div>
 
@@ -67,14 +72,14 @@ export default function MTFooter() {
 
         <div className="mt-16 pt-8 border-t border-white/[0.04] flex flex-col sm:flex-row items-center justify-between gap-4">
           <p className="text-xs text-white/20">
-            {new Date().getFullYear()} Media Trend. All rights reserved.
+            {new Date().getFullYear()} Media Trend. {t("All rights reserved.", "جميع الحقوق محفوظة.")}
           </p>
           <div className="flex items-center gap-6">
             <Link href="/t&c" className="text-xs text-white/20 hover:text-white/40 transition-colors">
-              Terms
+              {t("Terms", "الشروط")}
             </Link>
             <Link href="/t&c" className="text-xs text-white/20 hover:text-white/40 transition-colors">
-              Privacy
+              {t("Privacy", "الخصوصية")}
             </Link>
           </div>
         </div>

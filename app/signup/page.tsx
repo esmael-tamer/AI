@@ -8,9 +8,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useLang } from "@/lib/i18n";
 
 export default function SignupPage() {
   const router = useRouter();
+  const { t, isAr } = useLang();
   const [form, setForm] = useState({
     email: "",
     password: "",
@@ -36,13 +38,13 @@ export default function SignupPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Signup failed");
+        setError(data.error || t("Signup failed", "فشل إنشاء الحساب"));
         return;
       }
 
       router.push("/portal");
     } catch {
-      setError("Something went wrong");
+      setError(t("Something went wrong", "حدث خطأ ما"));
     } finally {
       setLoading(false);
     }
@@ -63,7 +65,7 @@ export default function SignupPage() {
               Media<span className="text-lime-400">Trend</span>
             </h1>
           </Link>
-          <p className="text-zinc-400 mt-2 text-sm">Create your account</p>
+          <p className="text-zinc-400 mt-2 text-sm">{t("Create your account", "أنشئ حسابك")}</p>
         </div>
 
         {/* Signup Card */}
@@ -78,7 +80,7 @@ export default function SignupPage() {
             <div className="grid grid-cols-2 gap-4">
               <div className="flex flex-col gap-2">
                 <Label htmlFor="name_ar" className="text-zinc-300 text-sm">
-                  Name (Arabic)
+                  {t("Name (Arabic)", "الاسم (عربي)")}
                 </Label>
                 <Input
                   id="name_ar"
@@ -93,7 +95,7 @@ export default function SignupPage() {
               </div>
               <div className="flex flex-col gap-2">
                 <Label htmlFor="name_en" className="text-zinc-300 text-sm">
-                  Name (English)
+                  {t("Name (English)", "الاسم (إنجليزي)")}
                 </Label>
                 <Input
                   id="name_en"
@@ -109,7 +111,7 @@ export default function SignupPage() {
 
             <div className="flex flex-col gap-2">
               <Label htmlFor="email" className="text-zinc-300 text-sm">
-                Email
+                {t("Email", "البريد الإلكتروني")}
               </Label>
               <Input
                 id="email"
@@ -124,7 +126,7 @@ export default function SignupPage() {
 
             <div className="flex flex-col gap-2">
               <Label htmlFor="phone" className="text-zinc-300 text-sm">
-                Phone
+                {t("Phone", "الهاتف")}
               </Label>
               <Input
                 id="phone"
@@ -138,14 +140,14 @@ export default function SignupPage() {
 
             <div className="flex flex-col gap-2">
               <Label htmlFor="password" className="text-zinc-300 text-sm">
-                Password
+                {t("Password", "كلمة المرور")}
               </Label>
               <Input
                 id="password"
                 type="password"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                placeholder="Min 6 characters"
+                placeholder={t("Min 6 characters", "6 أحرف على الأقل")}
                 required
                 minLength={6}
                 className="bg-white/5 border-white/10 text-white placeholder:text-zinc-500 focus:border-lime-400/50"
@@ -160,22 +162,22 @@ export default function SignupPage() {
               {loading ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                  Creating account...
+                  {t("Creating account...", "جاري الإنشاء...")}
                 </span>
               ) : (
-                "Create Account"
+                t("Create Account", "إنشاء الحساب")
               )}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-zinc-500 text-sm">
-              Already have an account?{" "}
+              {t("Already have an account? ", "لديك حساب بالفعل؟ ")}
               <Link
                 href="/login"
                 className="text-lime-400 hover:text-lime-300 transition-colors"
               >
-                Sign In
+                {t("Sign In", "تسجيل الدخول")}
               </Link>
             </p>
           </div>

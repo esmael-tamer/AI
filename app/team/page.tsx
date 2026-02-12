@@ -1,20 +1,33 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import MTHeader from "@/components/mt-header"
 import MTFooter from "@/components/mt-footer"
-import { sql } from "@/lib/db"
-import type { TeamMember } from "@/lib/db"
+import { useLang } from "@/lib/i18n"
 
-export const metadata = {
-  title: "Our Team | Media Trend",
-  description: "Meet the talented team behind Media Trend's AI-powered e-commerce platform.",
+interface TeamMember {
+  id: number
+  name_en: string | null
+  name_ar: string | null
+  role_en: string | null
+  role_ar: string | null
+  department: string | null
+  photo_url: string | null
+  sort_order: number
 }
 
-export default async function TeamPage() {
-  let team: TeamMember[] = []
-  try {
-    team = (await sql`SELECT * FROM team_members ORDER BY sort_order ASC`) as TeamMember[]
-  } catch {
-    team = []
-  }
+export default function TeamPage() {
+  const { t, isAr } = useLang()
+  const [team, setTeam] = useState<TeamMember[]>([])
+
+  useEffect(() => {
+    fetch("/api/admin/team")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setTeam(data)
+      })
+      .catch(() => {})
+  }, [])
 
   return (
     <main className="min-h-screen">
@@ -25,10 +38,14 @@ export default async function TeamPage() {
           {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground text-balance">
-              Our <span className="text-[#a3e635]">Team</span>
+              {isAr ? (
+                <span className="text-[#a3e635]">فريقنا</span>
+              ) : (
+                <>Our <span className="text-[#a3e635]">Team</span></>
+              )}
             </h1>
             <p className="mt-4 text-lg text-muted-foreground max-w-xl mx-auto text-pretty">
-              Meet the passionate people building the future of e-commerce in the MENA region.
+              {t("Meet the passionate people building the future of e-commerce in the MENA region.", "تعرّف على الأشخاص المتحمسين الذين يبنون مستقبل التجارة الإلكترونية.")}
             </p>
           </div>
 
@@ -38,15 +55,15 @@ export default async function TeamPage() {
               <div key={member.id} className="glass-border-subtle rounded-2xl p-6 text-center group hover:scale-[1.02] transition-all">
                 <div className="w-24 h-24 mx-auto rounded-full bg-white/10 mb-4 overflow-hidden">
                   {member.photo_url ? (
-                    <img src={member.photo_url || "/placeholder.svg"} alt={member.name_en || ""} className="w-full h-full object-cover" />
+                    <img src={member.photo_url || "/placeholder.svg"} alt={(isAr ? member.name_ar : member.name_en) || ""} className="w-full h-full object-cover" />
                   ) : (
                     <div className="w-full h-full flex items-center justify-center text-2xl font-bold text-[#a3e635]">
-                      {(member.name_en || "?")[0]}
+                      {((isAr ? member.name_ar : member.name_en) || "?")[0]}
                     </div>
                   )}
                 </div>
-                <h3 className="text-lg font-semibold text-foreground">{member.name_en}</h3>
-                <p className="text-sm text-[#a3e635] mt-1">{member.role_en}</p>
+                <h3 className="text-lg font-semibold text-foreground">{isAr ? member.name_ar : member.name_en}</h3>
+                <p className="text-sm text-[#a3e635] mt-1">{isAr ? member.role_ar : member.role_en}</p>
                 {member.department && (
                   <span className="inline-block mt-2 text-xs text-muted-foreground px-2 py-0.5 rounded-full bg-white/5">
                     {member.department}
@@ -58,7 +75,7 @@ export default async function TeamPage() {
 
           {team.length === 0 && (
             <div className="text-center glass-border-subtle rounded-2xl p-12">
-              <p className="text-muted-foreground">Team members coming soon.</p>
+              <p className="text-muted-foreground">{t("Team members coming soon.", "أعضاء الفريق قريباً.")}</p>
             </div>
           )}
         </div>

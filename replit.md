@@ -4,6 +4,16 @@
 A Next.js 14 application (App Router) for an AI-powered e-commerce platform with "Try First" model. Users build demo stores via AI chat without signup, then register and request activation (payments, shipping, warehousing). Revenue model: commission on sales only, no subscriptions.
 
 ## Recent Changes
+- **2026-02-12**: Full bilingual system (Arabic/English)
+  - Created `lib/i18n.tsx` with React Context-based language system (`LanguageProvider`, `useLang` hook)
+  - `useLang()` provides: `t(en, ar)` translation function, `isAr` boolean, `dir` (rtl/ltr), `lang`, `setLang`
+  - Language persisted in localStorage (`mt-lang`), default is Arabic
+  - `components/client-layout.tsx` wraps app with LanguageProvider + dynamically sets HTML dir/lang
+  - Updated all components: MTHeader (Globe language switcher), MTFooter, MTHero, MTServices, Pricing, MTPartners, MTCTA
+  - Updated all pages: Services, Contact, Login, Signup, Ad-Campaigns, Account-Management
+  - Converted Work, Team, Blog from server to client components (useEffect + fetch for data)
+  - RTL support: ArrowRight rotates 180° when `isAr`, text-start used, dir attribute on root
+
 - **2026-02-12**: Major development session
   - Migrated DB client from `@neondatabase/serverless` to `postgres` library (Replit PostgreSQL compatibility)
   - Built all 10 admin API routes with full CRUD (leads, tickets, stores, users, blog, pages, team, partners, cases, audit)
@@ -35,7 +45,7 @@ users, stores, products, leads, tickets, support_tickets, pages, blog_posts, par
 - `app/api/leads/` - Public lead capture API
 - `app/services/` - Service pages (ad-campaigns, account-management)
 - `components/` - React components (mt-header, mt-hero, mt-services, etc.)
-- `lib/` - Utilities (db.ts, auth.ts, builder-engine.tsx)
+- `lib/` - Utilities (db.ts, auth.ts, builder-engine.tsx, i18n.tsx)
 
 ### Environment Variables
 - `DATABASE_URL` - Replit PostgreSQL connection string (auto-provided)

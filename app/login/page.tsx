@@ -8,9 +8,11 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { useLang } from "@/lib/i18n";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { t, isAr } = useLang();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -31,7 +33,7 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || "Login failed");
+        setError(data.error || t("Login failed", "فشل تسجيل الدخول"));
         return;
       }
 
@@ -41,7 +43,7 @@ export default function LoginPage() {
         router.push("/portal");
       }
     } catch {
-      setError("Something went wrong");
+      setError(t("Something went wrong", "حدث خطأ ما"));
     } finally {
       setLoading(false);
     }
@@ -63,7 +65,7 @@ export default function LoginPage() {
               Media<span className="text-lime-400">Trend</span>
             </h1>
           </Link>
-          <p className="text-zinc-400 mt-2 text-sm">Sign in to your account</p>
+          <p className="text-zinc-400 mt-2 text-sm">{t("Sign in to your account", "سجّل دخولك")}</p>
         </div>
 
         {/* Login Card */}
@@ -77,7 +79,7 @@ export default function LoginPage() {
 
             <div className="flex flex-col gap-2">
               <Label htmlFor="email" className="text-zinc-300 text-sm">
-                Email
+                {t("Email", "البريد الإلكتروني")}
               </Label>
               <Input
                 id="email"
@@ -92,14 +94,14 @@ export default function LoginPage() {
 
             <div className="flex flex-col gap-2">
               <Label htmlFor="password" className="text-zinc-300 text-sm">
-                Password
+                {t("Password", "كلمة المرور")}
               </Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+                placeholder={t("Enter your password", "أدخل كلمة المرور")}
                 required
                 className="bg-white/5 border-white/10 text-white placeholder:text-zinc-500 focus:border-lime-400/50 focus:ring-lime-400/20"
               />
@@ -113,22 +115,22 @@ export default function LoginPage() {
               {loading ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                  Signing in...
+                  {t("Signing in...", "جاري الدخول...")}
                 </span>
               ) : (
-                "Sign In"
+                t("Sign In", "تسجيل الدخول")
               )}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-zinc-500 text-sm">
-              {"Don't have an account? "}
+              {t("Don't have an account? ", "ليس لديك حساب؟ ")}
               <Link
                 href="/signup"
                 className="text-lime-400 hover:text-lime-300 transition-colors"
               >
-                Sign Up
+                {t("Sign Up", "إنشاء حساب")}
               </Link>
             </p>
           </div>
@@ -137,7 +139,7 @@ export default function LoginPage() {
         {/* Demo credentials */}
         <div className="mt-4 bg-white/5 backdrop-blur-xl border border-white/10 rounded-xl p-4">
           <p className="text-zinc-500 text-xs text-center mb-2">
-            Demo credentials
+            {t("Demo credentials", "بيانات تجريبية")}
           </p>
           <div className="flex flex-col gap-1 text-center">
             <p className="text-zinc-400 text-xs">

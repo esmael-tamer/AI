@@ -1,22 +1,36 @@
+"use client"
+
+import { useState, useEffect } from "react"
 import MTHeader from "@/components/mt-header"
 import MTFooter from "@/components/mt-footer"
-import { sql } from "@/lib/db"
-import type { BlogPost } from "@/lib/db"
 import Link from "next/link"
 import { Calendar } from "lucide-react"
+import { useLang } from "@/lib/i18n"
 
-export const metadata = {
-  title: "Blog | Media Trend",
-  description: "Insights, guides, and news about e-commerce, AI, and digital business growth.",
+interface BlogPost {
+  id: number
+  title_en: string | null
+  title_ar: string | null
+  excerpt_en: string | null
+  excerpt_ar: string | null
+  slug: string
+  cover_image: string | null
+  published_at: string | null
+  status: string
 }
 
-export default async function BlogPage() {
-  let posts: BlogPost[] = []
-  try {
-    posts = (await sql`SELECT * FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC`) as BlogPost[]
-  } catch {
-    posts = []
-  }
+export default function BlogPage() {
+  const { t, isAr } = useLang()
+  const [posts, setPosts] = useState<BlogPost[]>([])
+
+  useEffect(() => {
+    fetch("/api/admin/blog?status=published")
+      .then((res) => res.json())
+      .then((data) => {
+        if (Array.isArray(data)) setPosts(data)
+      })
+      .catch(() => {})
+  }, [])
 
   return (
     <main className="min-h-screen">
@@ -27,10 +41,14 @@ export default async function BlogPage() {
           {/* Header */}
           <div className="text-center mb-16">
             <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-foreground text-balance">
-              Our <span className="text-[#a3e635]">Blog</span>
+              {isAr ? (
+                <span className="text-[#a3e635]">مدونتنا</span>
+              ) : (
+                <>Our <span className="text-[#a3e635]">Blog</span></>
+              )}
             </h1>
             <p className="mt-4 text-lg text-muted-foreground max-w-xl mx-auto text-pretty">
-              Insights, guides, and the latest news about e-commerce and digital growth.
+              {t("Insights, guides, and the latest news about e-commerce and digital growth.", "رؤى وأدلة وآخر الأخبار عن التجارة الإلكترونية.")}
             </p>
           </div>
 
@@ -45,7 +63,7 @@ export default async function BlogPage() {
                 >
                   <div className="aspect-video bg-white/5 relative">
                     {post.cover_image && (
-                      <img src={post.cover_image || "/placeholder.svg"} alt={post.title_en || ""} className="w-full h-full object-cover" />
+                      <img src={post.cover_image || "/placeholder.svg"} alt={(isAr ? post.title_ar : post.title_en) || ""} className="w-full h-full object-cover" />
                     )}
                   </div>
                   <div className="p-5">
@@ -54,16 +72,16 @@ export default async function BlogPage() {
                       <span>{post.published_at ? new Date(post.published_at).toLocaleDateString() : ""}</span>
                     </div>
                     <h3 className="text-lg font-semibold text-foreground group-hover:text-[#a3e635] transition-colors line-clamp-2">
-                      {post.title_en}
+                      {isAr ? post.title_ar : post.title_en}
                     </h3>
-                    <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{post.excerpt_en}</p>
+                    <p className="mt-2 text-sm text-muted-foreground line-clamp-2">{isAr ? post.excerpt_ar : post.excerpt_en}</p>
                   </div>
                 </Link>
               ))}
             </div>
           ) : (
             <div className="text-center glass-border-subtle rounded-2xl p-12">
-              <p className="text-muted-foreground">Blog posts coming soon.</p>
+              <p className="text-muted-foreground">{t("Blog posts coming soon.", "مقالات المدونة قريباً.")}</p>
             </div>
           )}
         </div>
