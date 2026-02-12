@@ -4,8 +4,6 @@ import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
 import Plasma from "@/components/plasma"
 import { Suspense } from "react"
-import { SpeedInsights } from "@vercel/speed-insights/next"
-import { Analytics } from "@vercel/analytics/react"
 
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" })
 
@@ -54,8 +52,6 @@ export default function RootLayout({
           </div>
           <div className="relative z-10">{children}</div>
         </Suspense>
-        <SpeedInsights />
-        <Analytics />
       </body>
     </html>
   )
