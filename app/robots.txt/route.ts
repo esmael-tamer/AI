@@ -1,60 +1,27 @@
 export async function GET(request: Request) {
-  const { origin } = new URL(request.url)
+  const { origin } = new URL(request.url);
 
   const lines = [
-    "# robots.txt for Skitbit — allow AI crawlers and search engines",
-    "User-agent: GPTBot",
-    "Allow: /",
-    "Disallow: /privacy",
-    "Disallow: /terms",
-    "Disallow: /t&c",
-    "",
-    "User-agent: ChatGPT-User",
-    "Allow: /",
-    "Disallow: /privacy",
-    "Disallow: /terms",
-    "Disallow: /t&c",
-    "",
-    "User-agent: ClaudeBot",
-    "Allow: /",
-    "Disallow: /privacy",
-    "Disallow: /terms",
-    "Disallow: /t&c",
-    "",
-    "User-agent: CCBot",
-    "Allow: /",
-    "Disallow: /privacy",
-    "Disallow: /terms",
-    "Disallow: /t&c",
-    "",
-    "User-agent: PerplexityBot",
-    "Allow: /",
-    "Disallow: /privacy",
-    "Disallow: /terms",
-    "Disallow: /t&c",
-    "",
-    "User-agent: Googlebot",
-    "Allow: /",
-    "Disallow: /privacy",
-    "Disallow: /terms",
-    "Disallow: /t&c",
-    "",
+    "# robots.txt for Media Trend",
     "User-agent: *",
     "Allow: /",
     "Disallow: /api/",
     "Disallow: /admin/",
-    "Disallow: /private/",
-    "Disallow: /privacy",
-    "Disallow: /terms",
-    "Disallow: /t&c",
+    "Disallow: /portal/",
+    "",
+    "User-agent: Googlebot",
+    "Allow: /",
+    "Disallow: /api/",
+    "Disallow: /admin/",
+    "Disallow: /portal/",
     "",
     `Sitemap: ${origin}/sitemap.xml`,
-  ].join("\n")
+  ].join("\n");
 
   return new Response(lines, {
     headers: {
       "Content-Type": "text/plain; charset=utf-8",
       "Cache-Control": "public, max-age=3600",
     },
-  })
+  });
 }
