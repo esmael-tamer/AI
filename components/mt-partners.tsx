@@ -8,11 +8,11 @@ function MarqueeRow({ items, direction }: { items: string[]; direction: "left" |
   return (
     <div className="overflow-hidden">
       <div className={direction === "left" ? "animate-scroll-left" : "animate-scroll-right"}>
-        <div className="flex gap-12 w-max">
+        <div className="flex gap-16 w-max">
           {tripled.map((name, i) => (
             <span
               key={`${name}-${i}`}
-              className="text-white/20 hover:text-white/60 transition-colors text-sm font-medium tracking-widest uppercase whitespace-nowrap py-4"
+              className="text-white/15 hover:text-lime-400/40 transition-colors duration-500 text-sm font-medium tracking-[0.2em] uppercase whitespace-nowrap py-5"
             >
               {name}
             </span>
@@ -25,9 +25,10 @@ function MarqueeRow({ items, direction }: { items: string[]; direction: "left" |
 
 export default function MTPartners() {
   return (
-    <section className="py-16 px-4 bg-black border-y border-white/5">
-      <div className="max-w-6xl mx-auto">
-        <p className="text-center text-sm text-white/40 mb-10 uppercase tracking-widest">
+    <section className="py-20 px-4 bg-[#0a0a0a] border-y border-white/[0.04] relative overflow-hidden">
+      <div className="absolute inset-0 bg-gradient-to-b from-transparent via-lime-400/[0.02] to-transparent pointer-events-none" />
+      <div className="max-w-6xl mx-auto relative">
+        <p className="text-center text-xs text-white/25 mb-12 uppercase tracking-[0.3em] font-medium">
           Trusted by Leading Companies
         </p>
         <div className="space-y-2">
