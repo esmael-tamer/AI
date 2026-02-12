@@ -39,14 +39,17 @@ export default function BuilderPage() {
     scrollToBottom()
   }, [messages])
 
+  const initialized = useRef(false)
   useEffect(() => {
+    if (initialized.current) return
+    initialized.current = true
+
     const greeting: Message = {
       id: "greeting",
       role: "ai",
-      content: t(
-        "Welcome! I'm your AI store builder. I'll help you create a professional online store in just a few steps. Let's get started!",
-        "مرحباً! أنا مساعدك الذكي لبناء المتاجر. سأساعدك في إنشاء متجر إلكتروني احترافي في خطوات بسيطة. هيا نبدأ!"
-      ),
+      content: isAr
+        ? "مرحباً! أنا مساعدك الذكي لبناء المتاجر. سأساعدك في إنشاء متجر إلكتروني احترافي في خطوات بسيطة. هيا نبدأ!"
+        : "Welcome! I'm your AI store builder. I'll help you create a professional online store in just a few steps. Let's get started!",
     }
     setMessages([greeting])
 
@@ -100,7 +103,7 @@ export default function BuilderPage() {
       const aiResponse: Message = {
         id: `r-${step.id}`,
         role: "ai",
-        content: getAIResponse(step.id, value),
+        content: getAIResponse(step.id, value, isAr),
       }
       setMessages((prev) => [...prev, aiResponse])
       setIsTyping(false)

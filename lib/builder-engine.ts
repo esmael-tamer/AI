@@ -140,41 +140,86 @@ export const builderSteps: BuilderStep[] = [
   },
 ]
 
-// Generate AI response messages based on user answers
-export function getAIResponse(stepId: string, answer: string): string {
-  const responses: Record<string, string[]> = {
-    "store-name": [
-      `"${answer}" - great name! It has a nice ring to it.`,
-      `Love it! "${answer}" sounds very professional.`,
-      `"${answer}" is memorable. Great choice!`,
-    ],
-    "store-name-ar": [
-      `Beautiful Arabic name! Bilingual stores perform 40% better in the region.`,
-      `Perfect! Having Arabic and English names helps reach more customers.`,
-    ],
-    category: [
-      `Excellent choice! That's one of the fastest-growing categories right now.`,
-      `Great market to be in! Let me customize your store for this category.`,
-    ],
-    country: [
-      `Perfect! I'll set up the right currency and shipping options for your region.`,
-      `Great! I'll optimize your store for that market.`,
-    ],
-    audience: [
-      `Got it! I'll tailor the store design and tone for your target audience.`,
-      `Understanding your audience helps me create a more effective store layout.`,
-    ],
-    description: [
-      `Wonderful description! I'll use this to create compelling copy for your store.`,
-      `That's a clear and engaging pitch. Your customers will love it.`,
-    ],
-    "theme-color": [
-      `Beautiful choice! I'll apply this color throughout your store for a cohesive brand look.`,
-      `Great eye for color! This will make your store stand out.`,
-    ],
+// Generate AI response messages based on user answers (bilingual)
+export function getAIResponse(stepId: string, answer: string, isAr: boolean = false): string {
+  const responses: Record<string, { en: string[]; ar: string[] }> = {
+    "store-name": {
+      en: [
+        `"${answer}" - great name! It has a nice ring to it.`,
+        `Love it! "${answer}" sounds very professional.`,
+        `"${answer}" is memorable. Great choice!`,
+      ],
+      ar: [
+        `"${answer}" - اسم رائع! له وقع جميل.`,
+        `أحببته! "${answer}" يبدو احترافياً جداً.`,
+        `"${answer}" اسم مميز. اختيار ممتاز!`,
+      ],
+    },
+    "store-name-ar": {
+      en: [
+        `Beautiful Arabic name! Bilingual stores perform 40% better in the region.`,
+        `Perfect! Having Arabic and English names helps reach more customers.`,
+      ],
+      ar: [
+        `اسم عربي جميل! المتاجر ثنائية اللغة تحقق أداءً أفضل بنسبة 40%.`,
+        `ممتاز! وجود اسم عربي وإنجليزي يساعد في الوصول لعملاء أكثر.`,
+      ],
+    },
+    category: {
+      en: [
+        `Excellent choice! That's one of the fastest-growing categories right now.`,
+        `Great market to be in! Let me customize your store for this category.`,
+      ],
+      ar: [
+        `اختيار ممتاز! هذا من أسرع القطاعات نمواً حالياً.`,
+        `سوق رائع! دعني أخصص متجرك لهذا القطاع.`,
+      ],
+    },
+    country: {
+      en: [
+        `Perfect! I'll set up the right currency and shipping options for your region.`,
+        `Great! I'll optimize your store for that market.`,
+      ],
+      ar: [
+        `ممتاز! سأضبط العملة وخيارات الشحن المناسبة لمنطقتك.`,
+        `رائع! سأحسّن متجرك لهذا السوق.`,
+      ],
+    },
+    audience: {
+      en: [
+        `Got it! I'll tailor the store design and tone for your target audience.`,
+        `Understanding your audience helps me create a more effective store layout.`,
+      ],
+      ar: [
+        `فهمت! سأصمم المتجر بما يناسب جمهورك المستهدف.`,
+        `معرفة جمهورك تساعدني في تصميم متجر أكثر فعالية.`,
+      ],
+    },
+    description: {
+      en: [
+        `Wonderful description! I'll use this to create compelling copy for your store.`,
+        `That's a clear and engaging pitch. Your customers will love it.`,
+      ],
+      ar: [
+        `وصف رائع! سأستخدمه لإنشاء محتوى جذاب لمتجرك.`,
+        `عرض واضح وجذاب. عملاؤك سيحبونه.`,
+      ],
+    },
+    "theme-color": {
+      en: [
+        `Beautiful choice! I'll apply this color throughout your store for a cohesive brand look.`,
+        `Great eye for color! This will make your store stand out.`,
+      ],
+      ar: [
+        `اختيار جميل! سأطبق هذا اللون في جميع أنحاء متجرك لمظهر متناسق.`,
+        `ذوق رفيع في اختيار الألوان! سيجعل متجرك مميزاً.`,
+      ],
+    },
   }
 
-  const options = responses[stepId] || ["Got it! Moving on..."]
+  const stepResponses = responses[stepId]
+  if (!stepResponses) return isAr ? "فهمت! لننتقل للخطوة التالية..." : "Got it! Moving on..."
+  const options = isAr ? stepResponses.ar : stepResponses.en
   return options[Math.floor(Math.random() * options.length)]
 }
 

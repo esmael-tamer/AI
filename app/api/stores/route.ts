@@ -40,7 +40,7 @@ export async function POST(request: Request) {
 
     const storeResult = await sql`
       INSERT INTO stores (session_id, slug, name_en, name_ar, store_config, status)
-      VALUES (${sessionId}, ${slug}, ${config.storeName}, ${config.storeNameAr || null}, ${JSON.stringify(storeConfig)}, 'draft')
+      VALUES (${sessionId}, ${slug}, ${config.storeName}, ${config.storeNameAr || null}, ${JSON.stringify(storeConfig)}, 'demo')
       RETURNING *
     `
     const store = storeResult[0]
