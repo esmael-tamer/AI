@@ -46,9 +46,9 @@ export async function POST(request: Request) {
       );
     }
 
-    // Re-hash with new salt format if stored in legacy format
+    // Re-hash with PBKDF2 if stored in legacy format
     const storedHash = user.password_hash as string;
-    if (storedHash && !storedHash.includes(":")) {
+    if (storedHash && !storedHash.startsWith("pbkdf2:")) {
       const newHash = await hashPassword(password);
       await sql`UPDATE users SET password_hash = ${newHash}, updated_at = NOW() WHERE id = ${user.id}`;
     }

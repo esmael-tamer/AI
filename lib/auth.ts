@@ -35,40 +35,72 @@ export async function createSession(userId: number): Promise<{ token: string; ex
   return { token, expiresAt }
 }
 
-export async function hashPassword(password: string): Promise<string> {
-  const salt = generateToken().slice(0, 32)
+const PBKDF2_ITERATIONS = 310000 // OWASP recommended minimum for SHA-256
+
+async function pbkdf2Hash(password: string, salt: Uint8Array): Promise<string> {
   const encoder = new TextEncoder()
-  const data = encoder.encode(password + salt)
-  const hash = await crypto.subtle.digest("SHA-256", data)
-  const hashHex = Array.from(new Uint8Array(hash))
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    encoder.encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"],
+  )
+  const derivedBits = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt, iterations: PBKDF2_ITERATIONS, hash: "SHA-256" },
+    keyMaterial,
+    256,
+  )
+  return Array.from(new Uint8Array(derivedBits))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("")
-  return `${salt}:${hashHex}`
+}
+
+export async function hashPassword(password: string): Promise<string> {
+  const salt = new Uint8Array(16)
+  crypto.getRandomValues(salt)
+  const saltHex = Array.from(salt, (b) => b.toString(16).padStart(2, "0")).join("")
+  const hash = await pbkdf2Hash(password, salt)
+  return `pbkdf2:${saltHex}:${hash}`
 }
 
 export async function verifyPassword(password: string, storedHash: string): Promise<boolean> {
   if (!storedHash) return false
 
-  if (!storedHash.includes(":")) {
-    // Legacy format (old SHA-256 with static salt)
-    const encoder = new TextEncoder()
-    const data = encoder.encode(password + "mediatrend-salt-2024")
-    const hash = await crypto.subtle.digest("SHA-256", data)
-    const hashHex = Array.from(new Uint8Array(hash))
-      .map((b) => b.toString(16).padStart(2, "0"))
-      .join("")
-    return hashHex === storedHash
+  // New PBKDF2 format: "pbkdf2:<saltHex>:<hashHex>"
+  if (storedHash.startsWith("pbkdf2:")) {
+    const parts = storedHash.split(":")
+    if (parts.length !== 3) return false
+    const saltHex = parts[1]
+    const expectedHash = parts[2]
+    const salt = new Uint8Array(
+      (saltHex.match(/.{2}/g) || []).map((byte) => parseInt(byte, 16)),
+    )
+    const computed = await pbkdf2Hash(password, salt)
+    return computed === expectedHash
   }
 
-  const [salt, hash] = storedHash.split(":")
-  if (!salt || !hash) return false
+  // Legacy format: "<randomSalt>:<sha256Hash>" (from previous fix)
+  if (storedHash.includes(":")) {
+    const [salt, hash] = storedHash.split(":")
+    if (!salt || !hash) return false
+    const encoder = new TextEncoder()
+    const data = encoder.encode(password + salt)
+    const computed = await crypto.subtle.digest("SHA-256", data)
+    const computedHex = Array.from(new Uint8Array(computed))
+      .map((b) => b.toString(16).padStart(2, "0"))
+      .join("")
+    return computedHex === hash
+  }
+
+  // Oldest legacy format: SHA-256 with static salt
   const encoder = new TextEncoder()
-  const data = encoder.encode(password + salt)
-  const computed = await crypto.subtle.digest("SHA-256", data)
-  const computedHex = Array.from(new Uint8Array(computed))
+  const data = encoder.encode(password + "mediatrend-salt-2024")
+  const hash = await crypto.subtle.digest("SHA-256", data)
+  const hashHex = Array.from(new Uint8Array(hash))
     .map((b) => b.toString(16).padStart(2, "0"))
     .join("")
-  return computedHex === hash
+  return hashHex === storedHash
 }
 
 export async function createUser(
