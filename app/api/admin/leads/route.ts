@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { withAdminAuth } from "@/lib/auth";
+import { createLeadSchema, updateLeadSchema, formatZodError } from "@/lib/validations/admin";
 
 export async function GET(request: NextRequest) {
   return withAdminAuth(async () => {
@@ -30,11 +31,11 @@ export async function POST(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { name, phone, email, country, type, selected_activations, payload_json, notes, status } = body;
-
-      if (!name) {
-        return NextResponse.json({ error: "Name is required" }, { status: 400 });
+      const parsed = createLeadSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { name, phone, email, country, type, selected_activations, payload_json, notes, status } = parsed.data;
 
       const result = await sql`
         INSERT INTO leads (name, phone, email, country, type, selected_activations, payload_json, notes, status)
@@ -43,11 +44,11 @@ export async function POST(request: NextRequest) {
           ${phone || null},
           ${email || null},
           ${country || null},
-          ${type || "store_activation"},
+          ${type},
           ${selected_activations ? JSON.stringify(selected_activations) : "[]"},
           ${payload_json ? JSON.stringify(payload_json) : "{}"},
           ${notes || null},
-          ${status || "new"}
+          ${status}
         )
         RETURNING *
       `;
@@ -68,11 +69,11 @@ export async function PATCH(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { id, status, assigned_to, notes } = body;
-
-      if (!id) {
-        return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      const parsed = updateLeadSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { id, status, assigned_to, notes } = parsed.data;
 
       const result = await sql`
         UPDATE leads SET

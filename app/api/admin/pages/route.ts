@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { withAdminAuth } from "@/lib/auth";
+import { createPageSchema, updatePageSchema, deletePageSchema, formatZodError } from "@/lib/validations/admin";
 
 export async function GET() {
   return withAdminAuth(async () => {
@@ -17,11 +18,11 @@ export async function POST(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { slug, title_ar, title_en, meta_title_ar, meta_title_en, meta_desc_ar, meta_desc_en, content_json, status } = body;
-
-      if (!slug) {
-        return NextResponse.json({ error: "Slug is required" }, { status: 400 });
+      const parsed = createPageSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { slug, title_ar, title_en, meta_title_ar, meta_title_en, meta_desc_ar, meta_desc_en, content_json, status } = parsed.data;
 
       const result = await sql`
         INSERT INTO pages (slug, title_ar, title_en, meta_title_ar, meta_title_en, meta_desc_ar, meta_desc_en, content_json, status)
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
           ${meta_desc_ar || null},
           ${meta_desc_en || null},
           ${content_json ? JSON.stringify(content_json) : "{}"},
-          ${status || "draft"}
+          ${status}
         )
         RETURNING *
       `;
@@ -55,11 +56,11 @@ export async function PATCH(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { id, slug, title_ar, title_en, meta_title_ar, meta_title_en, meta_desc_ar, meta_desc_en, content_json, status } = body;
-
-      if (!id) {
-        return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      const parsed = updatePageSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { id, slug, title_ar, title_en, meta_title_ar, meta_title_en, meta_desc_ar, meta_desc_en, content_json, status } = parsed.data;
 
       const result = await sql`
         UPDATE pages SET
@@ -97,11 +98,11 @@ export async function DELETE(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { id } = body;
-
-      if (!id) {
-        return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      const parsed = deletePageSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { id } = parsed.data;
 
       const result = await sql`DELETE FROM pages WHERE id = ${id} RETURNING id`;
 

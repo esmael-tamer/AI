@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { withAdminAuth } from "@/lib/auth";
+import { createTeamMemberSchema, updateTeamMemberSchema, deleteTeamMemberSchema, formatZodError } from "@/lib/validations/admin";
 
 export async function GET() {
   return withAdminAuth(async () => {
@@ -17,11 +18,11 @@ export async function POST(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { name_ar, name_en, role_ar, role_en, photo_url, department, sort_order } = body;
-
-      if (!name_en && !name_ar) {
-        return NextResponse.json({ error: "Name is required" }, { status: 400 });
+      const parsed = createTeamMemberSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { name_ar, name_en, role_ar, role_en, photo_url, department, sort_order } = parsed.data;
 
       const result = await sql`
         INSERT INTO team_members (name_ar, name_en, role_ar, role_en, photo_url, department, sort_order)
@@ -32,7 +33,7 @@ export async function POST(request: NextRequest) {
           ${role_en || null},
           ${photo_url || null},
           ${department || null},
-          ${sort_order ?? 0}
+          ${sort_order}
         )
         RETURNING *
       `;
@@ -53,11 +54,11 @@ export async function PATCH(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { id, name_ar, name_en, role_ar, role_en, photo_url, department, sort_order } = body;
-
-      if (!id) {
-        return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      const parsed = updateTeamMemberSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { id, name_ar, name_en, role_ar, role_en, photo_url, department, sort_order } = parsed.data;
 
       const result = await sql`
         UPDATE team_members SET
@@ -92,11 +93,11 @@ export async function DELETE(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { id } = body;
-
-      if (!id) {
-        return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      const parsed = deleteTeamMemberSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { id } = parsed.data;
 
       const result = await sql`DELETE FROM team_members WHERE id = ${id} RETURNING id`;
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { withAdminAuth } from "@/lib/auth";
+import { updateUserRoleSchema, formatZodError } from "@/lib/validations/admin";
 
 export async function GET(request: NextRequest) {
   return withAdminAuth(async () => {
@@ -34,11 +35,11 @@ export async function PATCH(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { id, role } = body;
-
-      if (!id || !role) {
-        return NextResponse.json({ error: "ID and role are required" }, { status: 400 });
+      const parsed = updateUserRoleSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { id, role } = parsed.data;
 
       const result = await sql`
         UPDATE users SET

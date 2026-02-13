@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { withAdminAuth } from "@/lib/auth";
+import { createBlogPostSchema, updateBlogPostSchema, deleteBlogPostSchema, formatZodError } from "@/lib/validations/admin";
 
 export async function GET() {
   return withAdminAuth(async () => {
@@ -17,11 +18,11 @@ export async function POST(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { slug, title_ar, title_en, excerpt_ar, excerpt_en, content_ar, content_en, cover_image, author_id, status } = body;
-
-      if (!slug) {
-        return NextResponse.json({ error: "Slug is required" }, { status: 400 });
+      const parsed = createBlogPostSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { slug, title_ar, title_en, excerpt_ar, excerpt_en, content_ar, content_en, cover_image, author_id, status } = parsed.data;
 
       const result = await sql`
         INSERT INTO blog_posts (slug, title_ar, title_en, excerpt_ar, excerpt_en, content_ar, content_en, cover_image, author_id, status, published_at)
@@ -35,7 +36,7 @@ export async function POST(request: NextRequest) {
           ${content_en || null},
           ${cover_image || null},
           ${author_id || null},
-          ${status || "draft"},
+          ${status},
           ${status === "published" ? new Date().toISOString() : null}
         )
         RETURNING *
@@ -57,11 +58,11 @@ export async function PATCH(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { id, slug, title_ar, title_en, excerpt_ar, excerpt_en, content_ar, content_en, cover_image, author_id, status } = body;
-
-      if (!id) {
-        return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      const parsed = updateBlogPostSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { id, slug, title_ar, title_en, excerpt_ar, excerpt_en, content_ar, content_en, cover_image, author_id, status } = parsed.data;
 
       const result = await sql`
         UPDATE blog_posts SET
@@ -100,11 +101,11 @@ export async function DELETE(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { id } = body;
-
-      if (!id) {
-        return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      const parsed = deleteBlogPostSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { id } = parsed.data;
 
       const result = await sql`DELETE FROM blog_posts WHERE id = ${id} RETURNING id`;
 

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { withAdminAuth } from "@/lib/auth";
+import { createPartnerSchema, updatePartnerSchema, deletePartnerSchema, formatZodError } from "@/lib/validations/admin";
 
 export async function GET() {
   return withAdminAuth(async () => {
@@ -17,11 +18,11 @@ export async function POST(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { name, logo_url, website, sort_order } = body;
-
-      if (!name) {
-        return NextResponse.json({ error: "Name is required" }, { status: 400 });
+      const parsed = createPartnerSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { name, logo_url, website, sort_order } = parsed.data;
 
       const result = await sql`
         INSERT INTO partners (name, logo_url, website, sort_order)
@@ -29,7 +30,7 @@ export async function POST(request: NextRequest) {
           ${name},
           ${logo_url || null},
           ${website || null},
-          ${sort_order ?? 0}
+          ${sort_order}
         )
         RETURNING *
       `;
@@ -50,11 +51,11 @@ export async function PATCH(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { id, name, logo_url, website, sort_order } = body;
-
-      if (!id) {
-        return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      const parsed = updatePartnerSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { id, name, logo_url, website, sort_order } = parsed.data;
 
       const result = await sql`
         UPDATE partners SET
@@ -86,11 +87,11 @@ export async function DELETE(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { id } = body;
-
-      if (!id) {
-        return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      const parsed = deletePartnerSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { id } = parsed.data;
 
       const result = await sql`DELETE FROM partners WHERE id = ${id} RETURNING id`;
 

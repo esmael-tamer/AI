@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { withAdminAuth } from "@/lib/auth";
+import { createCaseSchema, updateCaseSchema, deleteCaseSchema, formatZodError } from "@/lib/validations/admin";
 
 export async function GET() {
   return withAdminAuth(async () => {
@@ -17,11 +18,11 @@ export async function POST(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { title_ar, title_en, desc_ar, desc_en, cover_image, gallery, client_name, category, sort_order } = body;
-
-      if (!title_en && !title_ar) {
-        return NextResponse.json({ error: "Title is required" }, { status: 400 });
+      const parsed = createCaseSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { title_ar, title_en, desc_ar, desc_en, cover_image, gallery, client_name, category, sort_order } = parsed.data;
 
       const result = await sql`
         INSERT INTO case_studies (title_ar, title_en, desc_ar, desc_en, cover_image, gallery, client_name, category, sort_order)
@@ -34,7 +35,7 @@ export async function POST(request: NextRequest) {
           ${gallery ? JSON.stringify(gallery) : "[]"},
           ${client_name || null},
           ${category || null},
-          ${sort_order ?? 0}
+          ${sort_order}
         )
         RETURNING *
       `;
@@ -55,11 +56,11 @@ export async function PATCH(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { id, title_ar, title_en, desc_ar, desc_en, cover_image, gallery, client_name, category, sort_order } = body;
-
-      if (!id) {
-        return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      const parsed = updateCaseSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { id, title_ar, title_en, desc_ar, desc_en, cover_image, gallery, client_name, category, sort_order } = parsed.data;
 
       const result = await sql`
         UPDATE case_studies SET
@@ -96,11 +97,11 @@ export async function DELETE(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { id } = body;
-
-      if (!id) {
-        return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      const parsed = deleteCaseSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { id } = parsed.data;
 
       const result = await sql`DELETE FROM case_studies WHERE id = ${id} RETURNING id`;
 

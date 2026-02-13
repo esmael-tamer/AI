@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { withAdminAuth } from "@/lib/auth";
+import { createTicketSchema, updateTicketSchema, formatZodError } from "@/lib/validations/admin";
 
 export async function GET(request: NextRequest) {
   return withAdminAuth(async () => {
@@ -36,11 +37,11 @@ export async function POST(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { store_id, user_id, lead_id, type, notes } = body;
-
-      if (!type) {
-        return NextResponse.json({ error: "Type is required" }, { status: 400 });
+      const parsed = createTicketSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { store_id, user_id, lead_id, type, notes } = parsed.data;
 
       const result = await sql`
         INSERT INTO tickets (store_id, user_id, lead_id, type, notes)
@@ -70,11 +71,11 @@ export async function PATCH(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { id, status, notes } = body;
-
-      if (!id) {
-        return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      const parsed = updateTicketSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { id, status, notes } = parsed.data;
 
       const result = await sql`
         UPDATE tickets SET

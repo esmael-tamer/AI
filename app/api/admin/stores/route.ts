@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { withAdminAuth } from "@/lib/auth";
+import { updateStoreSchema, formatZodError } from "@/lib/validations/admin";
 
 export async function GET(request: NextRequest) {
   return withAdminAuth(async () => {
@@ -36,11 +37,11 @@ export async function PATCH(request: NextRequest) {
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
-      const { id, status, plan, commission_rate_percent, payments_status, shipping_status, warehousing_status } = body;
-
-      if (!id) {
-        return NextResponse.json({ error: "ID is required" }, { status: 400 });
+      const parsed = updateStoreSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
       }
+      const { id, status, plan, commission_rate_percent, payments_status, shipping_status, warehousing_status } = parsed.data;
 
       const result = await sql`
         UPDATE stores SET
