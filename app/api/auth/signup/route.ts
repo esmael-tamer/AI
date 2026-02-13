@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
-import { hashPassword } from "@/lib/auth";
+import { hashPassword, createSession } from "@/lib/auth";
 import { rateLimit } from "@/lib/rate-limit";
 import { z } from "zod";
 
@@ -55,11 +55,8 @@ export async function POST(request: Request) {
 
     const user = newUser[0];
 
-    // Create session
-    const tokenBytes = new Uint8Array(32);
-    crypto.getRandomValues(tokenBytes);
-    const token = Array.from(tokenBytes, (b) => b.toString(16).padStart(2, "0")).join("");
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    // Create session (stored in DB for validation)
+    const { token, expiresAt } = await createSession(user.id as number);
 
     const response = NextResponse.json({ user }, { status: 201 });
 

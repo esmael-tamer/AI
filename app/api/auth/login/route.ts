@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
-import { verifyPassword, hashPassword } from "@/lib/auth";
+import { verifyPassword, hashPassword, createSession } from "@/lib/auth";
 import { rateLimit } from "@/lib/rate-limit";
 
 const loginLimiter = rateLimit({ interval: 15 * 60 * 1000, maxRequests: 10 });
@@ -53,11 +53,8 @@ export async function POST(request: Request) {
       await sql`UPDATE users SET password_hash = ${newHash}, updated_at = NOW() WHERE id = ${user.id}`;
     }
 
-    // Create session token
-    const tokenBytes = new Uint8Array(32);
-    crypto.getRandomValues(tokenBytes);
-    const token = Array.from(tokenBytes, (b) => b.toString(16).padStart(2, "0")).join("");
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    // Create session token (stored in DB for validation)
+    const { token, expiresAt } = await createSession(user.id as number);
 
     await sql`UPDATE users SET updated_at = NOW() WHERE id = ${user.id}`;
 
