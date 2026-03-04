@@ -11,7 +11,7 @@ export async function GET(request: NextRequest) {
   }
   return withAdminAuth(async () => {
     try {
-      const posts = await sql`SELECT * FROM blog_posts ORDER BY created_at DESC`;
+      const posts = await sql`SELECT * FROM blog_posts WHERE deleted_at IS NULL ORDER BY created_at DESC`;
       return NextResponse.json(posts);
     } catch {
       return NextResponse.json({ error: "Failed to fetch blog posts" }, { status: 500 });
@@ -124,7 +124,11 @@ export async function DELETE(request: NextRequest) {
       }
       const { id } = parsed.data;
 
-      const result = await sql`DELETE FROM blog_posts WHERE id = ${id} RETURNING id`;
+      const result = await sql`
+        UPDATE blog_posts SET deleted_at = NOW()
+        WHERE id = ${id} AND deleted_at IS NULL
+        RETURNING id
+      `;
 
       if (result.length === 0) {
         return NextResponse.json({ error: "Blog post not found" }, { status: 400 });
@@ -132,7 +136,7 @@ export async function DELETE(request: NextRequest) {
 
       await sql`
         INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
-        VALUES (${admin.id}, 'delete', 'blog_post', ${id}, '{}')
+        VALUES (${admin.id}, 'soft_delete', 'blog_post', ${id}, '{}')
       `;
 
       return NextResponse.json({ success: true, id });
