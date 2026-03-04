@@ -2,8 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { withAdminAuth } from "@/lib/auth";
 import { createBlogPostSchema, updateBlogPostSchema, deleteBlogPostSchema, formatZodError } from "@/lib/validations/admin";
+import { adminLimiter } from "@/lib/rate-limit";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!adminLimiter.check(ip)) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
   return withAdminAuth(async () => {
     try {
       const posts = await sql`SELECT * FROM blog_posts ORDER BY created_at DESC`;
@@ -15,6 +20,10 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!adminLimiter.check(ip)) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
@@ -55,6 +64,10 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!adminLimiter.check(ip)) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
@@ -98,6 +111,10 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!adminLimiter.check(ip)) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();

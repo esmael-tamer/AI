@@ -40,3 +40,5 @@ export function rateLimit({ interval, maxRequests }: RateLimitOptions) {
     },
   }
 }
+
+export const adminLimiter = rateLimit({ interval: 15 * 60 * 1000, maxRequests: 200 })

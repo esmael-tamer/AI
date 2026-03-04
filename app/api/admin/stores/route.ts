@@ -2,8 +2,13 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { withAdminAuth } from "@/lib/auth";
 import { updateStoreSchema, formatZodError } from "@/lib/validations/admin";
+import { adminLimiter } from "@/lib/rate-limit";
 
 export async function GET(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!adminLimiter.check(ip)) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
   return withAdminAuth(async () => {
     try {
       const { searchParams } = new URL(request.url);
@@ -34,6 +39,10 @@ export async function GET(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!adminLimiter.check(ip)) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
   return withAdminAuth(async (admin) => {
     try {
       const body = await request.json();
@@ -62,7 +71,7 @@ export async function PATCH(request: NextRequest) {
 
       await sql`
         INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
-        VALUES (${admin.id}, 'update', 'store', ${id}, ${JSON.stringify({ status, plan, payments_status, shipping_status, warehousing_status })})
+        VALUES (${admin.id}, 'update', 'store', ${id}, ${JSON.stringify({ status, plan, commission_rate_percent, payments_status, shipping_status, warehousing_status })})
       `;
 
       return NextResponse.json(result[0]);

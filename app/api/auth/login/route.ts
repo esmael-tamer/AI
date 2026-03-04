@@ -86,7 +86,7 @@ export async function POST(request: Request) {
     });
 
     response.cookies.set("user_role", user.role as string, {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",

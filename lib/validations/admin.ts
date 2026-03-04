@@ -15,7 +15,7 @@ export const createPageSchema = z.object({
   meta_title_en: optionalString,
   meta_desc_ar: optionalString,
   meta_desc_en: optionalString,
-  content_json: z.any().optional(),
+  content_json: z.record(z.unknown()).optional(),
   status: z.enum(["draft", "published"]).default("draft"),
 });
 
@@ -28,7 +28,7 @@ export const updatePageSchema = z.object({
   meta_title_en: optionalString,
   meta_desc_ar: optionalString,
   meta_desc_en: optionalString,
-  content_json: z.any().optional(),
+  content_json: z.record(z.unknown()).optional(),
   status: z.enum(["draft", "published"]).optional(),
 });
 
@@ -41,8 +41,8 @@ export const createLeadSchema = z.object({
   email: z.string().email("Invalid email").optional().or(z.literal("")),
   country: optionalString,
   type: z.string().default("store_activation"),
-  selected_activations: z.any().optional(),
-  payload_json: z.any().optional(),
+  selected_activations: z.array(z.string()).optional(),
+  payload_json: z.record(z.unknown()).optional(),
   notes: optionalString,
   status: z.enum(["new", "contacted", "qualified", "converted", "lost"]).default("new"),
 });
@@ -118,7 +118,7 @@ export const createCaseSchema = z.object({
   desc_ar: optionalString,
   desc_en: optionalString,
   cover_image: optionalString,
-  gallery: z.any().optional(),
+  gallery: z.array(z.string().url()).optional(),
   client_name: optionalString,
   category: optionalString,
   sort_order: sortOrder,
@@ -131,7 +131,7 @@ export const updateCaseSchema = z.object({
   desc_ar: optionalString,
   desc_en: optionalString,
   cover_image: optionalString,
-  gallery: z.any().optional(),
+  gallery: z.array(z.string().url()).optional(),
   client_name: optionalString,
   category: optionalString,
   sort_order: z.number().int().min(0).optional(),
@@ -172,7 +172,7 @@ export const deleteBlogPostSchema = z.object({ id: idRequired });
 // ─── Users ───────────────────────────────────────────────
 export const updateUserRoleSchema = z.object({
   id: idRequired,
-  role: z.enum(["user", "admin", "moderator"], { required_error: "Role is required" }),
+  role: z.enum(["admin", "customer"], { required_error: "Role is required" }),
 });
 
 // ─── Stores ──────────────────────────────────────────────

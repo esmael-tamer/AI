@@ -1,8 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { withAdminAuth } from "@/lib/auth";
+import { adminLimiter } from "@/lib/rate-limit";
 
 export async function GET(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!adminLimiter.check(ip)) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
+  }
   return withAdminAuth(async () => {
     try {
       const { searchParams } = new URL(request.url);
