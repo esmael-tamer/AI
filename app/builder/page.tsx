@@ -2,7 +2,6 @@
 
 import React from "react"
 import { useState, useRef, useEffect } from "react"
-import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Sparkles, Send, Check, Loader2, Store, ArrowRight } from "lucide-react"
 import { builderSteps, getAIResponse } from "@/lib/builder-engine"
@@ -19,7 +18,6 @@ type Message = {
 }
 
 export default function BuilderPage() {
-  const router = useRouter()
   const { t, isAr } = useLang()
   const [messages, setMessages] = useState<Message[]>([])
   const [currentStep, setCurrentStep] = useState(0)

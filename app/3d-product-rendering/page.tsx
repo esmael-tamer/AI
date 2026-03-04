@@ -72,7 +72,7 @@ export default function Page() {
 
       {/* What you'll learn */}
       <section className="mx-auto w-full max-w-6xl px-4 py-16">
-        <h2 className="mb-10 text-center text-3xl font-semibold md:text-4xl">What you'll learn.</h2>
+        <h2 className="mb-10 text-center text-3xl font-semibold md:text-4xl">What you&apos;ll learn.</h2>
         <div className="grid gap-8 md:grid-cols-4">
           <Feature
             icon={<Camera className="h-5 w-5" />}
@@ -114,7 +114,7 @@ export default function Page() {
             <li>
               <strong className="text-foreground">For All Levels</strong>
               <br />
-              Whether you're a complete beginner or already have some experience, this course is designed to provide
+              Whether you&apos;re a complete beginner or already have some experience, this course is designed to provide
               value for everyone.
             </li>
             <li>
@@ -130,7 +130,7 @@ export default function Page() {
             <li>
               <strong className="text-foreground">Learn at Your Own Pace</strong>
               <br />
-              Enjoy lifetime access so you can learn whenever it's convenient for you.
+              Enjoy lifetime access so you can learn whenever it&apos;s convenient for you.
             </li>
           </ul>
         </div>
@@ -160,7 +160,7 @@ export default function Page() {
       <section className="mx-auto w-full max-w-6xl px-4 py-12">
         <h3 className="text-center text-3xl font-semibold md:text-4xl">Shot on iPhone.</h3>
         <p className="mx-auto mt-2 max-w-2xl text-center text-muted-foreground">
-          All of the photos you see here are shot on the iPhone. This is exactly the type of images you'll be able to
+          All of the photos you see here are shot on the iPhone. This is exactly the type of images you&apos;ll be able to
           reproduce after taking this course.
         </p>
         <div className="mt-8 grid gap-6 md:grid-cols-2">
@@ -228,7 +228,7 @@ export default function Page() {
                 </AccordionContent>
               </AccordionItem>
               <AccordionItem value="q2">
-                <AccordionTrigger>What's included in the course?</AccordionTrigger>
+                <AccordionTrigger>What&apos;s included in the course?</AccordionTrigger>
                 <AccordionContent>
                   Step-by-step lessons, presets, and lifetime access so you can learn at your own pace.
                 </AccordionContent>

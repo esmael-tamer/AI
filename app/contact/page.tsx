@@ -9,7 +9,7 @@ import { useState } from "react"
 import { useLang } from "@/lib/i18n"
 
 export default function ContactPage() {
-  const { t, isAr } = useLang()
+  const { t } = useLang()
   const [formState, setFormState] = useState({ name: "", email: "", phone: "", message: "", service: "" })
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)

@@ -29,7 +29,7 @@ export function LogoMarquee() {
     { name: "Medium", image: "/icons/Skyborne.png" },
   ]
 
-  const LogoCard = ({ logo, rowId }: { logo: any; rowId: string }) => (
+  const LogoCard = ({ logo, rowId }: { logo: { name: string; image: string }; rowId: string }) => (
     <div
       className="flex-shrink-0 mx-3"
       onMouseEnter={() => setPausedRow(rowId)}

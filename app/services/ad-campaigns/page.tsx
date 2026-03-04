@@ -152,7 +152,7 @@ export default function AdCampaignsPage() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState("")
 
-  function togglePlatform(id: string) {
+  function _togglePlatform(id: string) {
     setForm((prev) => ({
       ...prev,
       platforms: prev.platforms.includes(id)

@@ -6,7 +6,7 @@ import { Menu, X, ChevronDown, Globe } from "lucide-react"
 import { useLang } from "@/lib/i18n"
 
 export default function MTHeader() {
-  const { t, lang, setLang, isAr } = useLang()
+  const { t, setLang, isAr } = useLang()
   const [mobileOpen, setMobileOpen] = useState(false)
   const [openDropdown, setOpenDropdown] = useState<string | null>(null)
   const [scrolled, setScrolled] = useState(false)

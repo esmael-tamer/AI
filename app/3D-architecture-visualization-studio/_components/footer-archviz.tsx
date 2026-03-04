@@ -30,7 +30,7 @@ export function FooterArchviz() {
             <div>
               <p className="mb-2 text-[11px] tracking-widest text-lime-300">DESIGN BUY‑IN FASTER</p>
               <h3 className="text-2xl font-bold leading-tight text-white sm:text-3xl">
-                Walk stakeholders through your space — before it's built
+                Walk stakeholders through your space — before it&apos;s built
               </h3>
               <p className="mt-2 max-w-prose text-sm text-neutral-400">
                 Present options, gather timestamped feedback and reach approvals with walkthrough videos and stills.

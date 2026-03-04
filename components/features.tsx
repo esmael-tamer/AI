@@ -77,7 +77,7 @@ export function Features() {
           <CardHeader>
             <p className="text-[11px] tracking-widest text-white/80">CLIENT LOVE</p>
             <CardTitle className="mt-1 text-xl text-white">
-              Their work didn't just look good, it moved the needle — our audience felt the difference instantly.
+              Their work didn&apos;t just look good, it moved the needle — our audience felt the difference instantly.
             </CardTitle>
           </CardHeader>
           <CardContent>

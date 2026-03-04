@@ -12,7 +12,7 @@ import { useLang } from "@/lib/i18n";
 
 export default function SignupPage() {
   const router = useRouter();
-  const { t, isAr } = useLang();
+  const { t } = useLang();
   const [form, setForm] = useState({
     email: "",
     password: "",

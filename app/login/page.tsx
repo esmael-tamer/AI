@@ -12,7 +12,7 @@ import { useLang } from "@/lib/i18n";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { t, isAr } = useLang();
+  const { t } = useLang();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");

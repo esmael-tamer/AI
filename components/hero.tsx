@@ -48,7 +48,7 @@ function PhoneCard({
   title = "8°",
   sub = "Clear night. Great for render farm runs.",
   tone = "calm",
-  gradient = "from-[#0f172a] via-[#14532d] to-[#052e16]",
+  gradient: _gradient = "from-[#0f172a] via-[#14532d] to-[#052e16]",
   videoSrc,
 }: {
   title?: string

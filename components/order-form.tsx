@@ -289,7 +289,7 @@ export function OrderForm({ isOpen, onClose, selectedPackage }: OrderFormProps) 
             <div className="space-y-6">
               <div className="text-center">
                 <h3 className="text-xl font-semibold text-white mb-2">Confirm Your Package</h3>
-                <p className="text-neutral-400">Let's make sure we have the right package for you</p>
+                <p className="text-neutral-400">Let&apos;s make sure we have the right package for you</p>
               </div>
 
               <Card className="glass-border-subtle border-neutral-800 bg-neutral-900/50">
