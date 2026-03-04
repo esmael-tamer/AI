@@ -50,6 +50,12 @@ export async function PATCH(request: NextRequest) {
       }
       const { id, role } = parsed.data;
 
+      const existing = await sql`SELECT role FROM users WHERE id = ${id}`;
+      if (existing.length === 0) {
+        return NextResponse.json({ error: "User not found" }, { status: 400 });
+      }
+      const previousRole = existing[0].role;
+
       const result = await sql`
         UPDATE users SET
           role = ${role},
@@ -58,13 +64,9 @@ export async function PATCH(request: NextRequest) {
         RETURNING id, name_ar, name_en, email, phone, role, lang_pref, created_at, updated_at
       `;
 
-      if (result.length === 0) {
-        return NextResponse.json({ error: "User not found" }, { status: 400 });
-      }
-
       await sql`
         INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
-        VALUES (${admin.id}, 'update_role', 'user', ${id}, ${JSON.stringify({ role })})
+        VALUES (${admin.id}, 'update_role', 'user', ${id}, ${JSON.stringify({ from: previousRole, to: role })})
       `;
 
       return NextResponse.json(result[0]);
