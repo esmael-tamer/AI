@@ -15,7 +15,7 @@ export default function PhoneVideo({
     if (!el) return
 
     const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false
-    const saveData = (navigator as any)?.connection?.saveData === true
+    const saveData = (navigator as unknown as { connection?: { saveData?: boolean } })?.connection?.saveData === true
     const shouldAutoplay = !(prefersReducedMotion || saveData)
 
     let observer: IntersectionObserver | null = null

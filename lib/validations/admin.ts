@@ -3,7 +3,6 @@ import { z } from "zod";
 // ─── Shared ──────────────────────────────────────────────
 const idRequired = z.number().int().positive("ID is required");
 const optionalString = z.string().optional();
-const optionalUrl = z.string().url().optional().or(z.literal("")).or(z.literal(null)).transform(v => v || undefined);
 const sortOrder = z.number().int().min(0).default(0);
 
 // ─── Pages ───────────────────────────────────────────────

@@ -152,15 +152,6 @@ export default function AdCampaignsPage() {
   const [success, setSuccess] = useState(false)
   const [error, setError] = useState("")
 
-  function _togglePlatform(id: string) {
-    setForm((prev) => ({
-      ...prev,
-      platforms: prev.platforms.includes(id)
-        ? prev.platforms.filter((p) => p !== id)
-        : [...prev.platforms, id],
-    }))
-  }
-
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setError("")

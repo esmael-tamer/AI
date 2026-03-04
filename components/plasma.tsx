@@ -113,7 +113,7 @@ export const Plasma: React.FC<PlasmaProps> = ({
     const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
     const isMobile = window.innerWidth < 768
     const prefersReducedMotion = window.matchMedia?.("(prefers-reduced-motion: reduce)")?.matches ?? false
-    const saveData = (navigator as any)?.connection?.saveData === true
+    const saveData = (navigator as unknown as { connection?: { saveData?: boolean } })?.connection?.saveData === true
 
     // If user prefers reduced motion or is on data saver, don't mount the animation at all.
     if (prefersReducedMotion || saveData) {
@@ -204,9 +204,9 @@ export const Plasma: React.FC<PlasmaProps> = ({
         const timeValue = (t - t0) * 0.001
         if (direction === "pingpong") {
           const cycle = Math.sin(timeValue * 0.5) * directionMultiplier
-          ;(program.uniforms.uDirection as any).value = cycle
+          ;(program.uniforms.uDirection as { value: unknown }).value = cycle
         }
-        ;(program.uniforms.iTime as any).value = timeValue
+        ;(program.uniforms.iTime as { value: unknown }).value = timeValue
         renderer.render({ scene: mesh })
         lastTime = t
       }

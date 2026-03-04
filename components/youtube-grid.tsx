@@ -10,16 +10,27 @@ type YouTubeGridProps = {
 }
 
 // Minimal typings to avoid runtime imports
+type YTPlayer = {
+  playVideo: () => void
+  pauseVideo: () => void
+  destroy: () => void
+}
+
+type YTNamespace = {
+  Player: new (id: string, opts: unknown) => YTPlayer
+  PlayerState: Record<string, number>
+}
+
 declare global {
   interface Window {
-    YT: any
+    YT: YTNamespace
     onYouTubeIframeAPIReady: () => void
   }
 }
 
 export default function YouTubeGrid({ videoIds }: YouTubeGridProps) {
   const containerIds = useRef(videoIds.map((_, i) => `yt-player-${i}-${Math.random().toString(36).slice(2)}`))
-  const playersRef = useRef<any[]>([])
+  const playersRef = useRef<YTPlayer[]>([])
   const [apiReady, setApiReady] = useState(false)
   const [playingIndex, setPlayingIndex] = useState<number | null>(null)
 
@@ -70,7 +81,7 @@ export default function YouTubeGrid({ videoIds }: YouTubeGridProps) {
           // Autoplay is controlled via our custom buttons
         },
         events: {
-          onStateChange: (e: any) => {
+          onStateChange: (e: { data: number }) => {
             const state = e?.data
             const YTP = window.YT?.PlayerState
             if (state === YTP?.PLAYING) {
