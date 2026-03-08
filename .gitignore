@@ -29,3 +29,7 @@ replit.nix
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# package manager lock files (project uses pnpm)
+package-lock.json
+yarn.lock

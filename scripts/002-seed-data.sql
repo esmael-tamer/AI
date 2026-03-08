@@ -1,8 +1,8 @@
 -- Seed data for Media Trend platform
 
 -- Admin user (password hash for 'admin123' using SHA-256 + salt)
-INSERT INTO users (name, email, password_hash, role, lang_pref) VALUES
-  ('Admin', 'admin@mediatrend.com', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'admin', 'en')
+INSERT INTO users (name_en, name_ar, email, password_hash, role, lang_pref) VALUES
+  ('Admin', 'مدير', 'admin@mediatrend.com', 'e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855', 'admin', 'en')
 ON CONFLICT (email) DO NOTHING;
 
 -- Team members
