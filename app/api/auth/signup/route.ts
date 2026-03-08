@@ -1,16 +1,38 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { hashPassword, createSession } from "@/lib/auth";
+import { rateLimit } from "@/lib/rate-limit";
+import { z } from "zod";
+
+const signupLimiter = rateLimit({ interval: 60 * 60 * 1000, maxRequests: 5 });
+
+const signupSchema = z.object({
+  email: z.string().email("Invalid email format"),
+  password: z.string().min(8, "Password must be at least 8 characters"),
+  name_ar: z.string().optional(),
+  name_en: z.string().optional(),
+  phone: z.string().optional(),
+});
 
 export async function POST(request: Request) {
   try {
-    const { email, password, name_ar, name_en, phone } = await request.json();
-
-    if (!email || !password) {
+    const ip = request.headers.get("x-forwarded-for") || "unknown";
+    if (!signupLimiter.check(ip)) {
       return NextResponse.json(
-        { error: "Email and password are required" },
-        { status: 400 }
+        { error: "Too many signup attempts. Please try again later." },
+        { status: 429 }
       );
     }
+
+    const body = await request.json();
+    const parsed = signupSchema.safeParse(body);
+
+    if (!parsed.success) {
+      const firstError = parsed.error.errors[0]?.message || "Invalid input";
+      return NextResponse.json({ error: firstError }, { status: 400 });
+    }
+
+    const { email, password, name_ar, name_en, phone } = parsed.data;
 
     // Check if user already exists
     const existing = await sql`SELECT id FROM users WHERE email = ${email}`;
@@ -21,22 +43,24 @@ export async function POST(request: Request) {
       );
     }
 
+    // Hash password before storing
+    const passwordHash = await hashPassword(password);
+
     // Create user
     const newUser = await sql`
       INSERT INTO users (email, password_hash, name_ar, name_en, phone, role)
-      VALUES (${email}, ${password}, ${name_ar || ""}, ${name_en || ""}, ${phone || ""}, 'customer')
+      VALUES (${email}, ${passwordHash}, ${name_ar || null}, ${name_en || null}, ${phone || null}, 'customer')
       RETURNING id, email, name_ar, name_en, role, phone
     `;
 
     const user = newUser[0];
 
-    // Create session
-    const token = crypto.randomUUID();
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
+    // Create session (stored in DB for validation)
+    const { token, expiresAt } = await createSession(user.id as number);
 
-    const response = NextResponse.json({ user, token }, { status: 201 });
+    const response = NextResponse.json({ user }, { status: 201 });
 
-    response.cookies.set("session", token, {
+    response.cookies.set("mt-session", `${user.id}:${token}`, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -52,7 +76,7 @@ export async function POST(request: Request) {
       expires: expiresAt,
     });
 
-    response.cookies.set("user_role", user.role, {
+    response.cookies.set("user_role", user.role as string, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -61,8 +85,7 @@ export async function POST(request: Request) {
     });
 
     return response;
-  } catch (error) {
-    console.error("Signup error:", error);
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

@@ -1,8 +1,20 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { verifyPassword, hashPassword, createSession } from "@/lib/auth";
+import { rateLimit } from "@/lib/rate-limit";
+
+const loginLimiter = rateLimit({ interval: 15 * 60 * 1000, maxRequests: 10 });
 
 export async function POST(request: Request) {
   try {
+    const ip = request.headers.get("x-forwarded-for") || "unknown";
+    if (!loginLimiter.check(ip)) {
+      return NextResponse.json(
+        { error: "Too many login attempts. Please try again later." },
+        { status: 429 }
+      );
+    }
+
     const { email, password } = await request.json();
 
     if (!email || !password) {
@@ -12,8 +24,10 @@ export async function POST(request: Request) {
       );
     }
 
-    const users =
-      await sql`SELECT id, email, name_ar, name_en, role, phone FROM users WHERE email = ${email}`;
+    const users = await sql`
+      SELECT id, email, password_hash, name_ar, name_en, role, phone
+      FROM users WHERE email = ${email}
+    `;
 
     if (users.length === 0) {
       return NextResponse.json(
@@ -24,15 +38,7 @@ export async function POST(request: Request) {
 
     const user = users[0];
 
-    // Simple password check (in production use bcrypt)
-    const storedHash = (
-      await sql`SELECT password_hash FROM users WHERE id = ${user.id}`
-    )[0]?.password_hash;
-
-    // For demo: accept "admin123" for admin, or match stored hash
-    const isValid =
-      password === "admin123" || password === storedHash || storedHash === password;
-
+    const isValid = await verifyPassword(password, user.password_hash as string);
     if (!isValid) {
       return NextResponse.json(
         { error: "Invalid credentials" },
@@ -40,9 +46,15 @@ export async function POST(request: Request) {
       );
     }
 
-    // Create session token
-    const token = crypto.randomUUID();
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
+    // Re-hash with PBKDF2 if stored in legacy format
+    const storedHash = user.password_hash as string;
+    if (storedHash && !storedHash.startsWith("pbkdf2:")) {
+      const newHash = await hashPassword(password);
+      await sql`UPDATE users SET password_hash = ${newHash}, updated_at = NOW() WHERE id = ${user.id}`;
+    }
+
+    // Create session token (stored in DB for validation)
+    const { token, expiresAt } = await createSession(user.id as number);
 
     await sql`UPDATE users SET updated_at = NOW() WHERE id = ${user.id}`;
 
@@ -55,10 +67,9 @@ export async function POST(request: Request) {
         role: user.role,
         phone: user.phone,
       },
-      token,
     });
 
-    response.cookies.set("session", token, {
+    response.cookies.set("mt-session", `${user.id}:${token}`, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -74,7 +85,7 @@ export async function POST(request: Request) {
       expires: expiresAt,
     });
 
-    response.cookies.set("user_role", user.role, {
+    response.cookies.set("user_role", user.role as string, {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -83,8 +94,7 @@ export async function POST(request: Request) {
     });
 
     return response;
-  } catch (error) {
-    console.error("Login error:", error);
+  } catch {
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }
