@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { verifyPassword } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
@@ -13,7 +14,7 @@ export async function POST(request: Request) {
     }
 
     const users =
-      await sql`SELECT id, email, name_ar, name_en, role, phone FROM users WHERE email = ${email}`;
+      await sql`SELECT id, email, name_ar, name_en, role, phone, password_hash FROM users WHERE email = ${email}`;
 
     if (users.length === 0) {
       return NextResponse.json(
@@ -24,14 +25,7 @@ export async function POST(request: Request) {
 
     const user = users[0];
 
-    // Simple password check (in production use bcrypt)
-    const storedHash = (
-      await sql`SELECT password_hash FROM users WHERE id = ${user.id}`
-    )[0]?.password_hash;
-
-    // For demo: accept "admin123" for admin, or match stored hash
-    const isValid =
-      password === "admin123" || password === storedHash || storedHash === password;
+    const isValid = await verifyPassword(password, user.password_hash);
 
     if (!isValid) {
       return NextResponse.json(
@@ -58,7 +52,7 @@ export async function POST(request: Request) {
       token,
     });
 
-    response.cookies.set("session", token, {
+    response.cookies.set("mt-session", `${user.id}:${token}`, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -67,7 +61,7 @@ export async function POST(request: Request) {
     });
 
     response.cookies.set("user_id", String(user.id), {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",

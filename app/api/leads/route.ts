@@ -33,5 +33,15 @@ export async function POST(request: Request) {
 }
 
 export async function GET() {
-  return NextResponse.json({ leads: [] })
+  try {
+    const leads = await sql`
+      SELECT id, name, email, phone, type, status, notes, created_at
+      FROM leads
+      ORDER BY created_at DESC
+    `
+    return NextResponse.json({ leads })
+  } catch (error) {
+    console.error("Failed to fetch leads:", error)
+    return NextResponse.json({ error: "Failed to fetch leads" }, { status: 500 })
+  }
 }

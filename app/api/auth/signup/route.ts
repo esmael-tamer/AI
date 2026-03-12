@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { hashPassword } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
@@ -21,10 +22,12 @@ export async function POST(request: Request) {
       );
     }
 
+    const passwordHash = await hashPassword(password);
+
     // Create user
     const newUser = await sql`
       INSERT INTO users (email, password_hash, name_ar, name_en, phone, role)
-      VALUES (${email}, ${password}, ${name_ar || ""}, ${name_en || ""}, ${phone || ""}, 'customer')
+      VALUES (${email}, ${passwordHash}, ${name_ar || ""}, ${name_en || ""}, ${phone || ""}, 'customer')
       RETURNING id, email, name_ar, name_en, role, phone
     `;
 
@@ -36,7 +39,7 @@ export async function POST(request: Request) {
 
     const response = NextResponse.json({ user, token }, { status: 201 });
 
-    response.cookies.set("session", token, {
+    response.cookies.set("mt-session", `${user.id}:${token}`, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -45,7 +48,7 @@ export async function POST(request: Request) {
     });
 
     response.cookies.set("user_id", String(user.id), {
-      httpOnly: false,
+      httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
