@@ -1,10 +1,9 @@
 -- Seed data for Media Trend platform
 
--- Admin user (password hash for 'admin123' using SHA-256 + salt)
--- Password hash below is SHA-256('admin123' + 'mediatrend-salt-2024')
--- Change this password immediately after first login in production
-INSERT INTO users (name_ar, name_en, email, password_hash, role, lang_pref) VALUES
-  ('أدمن', 'Admin', 'admin@mediatrend.com', '987e4da27eeec872c691fec289a8947385632074e5a704f176e9748084135fd7', 'admin', 'en')
+-- Admin user (password: 'admin123', SHA-256 hash of 'admin123mediatrend-salt-2024')
+-- IMPORTANT: Change password immediately after first login in production!
+INSERT INTO users (name, email, password_hash, role, lang_pref) VALUES
+  ('Admin', 'admin@mediatrend.com', '987e4da27eeec872c691fec289a8947385632074e5a704f176e9748084135fd7', 'admin', 'en')
 ON CONFLICT (email) DO NOTHING;
 
 -- Team members

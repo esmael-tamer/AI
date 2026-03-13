@@ -35,12 +35,12 @@ export async function POST(request: Request) {
       descriptionAr: config.descriptionAr || "",
     }
 
-    // Generate session ID for guest users
-    const sessionId = `session_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
+    // Generate cryptographically secure session ID for guest users
+    const sessionId = `session_${crypto.randomUUID()}`
 
     const storeResult = await sql`
       INSERT INTO stores (session_id, slug, name_en, name_ar, store_config, status)
-      VALUES (${sessionId}, ${slug}, ${config.storeName}, ${config.storeNameAr || null}, ${JSON.stringify(storeConfig)}, 'demo')
+      VALUES (${sessionId}, ${slug}, ${config.storeName}, ${config.storeNameAr || null}, ${JSON.stringify(storeConfig)}, 'draft')
       RETURNING *
     `
     const store = storeResult[0]
@@ -63,8 +63,7 @@ export async function POST(request: Request) {
         sessionId,
       },
     })
-  } catch (error) {
-    console.error("Failed to create store:", error)
+  } catch {
     return NextResponse.json({ error: "Failed to create store" }, { status: 500 })
   }
 }

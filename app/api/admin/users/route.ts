@@ -1,73 +1,77 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
-import { requireAdmin } from "@/lib/auth";
+import { withAdminAuth } from "@/lib/auth";
+import { updateUserRoleSchema, formatZodError } from "@/lib/validations/admin";
+import { adminLimiter } from "@/lib/rate-limit";
 
 export async function GET(request: NextRequest) {
-  try {
-    await requireAdmin();
-  } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!adminLimiter.check(ip)) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
   }
-  try {
-    const { searchParams } = new URL(request.url);
-    const role = searchParams.get("role");
+  return withAdminAuth(async () => {
+    try {
+      const { searchParams } = new URL(request.url);
+      const role = searchParams.get("role");
 
-    let users;
-    if (role) {
-      users = await sql`
-        SELECT id, name_ar, name_en, email, phone, role, lang_pref, created_at, updated_at
-        FROM users
-        WHERE role = ${role}
-        ORDER BY created_at DESC
-      `;
-    } else {
-      users = await sql`
-        SELECT id, name_ar, name_en, email, phone, role, lang_pref, created_at, updated_at
-        FROM users
-        ORDER BY created_at DESC
-      `;
+      let users;
+      if (role) {
+        users = await sql`
+          SELECT id, name_ar, name_en, email, phone, role, lang_pref, created_at, updated_at
+          FROM users
+          WHERE role = ${role}
+          ORDER BY created_at DESC
+        `;
+      } else {
+        users = await sql`
+          SELECT id, name_ar, name_en, email, phone, role, lang_pref, created_at, updated_at
+          FROM users
+          ORDER BY created_at DESC
+        `;
+      }
+      return NextResponse.json(users);
+    } catch {
+      return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 });
     }
-    return NextResponse.json(users);
-  } catch (error) {
-    console.error("Admin users GET error:", error);
-    return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 });
-  }
+  });
 }
 
 export async function PATCH(request: NextRequest) {
-  try {
-    await requireAdmin();
-  } catch {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  const ip = request.headers.get("x-forwarded-for") || "unknown";
+  if (!adminLimiter.check(ip)) {
+    return NextResponse.json({ error: "Too many requests. Please try again later." }, { status: 429 });
   }
-  try {
-    const body = await request.json();
-    const { id, role } = body;
+  return withAdminAuth(async (admin) => {
+    try {
+      const body = await request.json();
+      const parsed = updateUserRoleSchema.safeParse(body);
+      if (!parsed.success) {
+        return NextResponse.json({ error: formatZodError(parsed.error) }, { status: 400 });
+      }
+      const { id, role } = parsed.data;
 
-    if (!id || !role) {
-      return NextResponse.json({ error: "ID and role are required" }, { status: 400 });
+      const existing = await sql`SELECT role FROM users WHERE id = ${id}`;
+      if (existing.length === 0) {
+        return NextResponse.json({ error: "User not found" }, { status: 400 });
+      }
+      const previousRole = existing[0].role;
+
+      const result = await sql`
+        UPDATE users SET
+          role = ${role},
+          updated_at = NOW()
+        WHERE id = ${id}
+        RETURNING id, name_ar, name_en, email, phone, role, lang_pref, created_at, updated_at
+      `;
+
+      await sql`
+        INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+        VALUES (${admin.id}, 'update_role', 'user', ${id}, ${JSON.stringify({ from: previousRole, to: role })})
+      `;
+
+      return NextResponse.json(result[0]);
+    } catch {
+      return NextResponse.json({ error: "Failed to update user" }, { status: 500 });
     }
-
-    const result = await sql`
-      UPDATE users SET
-        role = ${role},
-        updated_at = NOW()
-      WHERE id = ${id}
-      RETURNING id, name_ar, name_en, email, phone, role, lang_pref, created_at, updated_at
-    `;
-
-    if (result.length === 0) {
-      return NextResponse.json({ error: "User not found" }, { status: 400 });
-    }
-
-    await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('update_role', 'user', ${id}, ${JSON.stringify({ role })})
-    `;
-
-    return NextResponse.json(result[0]);
-  } catch (error) {
-    console.error("Admin users PATCH error:", error);
-    return NextResponse.json({ error: "Failed to update user" }, { status: 500 });
-  }
+  });
 }

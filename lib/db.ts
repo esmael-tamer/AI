@@ -1,7 +1,7 @@
 import postgres from "postgres"
 
 export const sql = postgres(process.env.DATABASE_URL!, {
-  ssl: false,
+  ssl: process.env.NODE_ENV === "production" ? "require" : false,
   max: 10,
 })
 
@@ -62,9 +62,9 @@ export type Lead = {
   phone: string | null
   email: string | null
   country: string | null
-  type: "store_activation" | "ads_launch" | "account_mgmt" | null
+  type: "store_activation" | "ads_launch" | "account_mgmt"
   selected_activations: string[]
-  payload_json: Record<string, unknown> | null
+  payload_json: Record<string, unknown>
   notes: string | null
   status: "new" | "contacted" | "qualified" | "closed"
   assigned_to: number | null
