@@ -28,8 +28,8 @@ export type Store = {
   name_ar: string | null
   name_en: string | null
   store_config: Record<string, unknown>
-  status: "demo" | "pending" | "live" | "suspended"
-  plan: string
+  status: "draft" | "pending" | "live" | "suspended"
+  plan: string | null
   commission_rate_percent: number
   payments_status: "inactive" | "pending" | "active"
   shipping_status: "inactive" | "pending" | "active"
@@ -62,9 +62,9 @@ export type Lead = {
   phone: string | null
   email: string | null
   country: string | null
-  type: "store_activation" | "ads_launch" | "account_mgmt"
+  type: "store_activation" | "ads_launch" | "account_mgmt" | null
   selected_activations: string[]
-  payload_json: Record<string, unknown>
+  payload_json: Record<string, unknown> | null
   notes: string | null
   status: "new" | "contacted" | "qualified" | "closed"
   assigned_to: number | null

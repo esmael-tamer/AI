@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { requireAdmin } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
+  try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
@@ -26,8 +32,13 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  try {
     const body = await request.json();
-    const { name, phone, email, country, type, selected_activations, payload_json, notes, status } = body;
+        const { name, phone, email, country, type, selected_activations, payload_json, notes, status } = body;
 
     if (!name) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
@@ -63,8 +74,13 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  try {
     const body = await request.json();
-    const { id, status, assigned_to, notes } = body;
+        const { id, status, assigned_to, notes } = body;
 
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });

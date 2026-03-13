@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { requireAdmin } from "@/lib/auth";
 
 export async function GET() {
+  try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const cases = await sql`SELECT * FROM case_studies ORDER BY sort_order ASC`;
     return NextResponse.json(cases);
@@ -13,8 +19,13 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  try {
     const body = await request.json();
-    const { title_ar, title_en, desc_ar, desc_en, cover_image, gallery, client_name, category, sort_order } = body;
+        const { title_ar, title_en, desc_ar, desc_en, cover_image, gallery, client_name, category, sort_order } = body;
 
     if (!title_en && !title_ar) {
       return NextResponse.json({ error: "Title is required" }, { status: 400 });
@@ -50,8 +61,13 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  try {
     const body = await request.json();
-    const { id, title_ar, title_en, desc_ar, desc_en, cover_image, gallery, client_name, category, sort_order } = body;
+        const { id, title_ar, title_en, desc_ar, desc_en, cover_image, gallery, client_name, category, sort_order } = body;
 
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
@@ -90,8 +106,13 @@ export async function PATCH(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  try {
     const body = await request.json();
-    const { id } = body;
+        const { id } = body;
 
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });

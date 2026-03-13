@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { requireAdmin } from "@/lib/auth";
 
 export async function GET(request: NextRequest) {
+  try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
@@ -32,8 +38,13 @@ export async function GET(request: NextRequest) {
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  try {
     const body = await request.json();
-    const { store_id, user_id, lead_id, type, notes } = body;
+        const { store_id, user_id, lead_id, type, notes } = body;
 
     if (!type) {
       return NextResponse.json({ error: "Type is required" }, { status: 400 });
@@ -65,8 +76,13 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  try {
     const body = await request.json();
-    const { id, status, notes } = body;
+        const { id, status, notes } = body;
 
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
