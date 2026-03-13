@@ -44,7 +44,7 @@ export function SiteHeader() {
     { href: "#pricing", label: "Pricing", icon: Tag },
     { href: "faq", label: "FAQ", icon: HelpCircle },
     { href: "#blog", label: "Blog", icon: FileText },
-    { href: "About", label: "About", icon: Info },
+    { href: "/about", label: "About", icon: Info },
   ]
 
   return (
