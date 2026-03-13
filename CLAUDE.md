@@ -78,8 +78,12 @@ Key capabilities:
 ├── hooks/                      # Custom React hooks
 ├── styles/                     # Global CSS
 ├── scripts/
-│   ├── 001-create-tables.sql   # Database schema (12 tables)
-│   └── 002-seed-data.sql       # Seed data (admin, team, partners, blog)
+│   ├── 001-create-tables.sql              # Database schema (12 tables)
+│   ├── 002-seed-data.sql                  # Seed data (admin, team, partners, blog)
+│   ├── 003-schema-fixes.sql               # Schema migration: bilingual columns, plan, etc.
+│   ├── 004-create-sessions.sql            # Sessions table for DB-backed auth tokens
+│   ├── 005-soft-delete-blog.sql           # Add deleted_at to blog_posts
+│   └── 006-deprecate-legacy-passwords.sql # Identify legacy SHA-256 password accounts
 ├── public/                     # Static assets (icons, images)
 ├── middleware.ts               # Route protection for /admin and /portal
 ├── next.config.mjs             # Next.js config
@@ -154,6 +158,16 @@ To initialize the database, run scripts in order:
 ```bash
 psql $DATABASE_URL -f scripts/001-create-tables.sql
 psql $DATABASE_URL -f scripts/002-seed-data.sql
+psql $DATABASE_URL -f scripts/003-schema-fixes.sql
+psql $DATABASE_URL -f scripts/004-create-sessions.sql
+psql $DATABASE_URL -f scripts/005-soft-delete-blog.sql
+```
+
+For existing databases (migration only):
+```bash
+psql $DATABASE_URL -f scripts/003-schema-fixes.sql
+psql $DATABASE_URL -f scripts/004-create-sessions.sql
+psql $DATABASE_URL -f scripts/005-soft-delete-blog.sql
 ```
 
 ---
@@ -244,9 +258,12 @@ pnpm install
 # Set environment variable
 export DATABASE_URL="your_postgres_connection_string"
 
-# Initialize database
+# Initialize database (fresh install)
 psql $DATABASE_URL -f scripts/001-create-tables.sql
 psql $DATABASE_URL -f scripts/002-seed-data.sql
+psql $DATABASE_URL -f scripts/003-schema-fixes.sql
+psql $DATABASE_URL -f scripts/004-create-sessions.sql
+psql $DATABASE_URL -f scripts/005-soft-delete-blog.sql
 
 # Start dev server (port 5000)
 pnpm dev
