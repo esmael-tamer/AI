@@ -1,16 +1,15 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { sql } from "@/lib/db";
+import { requireAuth } from "@/lib/auth";
 
 export async function POST(request: Request) {
+  let user;
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get("user_id")?.value;
-
-    if (!userId) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-    }
-
+    user = await requireAuth();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  try {
     const body = await request.json();
     const { store_id, services, business_name, business_type, contact_phone, notes } = body;
 
@@ -30,7 +29,7 @@ export async function POST(request: Request) {
     }
 
     const store = await sql`
-      SELECT id, owner_id FROM stores WHERE id = ${store_id} AND owner_id = ${userId}
+      SELECT id, owner_id FROM stores WHERE id = ${store_id} AND owner_id = ${user.id}
     `;
 
     if (store.length === 0) {
@@ -40,7 +39,7 @@ export async function POST(request: Request) {
     const [lead] = await sql`
       INSERT INTO leads (user_id, store_id, name, phone, type, selected_activations, notes, status, payload_json)
       VALUES (
-        ${userId},
+        ${user.id},
         ${store_id},
         ${business_name},
         ${contact_phone},
@@ -59,7 +58,7 @@ export async function POST(request: Request) {
         INSERT INTO tickets (store_id, user_id, lead_id, type, status, notes)
         VALUES (
           ${store_id},
-          ${userId},
+          ${user.id},
           ${lead.id},
           ${service},
           'pending',
@@ -69,11 +68,6 @@ export async function POST(request: Request) {
       `;
       tickets.push(ticket);
     }
-
-    const updateFields: Record<string, string> = {};
-    if (filteredServices.includes("payments")) updateFields.payments_status = "pending";
-    if (filteredServices.includes("shipping")) updateFields.shipping_status = "pending";
-    if (filteredServices.includes("warehousing")) updateFields.warehousing_status = "pending";
 
     await sql`
       UPDATE stores

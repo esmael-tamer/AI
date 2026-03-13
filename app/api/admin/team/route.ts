@@ -1,7 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { requireAdmin } from "@/lib/auth";
 
 export async function GET() {
+  try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
   try {
     const members = await sql`SELECT * FROM team_members ORDER BY sort_order ASC`;
     return NextResponse.json(members);
@@ -13,8 +19,13 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  try {
     const body = await request.json();
-    const { name_ar, name_en, role_ar, role_en, photo_url, department, sort_order } = body;
+        const { name_ar, name_en, role_ar, role_en, photo_url, department, sort_order } = body;
 
     if (!name_en && !name_ar) {
       return NextResponse.json({ error: "Name is required" }, { status: 400 });
@@ -48,8 +59,13 @@ export async function POST(request: NextRequest) {
 
 export async function PATCH(request: NextRequest) {
   try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  try {
     const body = await request.json();
-    const { id, name_ar, name_en, role_ar, role_en, photo_url, department, sort_order } = body;
+        const { id, name_ar, name_en, role_ar, role_en, photo_url, department, sort_order } = body;
 
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
@@ -86,8 +102,13 @@ export async function PATCH(request: NextRequest) {
 
 export async function DELETE(request: NextRequest) {
   try {
+    await requireAdmin();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  try {
     const body = await request.json();
-    const { id } = body;
+        const { id } = body;
 
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });

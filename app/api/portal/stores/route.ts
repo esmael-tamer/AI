@@ -1,20 +1,19 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { sql } from "@/lib/db";
+import { requireAuth } from "@/lib/auth";
 
 export async function GET() {
+  let user;
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get("user_id")?.value;
-
-    if (!userId) {
-      return NextResponse.json([], { status: 200 });
-    }
-
+    user = await requireAuth();
+  } catch {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  try {
     const stores = await sql`
       SELECT id, name_ar, name_en, slug, status, plan, payments_status, shipping_status, warehousing_status, created_at
       FROM stores
-      WHERE owner_id = ${userId}
+      WHERE owner_id = ${user.id}
       ORDER BY created_at DESC
     `;
 
