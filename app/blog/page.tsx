@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import MTHeader from "@/components/mt-header"
-import MTFooter from "@/components/mt-footer"
+import MTHeader from "@/components/layout/header"
+import MTFooter from "@/components/layout/footer"
 import Link from "next/link"
 import { Calendar } from "lucide-react"
 import { useLang } from "@/lib/i18n"

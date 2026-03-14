@@ -2,7 +2,7 @@ import type React from "react"
 import "./globals.css"
 import type { Metadata, Viewport } from "next"
 import { Inter } from "next/font/google"
-import ClientLayout from "@/components/client-layout"
+import ClientLayout from "@/components/layout/client-layout"
 
 const inter = Inter({ subsets: ["latin"], display: "swap", variable: "--font-inter" })
 

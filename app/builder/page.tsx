@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Sparkles, Send, Check, Loader2, Store, ArrowRight } from "lucide-react"
 import { builderSteps, getAIResponse } from "@/lib/builder-engine"
-import type { StoreConfig } from "@/lib/builder-engine"
+import type { StoreConfig } from "@/types"
 import { useLang } from "@/lib/i18n"
 
 type Message = {

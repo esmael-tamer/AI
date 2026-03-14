@@ -1,6 +1,6 @@
 "use client"
 
-import type { Store, Product } from "@/lib/db"
+import type { Store, Product } from "@/types"
 import { useState } from "react"
 import {
   ShoppingBag,

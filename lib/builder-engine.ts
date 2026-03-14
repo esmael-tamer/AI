@@ -1,40 +1,7 @@
 // AI Store Builder - Conversational Question Engine
-// This simulates an AI-guided flow with smart branching
+// Types are centralized in @/types
+import type { StoreConfig, ProductSeed, BuilderStep } from "@/types"
 
-export type StoreConfig = {
-  storeName: string
-  storeNameAr: string
-  category: string
-  description: string
-  descriptionAr: string
-  themeColor: string
-  currency: string
-  country: string
-  targetAudience: string
-  products: ProductSeed[]
-}
-
-export type ProductSeed = {
-  nameEn: string
-  nameAr: string
-  descEn: string
-  descAr: string
-  price: number
-  category: string
-  image: string
-}
-
-export type BuilderStep = {
-  id: string
-  question: string
-  questionAr: string
-  type: "text" | "select" | "multi-select" | "color"
-  options?: { value: string; label: string; labelAr: string }[]
-  field: keyof StoreConfig | "skip"
-  placeholder?: string
-  placeholderAr?: string
-  validation?: (value: string) => boolean
-}
 
 const CATEGORIES = [
   { value: "fashion", label: "Fashion & Apparel", labelAr: "أزياء وملابس" },

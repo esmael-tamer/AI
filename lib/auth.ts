@@ -1,6 +1,6 @@
 import { cookies } from "next/headers"
 import { sql } from "./db"
-import type { User } from "./db"
+import type { User } from "@/types"
 
 const SESSION_COOKIE = "mt-session"
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7 // 7 days

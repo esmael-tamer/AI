@@ -1,5 +1,5 @@
 import { sql } from "@/lib/db"
-import type { Store, Product } from "@/lib/db"
+import type { Store, Product } from "@/types"
 import { notFound } from "next/navigation"
 import DemoStorefront from "./storefront"
 
