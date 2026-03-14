@@ -113,7 +113,7 @@ export function SiteHeader() {
                          hover:bg-lime-300 hover:shadow-md hover:scale-[1.02]
                          transition-all"
             >
-              <Link href="#contact">Chat With Us</Link>
+              <a href="https://wa.link/rc25na" target="_blank" rel="noopener noreferrer">Get a quote</a>
             </Button>
           </div>
 
@@ -189,7 +189,7 @@ export function SiteHeader() {
                                hover:bg-lime-300 hover:shadow-md hover:scale-[1.02]
                                transition-all"
                   >
-                    <Link href="https://wa.link/65mf3i">Get a Quote</Link>
+                    <a href="https://wa.link/rc25na" target="_blank" rel="noopener noreferrer">Get a quote</a>
                   </Button>
                 </div>
               </SheetContent>

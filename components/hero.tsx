@@ -6,8 +6,8 @@ export function Hero() {
   const buttonNew = (
     <Button asChild className="rounded-full bg-lime-400 px-6 text-black hover:bg-lime-300">
       <a href="https://wa.link/rc25na" target="_blank" rel="noopener noreferrer">
-        Chat With Us
-      </a>
+        Start a project
+</a>
     </Button>
   )
 
