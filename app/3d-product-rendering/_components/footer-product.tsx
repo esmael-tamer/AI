@@ -6,7 +6,7 @@ import { Card } from "@/components/ui/card"
 import LazyVideo from "@/components/lazy-video"
 import Image from "next/image"
 
-export function FooterArchviz() {
+export function FooterProduct() {
   return (
     <section className="text-white">
       {/* Contact CTA */}
@@ -28,12 +28,12 @@ export function FooterArchviz() {
         <Card className="relative overflow-hidden rounded-3xl liquid-glass p-6 sm:p-10">
           <div className="relative grid items-center gap-8 md:grid-cols-2">
             <div>
-              <p className="mb-2 text-[11px] tracking-widest text-lime-300">DESIGN BUY‑IN FASTER</p>
+              <p className="mb-2 text-[11px] tracking-widest text-lime-300">SELL MORE, SHOOT LESS</p>
               <h3 className="text-2xl font-bold leading-tight text-white sm:text-3xl">
-                Walk stakeholders through your space — before it's built
+                Replace expensive photo shoots with renders that look better
               </h3>
               <p className="mt-2 max-w-prose text-sm text-neutral-400">
-                Present options, gather timestamped feedback and reach approvals with walkthrough videos and stills.
+                Consistent lighting, infinite angles, zero studio cost. Update colorways in hours, not weeks.
               </p>
             </div>
 
@@ -41,21 +41,21 @@ export function FooterArchviz() {
               <div className="relative rounded-[28px] liquid-glass p-2 shadow-2xl">
                 <div className="relative aspect-[9/19] w-full overflow-hidden rounded-2xl bg-black">
                   <LazyVideo
-                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/Timeline%202-YFaCK7cEiHWSMRv8XEHaLCoYj2SUAi.mp4"
+                    src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/A%20new%20chapter%20in%20the%20story%20of%20success.__Introducing%20the%20new%20TAG%20Heuer%20Carrera%20Day-Date%20collection%2C%20reimagined%20with%20bold%20colors%2C%20refined%20finishes%2C%20and%20upgraded%20functionality%20to%20keep%20you%20focused%20on%20your%20goals.%20__Six%20-nDNoRQyFaZ8oaaoty4XaQz8W8E5bqA.mp4"
                     className="absolute inset-0 h-full w-full object-cover"
                     autoplay
                     loop
                     muted
                     playsInline
-                    aria-label="ArchViz walkthrough preview"
+                    aria-label="3D product render preview"
                   />
                   <div className="relative p-3">
                     <div className="mx-auto mb-3 h-1.5 w-16 rounded-full bg-white/20" />
                     <div className="space-y-1 px-1">
-                      <div className="text-5xl font-extrabold text-lime-300">ArchViz</div>
-                      <p className="text-xs text-white/80">Sell the vision with visuals</p>
+                      <div className="text-5xl font-extrabold text-lime-300">CGI</div>
+                      <p className="text-xs text-white/80">Photoreal. On demand.</p>
                       <div className="mt-3 inline-flex items-center rounded-full bg-black/40 px-2 py-0.5 text-[10px] uppercase tracking-wider text-lime-300">
-                        Walkthrough Ready
+                        Render Ready
                       </div>
                     </div>
                   </div>
@@ -72,10 +72,10 @@ export function FooterArchviz() {
             <div className="space-y-3">
               <div className="flex items-center gap-1.5">
                 <Image src="/icons/skitbit-white.svg" alt="Skitbit logo" width={24} height={24} className="h-6 w-6" />
-                <span className="text-xl font-semibold text-white">Skitbit ArchViz</span>
+                <span className="text-xl font-semibold text-white">Skitbit Renders</span>
               </div>
               <p className="max-w-sm text-sm text-neutral-400">
-                Photorealistic architecture visualization for launches, leasing and approvals.
+                Studio-quality 3D product rendering for e-commerce, ads and brand campaigns.
               </p>
             </div>
 

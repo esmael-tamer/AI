@@ -100,7 +100,7 @@ export function PricingArchviz() {
               className="rounded-full px-5 text-neutral-900 hover:brightness-95"
               style={{ backgroundColor: "#f2f2f2" }}
             >
-              <Link href="https://wa.link/65mf3i" target="_blank">
+              <Link href="https://wa.link/rc25na" target="_blank">
                 Get a Custom Quote
               </Link>
             </Button>
