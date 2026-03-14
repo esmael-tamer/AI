@@ -29,10 +29,13 @@ export default function SignupPage() {
     setError("");
 
     try {
+      const sessionId = localStorage.getItem("mt_session_id") || undefined;
+      const storeSlug = localStorage.getItem("mt_store_slug") || undefined;
+
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, session_id: sessionId }),
       });
 
       const data = await res.json();
@@ -42,7 +45,16 @@ export default function SignupPage() {
         return;
       }
 
-      router.push("/portal");
+      // Clear saved session after linking
+      localStorage.removeItem("mt_session_id");
+      localStorage.removeItem("mt_store_slug");
+
+      // If they came from building a demo store, show them their store first
+      if (storeSlug) {
+        router.push(`/portal?linked=${storeSlug}`);
+      } else {
+        router.push("/portal");
+      }
     } catch {
       setError(t("Something went wrong", "حدث خطأ ما"));
     } finally {

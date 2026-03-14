@@ -3,7 +3,7 @@ import { sql } from "@/lib/db";
 
 export async function POST(request: Request) {
   try {
-    const { email, password, name_ar, name_en, phone } = await request.json();
+    const { email, password, name_ar, name_en, phone, session_id } = await request.json();
 
     if (!email || !password) {
       return NextResponse.json(
@@ -29,6 +29,14 @@ export async function POST(request: Request) {
     `;
 
     const user = newUser[0];
+
+    // Link any demo store created in this session to the new user
+    if (session_id) {
+      await sql`
+        UPDATE stores SET user_id = ${user.id}
+        WHERE session_id = ${session_id} AND user_id IS NULL
+      `;
+    }
 
     // Create session
     const token = crypto.randomUUID();

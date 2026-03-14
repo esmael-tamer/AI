@@ -2,47 +2,47 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import { ArrowRight, ShoppingBag } from "lucide-react"
+import { ArrowRight, ShoppingBag, ExternalLink } from "lucide-react"
 import { useLang } from "@/lib/i18n"
 import ScrollReveal from "@/components/ui/scroll-reveal"
 
 const DEMO_STORES = [
+  {
+    nameEn: "Khayal Perfumes",
+    nameAr: "خيال للعطور",
+    category: "perfumes",
+    categoryAr: "عطور",
+    themeColor: "#c9a84c",
+    slug: "demo-khayal-perfumes",
+    products: [
+      "https://images.unsplash.com/photo-1592945403244-b3fbafd7f539?w=300&q=70",
+      "https://images.unsplash.com/photo-1541643600914-78b084683702?w=300&q=70",
+      "https://images.unsplash.com/photo-1615634260167-c8cdede054de?w=300&q=70",
+    ],
+  },
   {
     nameEn: "Elegance Fashion",
     nameAr: "أناقة للأزياء",
     category: "fashion",
     categoryAr: "أزياء",
     themeColor: "#ec4899",
-    slug: null,
+    slug: "demo-elegance-fashion",
     products: [
-      "https://images.unsplash.com/photo-1566174053879-31528523f8ae?w=300&q=70",
+      "https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=300&q=70",
       "https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=300&q=70",
       "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=300&q=70",
     ],
   },
   {
-    nameEn: "Layla's Kitchen",
-    nameAr: "مطبخ ليلى",
-    category: "food",
-    categoryAr: "أطعمة",
-    themeColor: "#f59e0b",
-    slug: null,
-    products: [
-      "https://images.unsplash.com/photo-1447933601403-0c6688de566e?w=300&q=70",
-      "https://images.unsplash.com/photo-1611003229641-7e343593e5cf?w=300&q=70",
-      "https://images.unsplash.com/photo-1587049352846-4a222e784d38?w=300&q=70",
-    ],
-  },
-  {
     nameEn: "Glow Collective",
     nameAr: "غلو للجمال",
-    category: "beauty",
-    categoryAr: "جمال",
+    category: "skincare",
+    categoryAr: "عناية",
     themeColor: "#8b5cf6",
-    slug: null,
+    slug: "demo-glow-skincare",
     products: [
       "https://images.unsplash.com/photo-1620916566398-39f1143ab7be?w=300&q=70",
-      "https://images.unsplash.com/photo-1541643600914-78b084683702?w=300&q=70",
+      "https://images.unsplash.com/photo-1522335789203-aabd1fc54bc9?w=300&q=70",
       "https://images.unsplash.com/photo-1586495777744-4e6232bf2176?w=300&q=70",
     ],
   },
@@ -115,15 +115,14 @@ export default function DemoShowcase() {
                 </div>
 
                 {/* Store footer */}
-                <div className="p-4 flex items-center justify-between">
-                  <div>
-                    <div className="flex gap-1 mb-1">
-                      {[...Array(5)].map((_, k) => (
-                        <div key={k} className="w-2.5 h-2.5 rounded-sm" style={{ backgroundColor: store.themeColor + (k < 4 ? "cc" : "30") }} />
-                      ))}
-                    </div>
-                    <p className="text-white/30 text-xs">{t("3 products shown", "3 منتجات معروضة")}</p>
-                  </div>
+                <div className="p-4 flex items-center justify-between gap-2">
+                  <Link
+                    href={`/s/${store.slug}`}
+                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium text-white/60 border border-white/10 hover:border-white/20 hover:text-white transition-all"
+                  >
+                    <ExternalLink className="w-3 h-3" />
+                    {t("View", "عرض")}
+                  </Link>
                   <Link
                     href="/builder"
                     className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold text-black transition-all hover:opacity-90 hover:scale-105"

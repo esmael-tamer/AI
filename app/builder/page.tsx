@@ -149,6 +149,11 @@ export default function BuilderPage() {
 
       if (data.success) {
         setStoreSlug(data.store.slug)
+        // Save sessionId so signup can link this store to the new account
+        if (data.store.sessionId) {
+          localStorage.setItem("mt_session_id", data.store.sessionId)
+          localStorage.setItem("mt_store_slug", data.store.slug)
+        }
         setTimeout(() => {
           const completeMessage: Message = {
             id: "complete",
