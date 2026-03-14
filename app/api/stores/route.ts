@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import type { StoreConfig } from "@/lib/builder-engine"
+import type { StoreConfig } from "@/types"
 import { generateSlug, generateSampleProducts } from "@/lib/builder-engine"
 
 export async function POST(request: Request) {
