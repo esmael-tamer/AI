@@ -1,6 +1,5 @@
 "use client"
 
-import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { ArrowRight, Sparkles, Mic, Send, MessageCircle } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
@@ -122,12 +121,6 @@ export default function MTHero() {
             {t("Start building for free", "ابدأ البناء مجانًا")}
             <ArrowRight className={`w-5 h-5 group-hover:translate-x-1 transition-transform ${isAr ? "rotate-180 group-hover:-translate-x-1" : ""}`} />
           </button>
-          <Link
-            href="/work"
-            className="flex items-center gap-2 px-8 py-3.5 text-white font-medium text-base rounded-full border border-white/15 hover:bg-white/5 hover:border-white/25 transition-all backdrop-blur-sm"
-          >
-            {t("View our work", "شاهد أعمالنا")}
-          </Link>
           <a
             href="https://wa.me/9656566179840"
             target="_blank"
@@ -135,8 +128,23 @@ export default function MTHero() {
             className="flex items-center gap-2 px-6 py-3.5 text-white/60 font-medium text-sm rounded-full border border-white/10 hover:bg-white/5 hover:border-white/20 transition-all"
           >
             <MessageCircle className="w-4 h-4 text-green-400" />
-            {t("Talk to our AI agent", "كلم مندوبنا الآلي")}
+            {t("Talk to our team", "تكلم مع فريقنا")}
           </a>
+        </div>
+
+        {/* Stats bar */}
+        <div className={`mt-14 grid grid-cols-2 sm:grid-cols-4 gap-px rounded-2xl overflow-hidden border border-white/[0.06] bg-white/[0.06] transition-all duration-700 delay-[700ms] ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+          {[
+            { value: "500+", labelEn: "Stores built", labelAr: "متجر تم بناؤه" },
+            { value: "8", labelEn: "MENA countries", labelAr: "دول خليجية" },
+            { value: "< 3 min", labelEn: "Average build time", labelAr: "وقت البناء" },
+            { value: "0%", labelEn: "Monthly fees", labelAr: "رسوم شهرية" },
+          ].map((stat) => (
+            <div key={stat.value} className="bg-[#0a0a0a] px-6 py-5 text-center">
+              <p className="text-2xl font-black text-white">{stat.value}</p>
+              <p className="text-xs text-white/30 mt-1">{isAr ? stat.labelAr : stat.labelEn}</p>
+            </div>
+          ))}
         </div>
       </div>
     </section>
