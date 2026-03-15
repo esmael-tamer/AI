@@ -65,7 +65,7 @@ export async function PATCH(request: NextRequest) {
   if (authError) return authError;
   try {
     const body = await request.json();
-    const { id, title_ar, title_en, desc_ar, desc_en, cover_image, gallery, client_name, category, sort_order } = body;
+    const { id, title_ar, title_en, desc_ar, desc_en, cover_image, gallery, client_name, category, status, sort_order } = body;
 
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
@@ -81,6 +81,7 @@ export async function PATCH(request: NextRequest) {
         gallery = COALESCE(${gallery ? JSON.stringify(gallery) : null}, gallery),
         client_name = COALESCE(${client_name ?? null}, client_name),
         category = COALESCE(${category ?? null}, category),
+        status = COALESCE(${status ?? null}, status),
         sort_order = COALESCE(${sort_order ?? null}, sort_order)
       WHERE id = ${id}
       RETURNING *
