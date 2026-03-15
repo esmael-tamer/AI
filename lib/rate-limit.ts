@@ -17,6 +17,10 @@ if (typeof setInterval !== "undefined") {
   }, 10 * 60 * 1000)
 }
 
+export function getClientIp(request: { headers: { get(name: string): string | null } }): string {
+  return request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown"
+}
+
 export function checkRateLimit(
   ip: string,
   maxAttempts: number,

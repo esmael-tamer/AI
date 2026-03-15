@@ -1,12 +1,12 @@
 import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { verifyPassword, createSessionValue, SESSION_MAX_AGE, isValidEmail } from "@/lib/auth"
-import { checkRateLimit } from "@/lib/rate-limit"
+import { verifyPassword, createSessionValue, SESSION_MAX_AGE, isValidEmail, setClientIdentityCookies } from "@/lib/auth"
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
   try {
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown"
+    const ip = getClientIp(request)
     const rl = checkRateLimit(ip, 10, 15 * 60 * 1000) // 10 attempts per 15 min
     if (!rl.allowed) {
       return NextResponse.json(
@@ -62,20 +62,7 @@ export async function POST(request: Request) {
     })
 
     // Non-httpOnly cookies — allow middleware + client JS to read identity
-    response.cookies.set("user_role", user.role, {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: SESSION_MAX_AGE,
-    })
-    response.cookies.set("user_id", String(user.id), {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: SESSION_MAX_AGE,
-    })
+    setClientIdentityCookies(response, user.id, user.role)
 
     return response
   } catch (error) {

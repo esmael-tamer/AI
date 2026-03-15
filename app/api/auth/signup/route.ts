@@ -1,12 +1,12 @@
 import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { hashPassword, createSessionValue, SESSION_MAX_AGE, isValidEmail } from "@/lib/auth"
-import { checkRateLimit } from "@/lib/rate-limit"
+import { hashPassword, createSessionValue, SESSION_MAX_AGE, isValidEmail, setClientIdentityCookies } from "@/lib/auth"
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
   try {
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown"
+    const ip = getClientIp(request)
     const rl = checkRateLimit(ip, 5, 60 * 60 * 1000) // 5 signups per hour
     if (!rl.allowed) {
       return NextResponse.json(
@@ -74,20 +74,7 @@ export async function POST(request: Request) {
       maxAge: SESSION_MAX_AGE,
     })
 
-    response.cookies.set("user_role", "customer", {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: SESSION_MAX_AGE,
-    })
-    response.cookies.set("user_id", String(user.id), {
-      httpOnly: false,
-      secure: process.env.NODE_ENV === "production",
-      sameSite: "lax",
-      path: "/",
-      maxAge: SESSION_MAX_AGE,
-    })
+    setClientIdentityCookies(response, user.id, "customer")
 
     return response
   } catch (error) {

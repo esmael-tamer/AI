@@ -1,9 +1,23 @@
 import { cookies } from "next/headers"
+import { NextResponse } from "next/server"
 import { sql } from "./db"
 import type { User } from "@/types"
 
 const SESSION_COOKIE = "mt-session"
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 7 // 7 days in seconds
+
+/** Sets non-httpOnly identity cookies (user_role + user_id) readable by client JS and middleware. */
+export function setClientIdentityCookies(response: NextResponse, userId: number, role: string): void {
+  const opts = {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: "lax" as const,
+    path: "/",
+    maxAge: SESSION_MAX_AGE,
+  }
+  response.cookies.set("user_role", role, opts)
+  response.cookies.set("user_id", String(userId), opts)
+}
 const PBKDF2_ITERATIONS = 100_000
 
 if (process.env.NODE_ENV === "production" && !process.env.SESSION_SECRET) {

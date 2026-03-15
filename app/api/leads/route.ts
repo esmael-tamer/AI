@@ -1,13 +1,13 @@
 import { logger } from "@/lib/logger"
 import { NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { checkRateLimit } from "@/lib/rate-limit"
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 import { isValidEmail } from "@/lib/auth"
 
 const VALID_TYPES = ["store_activation", "ads_launch", "account_mgmt"] as const
 
 export async function POST(request: NextRequest) {
-  const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown"
+  const ip = getClientIp(request)
   const rl = checkRateLimit(`leads:${ip}`, 10, 60 * 60 * 1000) // 10 leads per hour per IP
   if (!rl.allowed) {
     return NextResponse.json(
