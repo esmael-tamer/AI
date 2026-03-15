@@ -61,8 +61,15 @@ export async function POST(request: Request) {
       maxAge: SESSION_MAX_AGE,
     })
 
-    // Non-httpOnly role cookie — allows middleware + client JS to read role
+    // Non-httpOnly cookies — allow middleware + client JS to read identity
     response.cookies.set("user_role", user.role, {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: SESSION_MAX_AGE,
+    })
+    response.cookies.set("user_id", String(user.id), {
       httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",

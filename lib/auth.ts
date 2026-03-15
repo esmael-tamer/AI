@@ -144,6 +144,7 @@ export async function logout(): Promise<void> {
   const cookieStore = await cookies()
   cookieStore.delete(SESSION_COOKIE)
   cookieStore.delete("user_role")
+  cookieStore.delete("user_id")
 }
 
 export async function getSession(): Promise<User | null> {

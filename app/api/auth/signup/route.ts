@@ -81,6 +81,13 @@ export async function POST(request: Request) {
       path: "/",
       maxAge: SESSION_MAX_AGE,
     })
+    response.cookies.set("user_id", String(user.id), {
+      httpOnly: false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: SESSION_MAX_AGE,
+    })
 
     return response
   } catch (error) {

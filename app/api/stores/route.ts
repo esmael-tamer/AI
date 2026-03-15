@@ -1,10 +1,20 @@
 import { logger } from "@/lib/logger"
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
 import type { StoreConfig } from "@/types"
 import { generateSlug, generateSampleProducts } from "@/lib/builder-engine"
+import { checkRateLimit } from "@/lib/rate-limit"
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown"
+  const rl = checkRateLimit(`stores:${ip}`, 5, 60 * 60 * 1000) // 5 stores per hour per IP
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "Too many store creation requests. Please try again later." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } }
+    )
+  }
+
   try {
     const config: StoreConfig = await request.json()
 

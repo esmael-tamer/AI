@@ -75,6 +75,16 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
     }
 
+    if (slug !== undefined) {
+      if (!isValidSlug(slug)) {
+        return NextResponse.json({ error: "Slug must contain only lowercase letters, numbers, and hyphens" }, { status: 400 });
+      }
+      const conflict = await sql`SELECT id FROM pages WHERE slug = ${slug} AND id != ${id}`;
+      if (conflict.length > 0) {
+        return NextResponse.json({ error: "A page with this slug already exists" }, { status: 409 });
+      }
+    }
+
     const result = await sql`
       UPDATE pages SET
         slug = COALESCE(${slug ?? null}, slug),
