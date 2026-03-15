@@ -55,3 +55,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ error: "Failed to submit" }, { status: 500 })
   }
 }
+
+export async function GET() {
+  try {
+    const leads = await sql`
+      SELECT id, name, email, phone, type, status, notes, created_at
+      FROM leads
+      ORDER BY created_at DESC
+    `
+    return NextResponse.json({ leads })
+  } catch (error) {
+    logger.error("api", "Failed to fetch leads:", error)
+    return NextResponse.json({ error: "Failed to fetch leads" }, { status: 500 })
+  }
+}

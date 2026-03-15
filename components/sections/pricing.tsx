@@ -88,6 +88,17 @@ export function Pricing() {
                 "المتجر التجريبي متاح للجميع. بعد ما يعجبك المتجر، اختر باقة التفعيل المناسبة ونبدأ الربط والتجهيز."
               )}
             </p>
+            <div className="mt-8">
+              <a
+                href="https://wa.link/rc25na"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center rounded-full px-5 py-2 text-neutral-900 hover:brightness-95 transition-all font-medium text-sm"
+                style={{ backgroundColor: "#f2f2f2" }}
+              >
+                {t("Contact now", "تواصل الآن")}
+              </a>
+            </div>
           </div>
         </ScrollReveal>
 
