@@ -72,3 +72,25 @@ export async function PATCH(request: NextRequest) {
     return NextResponse.json({ error: "Failed to update store" }, { status: 500 });
   }
 }
+
+export async function DELETE(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
+  try {
+    const { id } = await request.json();
+    if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
+
+    const result = await sql`DELETE FROM stores WHERE id = ${id} RETURNING id`;
+    if (result.length === 0) return NextResponse.json({ error: "Store not found" }, { status: 404 });
+
+    await sql`
+      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
+      VALUES ('delete', 'store', ${id}, '{}')
+    `;
+
+    return NextResponse.json({ success: true, id });
+  } catch (error) {
+    console.error("Admin stores DELETE error:", error);
+    return NextResponse.json({ error: "Failed to delete store" }, { status: 500 });
+  }
+}

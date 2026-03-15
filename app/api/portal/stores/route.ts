@@ -1,20 +1,19 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { sql } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get("user_id")?.value;
+    const user = await getSession();
 
-    if (!userId) {
+    if (!user) {
       return NextResponse.json([], { status: 200 });
     }
 
     const stores = await sql`
       SELECT id, name_ar, name_en, slug, status, plan, payments_status, shipping_status, warehousing_status, created_at
       FROM stores
-      WHERE owner_id = ${userId}
+      WHERE owner_id = ${user.id}
       ORDER BY created_at DESC
     `;
 

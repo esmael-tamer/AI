@@ -10,7 +10,7 @@ export async function GET() {
       sql`SELECT COUNT(*) as count FROM stores`,
       sql`SELECT COUNT(*) as count FROM users`,
       sql`SELECT COUNT(*) as count FROM leads`,
-      sql`SELECT COUNT(*) as count FROM support_tickets WHERE status = 'open'`,
+      sql`SELECT COUNT(*) as count FROM tickets WHERE status = 'pending'`,
       sql`SELECT COUNT(*) as count FROM blog_posts`,
     ]);
 

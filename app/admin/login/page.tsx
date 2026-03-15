@@ -153,15 +153,6 @@ export default function AdminLogin() {
             </Button>
           </form>
 
-          <div className="mt-6 bg-white/5 border border-white/10 rounded-xl p-4">
-            <p className="text-zinc-500 text-xs text-center mb-2">
-              Demo credentials
-            </p>
-            <p className="text-zinc-400 text-xs text-center">
-              <span className="text-lime-400">admin@mediatrend.sa</span> /{" "}
-              <span className="text-lime-400">admin123</span>
-            </p>
-          </div>
         </div>
       </div>
     </div>

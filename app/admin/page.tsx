@@ -119,6 +119,10 @@ export default function AdminDashboard() {
         partners: "partners",
         cases: "cases",
         pages: "pages",
+        stores: "stores",
+        users: "users",
+        leads: "leads",
+        tickets: "tickets",
       };
       const endpoint = endpointMap[sec];
       if (!endpoint) return;
@@ -204,7 +208,7 @@ export default function AdminDashboard() {
     }
   };
 
-  const DELETABLE_SECTIONS = ["blog", "team", "partners", "cases", "pages"];
+  const DELETABLE_SECTIONS = ["blog", "team", "partners", "cases", "pages", "stores", "users", "leads", "tickets"];
 
   const renderTable = (
     items: Record<string, unknown>[],
