@@ -160,6 +160,7 @@ CREATE TABLE IF NOT EXISTS case_studies (
   gallery JSON DEFAULT '[]',
   client_name VARCHAR(255),
   category VARCHAR(100),
+  status VARCHAR(20) NOT NULL DEFAULT 'published' CHECK (status IN ('draft', 'published')),
   sort_order INTEGER DEFAULT 0
 );
 

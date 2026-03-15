@@ -28,7 +28,7 @@ export async function PATCH(request: Request) {
 
     const { name_ar, name_en, phone } = await request.json();
 
-    const [updated] = await sql`
+    const result = await sql`
       UPDATE users SET
         name_ar = COALESCE(${name_ar ?? null}, name_ar),
         name_en = COALESCE(${name_en ?? null}, name_en),
@@ -38,7 +38,9 @@ export async function PATCH(request: Request) {
       RETURNING id, email, name_ar, name_en, phone, role, lang_pref
     `;
 
-    return NextResponse.json(updated);
+    if (result.length === 0) return NextResponse.json({ error: "User not found" }, { status: 404 });
+
+    return NextResponse.json(result[0]);
   } catch (error) {
     console.error("Portal profile PATCH error:", error);
     return NextResponse.json({ error: "Failed to update profile" }, { status: 500 });

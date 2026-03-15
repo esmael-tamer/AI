@@ -16,3 +16,6 @@ ALTER TABLE leads ADD COLUMN IF NOT EXISTS type VARCHAR(50) DEFAULT 'store_activ
 -- Add payload_json column to leads table
 -- portal/activate inserts business_type into payload_json, but this column was missing
 ALTER TABLE leads ADD COLUMN IF NOT EXISTS payload_json JSON DEFAULT '{}';
+
+-- Add status column to case_studies table
+ALTER TABLE case_studies ADD COLUMN IF NOT EXISTS status VARCHAR(20) NOT NULL DEFAULT 'published' CHECK (status IN ('draft', 'published'));

@@ -2,11 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { checkAdminAuth, getAdminId } from "@/lib/admin-auth";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const authError = await checkAdminAuth();
   if (authError) return authError;
   try {
-    const cases = await sql`SELECT * FROM case_studies ORDER BY sort_order ASC`;
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get("status");
+
+    const cases = status
+      ? await sql`SELECT * FROM case_studies WHERE status = ${status} ORDER BY sort_order ASC`
+      : await sql`SELECT * FROM case_studies ORDER BY sort_order ASC`;
+
     return NextResponse.json(cases);
   } catch (error) {
     console.error("Admin cases GET error:", error);

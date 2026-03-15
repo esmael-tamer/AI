@@ -2,11 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { checkAdminAuth, getAdminId } from "@/lib/admin-auth";
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   const authError = await checkAdminAuth();
   if (authError) return authError;
   try {
-    const posts = await sql`SELECT * FROM blog_posts ORDER BY created_at DESC`;
+    const { searchParams } = new URL(request.url);
+    const status = searchParams.get("status");
+
+    const posts = status
+      ? await sql`SELECT * FROM blog_posts WHERE status = ${status} ORDER BY created_at DESC`
+      : await sql`SELECT * FROM blog_posts ORDER BY created_at DESC`;
+
     return NextResponse.json(posts);
   } catch (error) {
     console.error("Admin blog GET error:", error);
