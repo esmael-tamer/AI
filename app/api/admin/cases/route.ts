@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
-import { checkAdminAuth } from "@/lib/admin-auth";
+import { checkAdminAuth, getAdminId } from "@/lib/admin-auth";
 
 export async function GET() {
   const authError = await checkAdminAuth();
@@ -41,9 +41,10 @@ export async function POST(request: NextRequest) {
       RETURNING *
     `;
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('create', 'case_study', ${result[0].id}, ${JSON.stringify({ title_en, title_ar, client_name })})
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'create', 'case_study', ${result[0].id}, ${JSON.stringify({ title_en, title_ar, client_name })})
     `;
 
     return NextResponse.json(result[0], { status: 201 });
@@ -83,9 +84,10 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Case study not found" }, { status: 400 });
     }
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('update', 'case_study', ${id}, ${JSON.stringify({ title_en, title_ar })})
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'update', 'case_study', ${id}, ${JSON.stringify({ title_en, title_ar })})
     `;
 
     return NextResponse.json(result[0]);
@@ -112,9 +114,10 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Case study not found" }, { status: 400 });
     }
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('delete', 'case_study', ${id}, '{}')
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'delete', 'case_study', ${id}, '{}')
     `;
 
     return NextResponse.json({ success: true, id });

@@ -133,6 +133,13 @@ export default function PortalPage() {
   const [submitting, setSubmitting] = useState(false);
   const [activationResult, setActivationResult] = useState<ActivationResult | null>(null);
 
+  // Profile settings state
+  const [profileNameAr, setProfileNameAr] = useState("");
+  const [profileNameEn, setProfileNameEn] = useState("");
+  const [profilePhone, setProfilePhone] = useState("");
+  const [savingProfile, setSavingProfile] = useState(false);
+  const [profileSaved, setProfileSaved] = useState(false);
+
   const fetchData = useCallback(async () => {
     try {
       const [storesRes, ticketsRes] = await Promise.all([
@@ -153,6 +160,41 @@ export default function PortalPage() {
     const linked = searchParams.get("linked");
     if (linked) setLinkedSlug(linked);
   }, [fetchData, searchParams]);
+
+  useEffect(() => {
+    if (activeTab === "settings" && !profileNameAr && !profileNameEn && !profilePhone) {
+      fetch("/api/portal/profile")
+        .then((r) => r.ok ? r.json() : null)
+        .then((data) => {
+          if (data) {
+            setProfileNameAr(data.name_ar || "");
+            setProfileNameEn(data.name_en || "");
+            setProfilePhone(data.phone || "");
+          }
+        })
+        .catch(() => {});
+    }
+  }, [activeTab, profileNameAr, profileNameEn, profilePhone]);
+
+  async function handleSaveProfile() {
+    setSavingProfile(true);
+    setProfileSaved(false);
+    try {
+      const res = await fetch("/api/portal/profile", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name_ar: profileNameAr, name_en: profileNameEn, phone: profilePhone }),
+      });
+      if (res.ok) {
+        setProfileSaved(true);
+        setTimeout(() => setProfileSaved(false), 3000);
+      }
+    } catch (err) {
+      console.error("Profile save error:", err);
+    } finally {
+      setSavingProfile(false);
+    }
+  }
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -356,8 +398,10 @@ export default function PortalPage() {
                 <BarChart3 className="w-5 h-5 text-blue-400" />
               </div>
               <div>
-                <p className="text-2xl font-bold text-white">0</p>
-                <p className="text-zinc-500 text-sm">{t("Total Orders", "إجمالي الطلبات")}</p>
+                <p className="text-2xl font-bold text-white">
+                  {stores.filter((s) => s.status === "live").length}
+                </p>
+                <p className="text-zinc-500 text-sm">{t("Live Stores", "المتاجر النشطة")}</p>
               </div>
             </div>
           </div>
@@ -532,16 +576,16 @@ export default function PortalPage() {
                                   {t("Manage Store", "إدارة المتجر")}
                                 </Button>
                               </Link>
-                              <Link href={`/s/${store.slug}`} className="flex-1">
+                              <a href={`https://${store.slug}.mediatrend.sa`} target="_blank" rel="noopener noreferrer" className="flex-1">
                                 <Button
                                   variant="outline"
                                   size="sm"
                                   className="w-full border-white/10 text-zinc-300 hover:text-white hover:bg-white/5 gap-2 bg-transparent"
                                 >
-                                  <BarChart3 className="w-3 h-3" />
-                                  {t("Analytics", "التحليلات")}
+                                  <ExternalLink className="w-3 h-3" />
+                                  {t("Visit Store", "زيارة المتجر")}
                                 </Button>
-                              </Link>
+                              </a>
                             </>
                           )}
                         </div>
@@ -632,13 +676,64 @@ export default function PortalPage() {
                 <h2 className="text-xl font-semibold text-white mb-6">
                   {t("Account Settings", "إعدادات الحساب")}
                 </h2>
-                <div className="bg-white/5 border border-white/10 rounded-2xl p-6">
-                  <p className="text-zinc-400 text-sm">
-                    {t(
-                      "Account settings coming soon. You can contact support for any account changes.",
-                      "إعدادات الحساب قادمة قريباً. يمكنك التواصل مع الدعم لأي تعديلات على حسابك."
-                    )}
-                  </p>
+                <div className="bg-white/5 border border-white/10 rounded-2xl p-6 max-w-lg space-y-5">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-zinc-300 text-sm mb-1.5">
+                        {t("Name (Arabic)", "الاسم بالعربي")}
+                      </label>
+                      <input
+                        type="text"
+                        value={profileNameAr}
+                        onChange={(e) => setProfileNameAr(e.target.value)}
+                        placeholder={t("Your name in Arabic", "اسمك بالعربي")}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-zinc-600 focus:outline-none focus:border-lime-400/40 transition-colors"
+                        dir="rtl"
+                      />
+                    </div>
+                    <div>
+                      <label className="block text-zinc-300 text-sm mb-1.5">
+                        {t("Name (English)", "الاسم بالإنجليزي")}
+                      </label>
+                      <input
+                        type="text"
+                        value={profileNameEn}
+                        onChange={(e) => setProfileNameEn(e.target.value)}
+                        placeholder={t("Your name in English", "اسمك بالإنجليزي")}
+                        className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-zinc-600 focus:outline-none focus:border-lime-400/40 transition-colors"
+                      />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-zinc-300 text-sm mb-1.5">
+                      {t("Phone Number", "رقم الجوال")}
+                    </label>
+                    <input
+                      type="tel"
+                      value={profilePhone}
+                      onChange={(e) => setProfilePhone(e.target.value)}
+                      placeholder="+966 5x xxx xxxx"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-zinc-600 focus:outline-none focus:border-lime-400/40 transition-colors"
+                    />
+                  </div>
+                  <div className="flex items-center gap-3 pt-1">
+                    <Button
+                      onClick={handleSaveProfile}
+                      disabled={savingProfile}
+                      className="bg-lime-400 hover:bg-lime-300 text-black font-semibold gap-2"
+                    >
+                      {savingProfile ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : profileSaved ? (
+                        <Check className="w-4 h-4" />
+                      ) : null}
+                      {profileSaved
+                        ? t("Saved!", "تم الحفظ!")
+                        : savingProfile
+                        ? t("Saving...", "جاري الحفظ...")
+                        : t("Save Changes", "حفظ التعديلات")}
+                    </Button>
+                  </div>
                 </div>
               </div>
             )}

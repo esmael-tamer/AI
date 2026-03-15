@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
-import { checkAdminAuth } from "@/lib/admin-auth";
+import { checkAdminAuth, getAdminId } from "@/lib/admin-auth";
 
 export async function GET(request: NextRequest) {
   const authError = await checkAdminAuth();
@@ -54,9 +54,10 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "User not found" }, { status: 400 });
     }
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('update_role', 'user', ${id}, ${JSON.stringify({ role })})
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'update_role', 'user', ${id}, ${JSON.stringify({ role })})
     `;
 
     return NextResponse.json(result[0]);
@@ -84,9 +85,10 @@ export async function DELETE(request: NextRequest) {
     const result = await sql`DELETE FROM users WHERE id = ${id} RETURNING id`;
     if (result.length === 0) return NextResponse.json({ error: "User not found" }, { status: 404 });
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('delete', 'user', ${id}, '{}')
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'delete', 'user', ${id}, '{}')
     `;
 
     return NextResponse.json({ success: true, id });

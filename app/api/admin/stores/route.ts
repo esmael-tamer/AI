@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
-import { checkAdminAuth } from "@/lib/admin-auth";
+import { checkAdminAuth, getAdminId } from "@/lib/admin-auth";
 
 export async function GET(request: NextRequest) {
   const authError = await checkAdminAuth();
@@ -61,9 +61,10 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Store not found" }, { status: 400 });
     }
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('update', 'store', ${id}, ${JSON.stringify({ status, plan, payments_status, shipping_status, warehousing_status })})
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'update', 'store', ${id}, ${JSON.stringify({ status, plan, payments_status, shipping_status, warehousing_status })})
     `;
 
     return NextResponse.json(result[0]);
@@ -83,9 +84,10 @@ export async function DELETE(request: NextRequest) {
     const result = await sql`DELETE FROM stores WHERE id = ${id} RETURNING id`;
     if (result.length === 0) return NextResponse.json({ error: "Store not found" }, { status: 404 });
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('delete', 'store', ${id}, '{}')
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'delete', 'store', ${id}, '{}')
     `;
 
     return NextResponse.json({ success: true, id });

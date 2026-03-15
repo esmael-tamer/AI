@@ -1,9 +1,19 @@
 import { NextResponse } from "next/server"
 import { sql } from "@/lib/db"
 import { hashPassword } from "@/lib/auth"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
   try {
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown"
+    const rl = checkRateLimit(ip, 5, 60 * 60 * 1000) // 5 signups per hour
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Too many signup attempts. Please try again later." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } }
+      )
+    }
+
     const { email, password, name_ar, name_en, phone, session_id } = await request.json()
 
     if (!email || !password) {
@@ -31,8 +41,8 @@ export async function POST(request: Request) {
 
     if (session_id) {
       await sql`
-        UPDATE stores SET user_id = ${user.id}
-        WHERE session_id = ${session_id} AND user_id IS NULL
+        UPDATE stores SET owner_id = ${user.id}
+        WHERE session_id = ${session_id} AND owner_id IS NULL
       `
     }
 

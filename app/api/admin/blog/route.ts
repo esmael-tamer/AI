@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
-import { checkAdminAuth } from "@/lib/admin-auth";
+import { checkAdminAuth, getAdminId } from "@/lib/admin-auth";
 
 export async function GET() {
   const authError = await checkAdminAuth();
@@ -43,9 +43,10 @@ export async function POST(request: NextRequest) {
       RETURNING *
     `;
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('create', 'blog_post', ${result[0].id}, ${JSON.stringify({ slug, title_en })})
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'create', 'blog_post', ${result[0].id}, ${JSON.stringify({ slug, title_en })})
     `;
 
     return NextResponse.json(result[0], { status: 201 });
@@ -87,9 +88,10 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Blog post not found" }, { status: 400 });
     }
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('update', 'blog_post', ${id}, ${JSON.stringify({ slug, title_en, status })})
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'update', 'blog_post', ${id}, ${JSON.stringify({ slug, title_en, status })})
     `;
 
     return NextResponse.json(result[0]);
@@ -116,9 +118,10 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Blog post not found" }, { status: 400 });
     }
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('delete', 'blog_post', ${id}, '{}')
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'delete', 'blog_post', ${id}, '{}')
     `;
 
     return NextResponse.json({ success: true, id });
