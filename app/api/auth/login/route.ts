@@ -1,11 +1,12 @@
+import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { verifyPassword } from "@/lib/auth"
-import { checkRateLimit } from "@/lib/rate-limit"
+import { verifyPassword, createSessionValue, SESSION_MAX_AGE, isValidEmail, setClientIdentityCookies } from "@/lib/auth"
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
   try {
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown"
+    const ip = getClientIp(request)
     const rl = checkRateLimit(ip, 10, 15 * 60 * 1000) // 10 attempts per 15 min
     if (!rl.allowed) {
       return NextResponse.json(
@@ -18,6 +19,10 @@ export async function POST(request: Request) {
 
     if (!email || !password) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 })
+    }
+
+    if (!isValidEmail(email)) {
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
 
     const users = await sql`SELECT * FROM users WHERE email = ${email}`
@@ -36,11 +41,7 @@ export async function POST(request: Request) {
 
     await sql`UPDATE users SET updated_at = NOW() WHERE id = ${user.id}`
 
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-    const tokenArray = new Uint8Array(32)
-    crypto.getRandomValues(tokenArray)
-    const token = Array.from(tokenArray, (b) => b.toString(16).padStart(2, "0")).join("")
-
+    const sessionValue = await createSessionValue(user.id)
     const response = NextResponse.json({
       user: {
         id: user.id,
@@ -50,20 +51,22 @@ export async function POST(request: Request) {
         role: user.role,
         phone: user.phone,
       },
-      token,
     })
 
-    response.cookies.set("mt-session", `${user.id}:${token}`, {
+    response.cookies.set("mt-session", sessionValue, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      expires: expiresAt,
+      maxAge: SESSION_MAX_AGE,
     })
+
+    // Non-httpOnly cookies — allow middleware + client JS to read identity
+    setClientIdentityCookies(response, user.id, user.role)
 
     return response
   } catch (error) {
-    console.error("Login error:", error)
+    logger.error("api", "Login error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

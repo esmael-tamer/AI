@@ -1,11 +1,12 @@
+import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { hashPassword } from "@/lib/auth"
-import { checkRateLimit } from "@/lib/rate-limit"
+import { hashPassword, createSessionValue, SESSION_MAX_AGE, isValidEmail, setClientIdentityCookies } from "@/lib/auth"
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
   try {
-    const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown"
+    const ip = getClientIp(request)
     const rl = checkRateLimit(ip, 5, 60 * 60 * 1000) // 5 signups per hour
     if (!rl.allowed) {
       return NextResponse.json(
@@ -20,8 +21,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 })
     }
 
+    if (!isValidEmail(email)) {
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 })
+    }
+
     if (password.length < 8) {
       return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 })
+    }
+
+    if (password.length > 128) {
+      return NextResponse.json({ error: "Password must be at most 128 characters" }, { status: 400 })
+    }
+
+    if (name_ar && name_ar.length > 100) {
+      return NextResponse.json({ error: "Name must be at most 100 characters" }, { status: 400 })
+    }
+
+    if (phone && phone.length > 20) {
+      return NextResponse.json({ error: "Phone number must be at most 20 characters" }, { status: 400 })
     }
 
     const existing = await sql`SELECT id FROM users WHERE email = ${email}`
@@ -46,24 +63,22 @@ export async function POST(request: Request) {
       `
     }
 
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-    const tokenArray = new Uint8Array(32)
-    crypto.getRandomValues(tokenArray)
-    const token = Array.from(tokenArray, (b) => b.toString(16).padStart(2, "0")).join("")
+    const sessionValue = await createSessionValue(user.id)
+    const response = NextResponse.json({ user }, { status: 201 })
 
-    const response = NextResponse.json({ user, token }, { status: 201 })
-
-    response.cookies.set("mt-session", `${user.id}:${token}`, {
+    response.cookies.set("mt-session", sessionValue, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      expires: expiresAt,
+      maxAge: SESSION_MAX_AGE,
     })
+
+    setClientIdentityCookies(response, user.id, "customer")
 
     return response
   } catch (error) {
-    console.error("Signup error:", error)
+    logger.error("api", "Signup error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

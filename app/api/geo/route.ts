@@ -1,8 +1,15 @@
-import { NextResponse } from "next/server"
+import { NextRequest, NextResponse } from "next/server"
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 
 const SOUTH_ASIA = new Set(["IN", "PK", "BD"])
 
-export async function GET(request: Request) {
+export async function GET(request: NextRequest) {
+  const ip = getClientIp(request)
+  const rl = checkRateLimit(`geo:${ip}`, 60, 60 * 1000) // 60 req/min per IP
+  if (!rl.allowed) {
+    return NextResponse.json({ error: "Too many requests" }, { status: 429 })
+  }
+
   // Prefer Vercel country header; fall back to Accept-Language / timezone heuristics.
   const countryHeader =
     request.headers.get("x-vercel-ip-country") ||

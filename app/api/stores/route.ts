@@ -1,9 +1,20 @@
-import { NextResponse } from "next/server"
+import { logger } from "@/lib/logger"
+import { NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
 import type { StoreConfig } from "@/types"
 import { generateSlug, generateSampleProducts } from "@/lib/builder-engine"
+import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const ip = getClientIp(request)
+  const rl = checkRateLimit(`stores:${ip}`, 5, 60 * 60 * 1000) // 5 stores per hour per IP
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "Too many store creation requests. Please try again later." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } }
+    )
+  }
+
   try {
     const config: StoreConfig = await request.json()
 
@@ -45,14 +56,12 @@ export async function POST(request: Request) {
     `
     const store = storeResult[0]
 
-    // Generate and insert sample products
+    // Generate and insert sample products (parallel, not sequential)
     const products = generateSampleProducts(config.category, config.storeName)
-    for (const product of products) {
-      await sql`
-        INSERT INTO products (store_id, name_en, name_ar, desc_en, desc_ar, price, category, images, is_active)
-        VALUES (${store.id}, ${product.nameEn}, ${product.nameAr}, ${product.descEn}, ${product.descAr}, ${product.price}, ${product.category}, ${JSON.stringify([product.image])}, true)
-      `
-    }
+    await Promise.all(products.map(product => sql`
+      INSERT INTO products (store_id, name_en, name_ar, desc_en, desc_ar, price, category, images, is_active)
+      VALUES (${store.id}, ${product.nameEn}, ${product.nameAr}, ${product.descEn}, ${product.descAr}, ${product.price}, ${product.category}, ${JSON.stringify([product.image])}, true)
+    `))
 
     return NextResponse.json({
       success: true,
@@ -64,7 +73,7 @@ export async function POST(request: Request) {
       },
     })
   } catch (error) {
-    console.error("Failed to create store:", error)
+    logger.error("api", "Failed to create store:", error)
     return NextResponse.json({ error: "Failed to create store" }, { status: 500 })
   }
 }

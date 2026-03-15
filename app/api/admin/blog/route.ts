@@ -1,6 +1,8 @@
+import { logger } from "@/lib/logger"
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { checkAdminAuth, getAdminId } from "@/lib/admin-auth";
+import { isValidSlug } from "@/lib/utils";
 
 export async function GET(request: NextRequest) {
   const authError = await checkAdminAuth();
@@ -15,7 +17,7 @@ export async function GET(request: NextRequest) {
 
     return NextResponse.json(posts);
   } catch (error) {
-    console.error("Admin blog GET error:", error);
+    logger.error("api", "Admin blog GET error:", error);
     return NextResponse.json({ error: "Failed to fetch blog posts" }, { status: 500 });
   }
 }
@@ -29,6 +31,14 @@ export async function POST(request: NextRequest) {
 
     if (!slug) {
       return NextResponse.json({ error: "Slug is required" }, { status: 400 });
+    }
+    if (!isValidSlug(slug)) {
+      return NextResponse.json({ error: "Slug must contain only lowercase letters, numbers, and hyphens" }, { status: 400 });
+    }
+
+    const existing = await sql`SELECT id FROM blog_posts WHERE slug = ${slug}`;
+    if (existing.length > 0) {
+      return NextResponse.json({ error: "A blog post with this slug already exists" }, { status: 409 });
     }
 
     const result = await sql`
@@ -57,7 +67,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result[0], { status: 201 });
   } catch (error) {
-    console.error("Admin blog POST error:", error);
+    logger.error("api", "Admin blog POST error:", error);
     return NextResponse.json({ error: "Failed to create blog post" }, { status: 500 });
   }
 }
@@ -71,6 +81,16 @@ export async function PATCH(request: NextRequest) {
 
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    }
+
+    if (slug !== undefined) {
+      if (!isValidSlug(slug)) {
+        return NextResponse.json({ error: "Slug must contain only lowercase letters, numbers, and hyphens" }, { status: 400 });
+      }
+      const conflict = await sql`SELECT id FROM blog_posts WHERE slug = ${slug} AND id != ${id}`;
+      if (conflict.length > 0) {
+        return NextResponse.json({ error: "A blog post with this slug already exists" }, { status: 409 });
+      }
     }
 
     const result = await sql`
@@ -102,7 +122,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(result[0]);
   } catch (error) {
-    console.error("Admin blog PATCH error:", error);
+    logger.error("api", "Admin blog PATCH error:", error);
     return NextResponse.json({ error: "Failed to update blog post" }, { status: 500 });
   }
 }
@@ -132,7 +152,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true, id });
   } catch (error) {
-    console.error("Admin blog DELETE error:", error);
+    logger.error("api", "Admin blog DELETE error:", error);
     return NextResponse.json({ error: "Failed to delete blog post" }, { status: 500 });
   }
 }

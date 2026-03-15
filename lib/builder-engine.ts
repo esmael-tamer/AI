@@ -270,13 +270,14 @@ export function generateSampleProducts(category: string, storeName: string): Pro
   return productsByCategory[category] || defaultProducts
 }
 
-// Generate a slug from store name
+// Generate a URL-safe slug from store name
 export function generateSlug(name: string): string {
-  return name
+  const slug = name
     .toLowerCase()
     .replace(/[^a-z0-9\s-]/g, "")
     .replace(/\s+/g, "-")
     .replace(/-+/g, "-")
-    .trim()
+    .replace(/^-+|-+$/g, "") // strip leading/trailing hyphens
     .substring(0, 50)
+  return slug || "store"
 }

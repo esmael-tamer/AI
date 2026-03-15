@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger"
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { checkAdminAuth, getAdminId } from "@/lib/admin-auth";
@@ -22,7 +23,7 @@ export async function GET(request: NextRequest) {
     }
     return NextResponse.json(leads);
   } catch (error) {
-    console.error("Admin leads GET error:", error);
+    logger.error("api", "Admin leads GET error:", error);
     return NextResponse.json({ error: "Failed to fetch leads" }, { status: 500 });
   }
 }
@@ -62,7 +63,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result[0], { status: 201 });
   } catch (error) {
-    console.error("Admin leads POST error:", error);
+    logger.error("api", "Admin leads POST error:", error);
     return NextResponse.json({ error: "Failed to create lead" }, { status: 500 });
   }
 }
@@ -99,7 +100,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(result[0]);
   } catch (error) {
-    console.error("Admin leads PATCH error:", error);
+    logger.error("api", "Admin leads PATCH error:", error);
     return NextResponse.json({ error: "Failed to update lead" }, { status: 500 });
   }
 }
@@ -122,7 +123,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true, id });
   } catch (error) {
-    console.error("Admin leads DELETE error:", error);
+    logger.error("api", "Admin leads DELETE error:", error);
     return NextResponse.json({ error: "Failed to delete lead" }, { status: 500 });
   }
 }

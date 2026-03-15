@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { getSession } from "@/lib/auth";
@@ -16,7 +17,7 @@ export async function GET() {
 
     return NextResponse.json(profile);
   } catch (error) {
-    console.error("Portal profile GET error:", error);
+    logger.error("api", "Portal profile GET error:", error);
     return NextResponse.json({ error: "Failed to fetch profile" }, { status: 500 });
   }
 }
@@ -42,7 +43,7 @@ export async function PATCH(request: Request) {
 
     return NextResponse.json(result[0]);
   } catch (error) {
-    console.error("Portal profile PATCH error:", error);
+    logger.error("api", "Portal profile PATCH error:", error);
     return NextResponse.json({ error: "Failed to update profile" }, { status: 500 });
   }
 }

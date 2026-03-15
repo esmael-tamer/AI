@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger"
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { checkAdminAuth, getAdminId } from "@/lib/admin-auth";
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
     }
     return NextResponse.json(users);
   } catch (error) {
-    console.error("Admin users GET error:", error);
+    logger.error("api", "Admin users GET error:", error);
     return NextResponse.json({ error: "Failed to fetch users" }, { status: 500 });
   }
 }
@@ -62,7 +63,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(result[0]);
   } catch (error) {
-    console.error("Admin users PATCH error:", error);
+    logger.error("api", "Admin users PATCH error:", error);
     return NextResponse.json({ error: "Failed to update user" }, { status: 500 });
   }
 }
@@ -93,7 +94,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true, id });
   } catch (error) {
-    console.error("Admin users DELETE error:", error);
+    logger.error("api", "Admin users DELETE error:", error);
     return NextResponse.json({ error: "Failed to delete user" }, { status: 500 });
   }
 }

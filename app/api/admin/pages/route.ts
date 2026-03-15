@@ -1,6 +1,8 @@
+import { logger } from "@/lib/logger"
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { checkAdminAuth, getAdminId } from "@/lib/admin-auth";
+import { isValidSlug } from "@/lib/utils";
 
 export async function GET() {
   const authError = await checkAdminAuth();
@@ -9,7 +11,7 @@ export async function GET() {
     const pages = await sql`SELECT * FROM pages ORDER BY created_at DESC`;
     return NextResponse.json(pages);
   } catch (error) {
-    console.error("Admin pages GET error:", error);
+    logger.error("api", "Admin pages GET error:", error);
     return NextResponse.json({ error: "Failed to fetch pages" }, { status: 500 });
   }
 }
@@ -23,6 +25,14 @@ export async function POST(request: NextRequest) {
 
     if (!slug) {
       return NextResponse.json({ error: "Slug is required" }, { status: 400 });
+    }
+    if (!isValidSlug(slug)) {
+      return NextResponse.json({ error: "Slug must contain only lowercase letters, numbers, and hyphens" }, { status: 400 });
+    }
+
+    const existing = await sql`SELECT id FROM pages WHERE slug = ${slug}`;
+    if (existing.length > 0) {
+      return NextResponse.json({ error: "A page with this slug already exists" }, { status: 409 });
     }
 
     const result = await sql`
@@ -49,7 +59,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result[0], { status: 201 });
   } catch (error) {
-    console.error("Admin pages POST error:", error);
+    logger.error("api", "Admin pages POST error:", error);
     return NextResponse.json({ error: "Failed to create page" }, { status: 500 });
   }
 }
@@ -63,6 +73,16 @@ export async function PATCH(request: NextRequest) {
 
     if (!id) {
       return NextResponse.json({ error: "ID is required" }, { status: 400 });
+    }
+
+    if (slug !== undefined) {
+      if (!isValidSlug(slug)) {
+        return NextResponse.json({ error: "Slug must contain only lowercase letters, numbers, and hyphens" }, { status: 400 });
+      }
+      const conflict = await sql`SELECT id FROM pages WHERE slug = ${slug} AND id != ${id}`;
+      if (conflict.length > 0) {
+        return NextResponse.json({ error: "A page with this slug already exists" }, { status: 409 });
+      }
     }
 
     const result = await sql`
@@ -93,7 +113,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(result[0]);
   } catch (error) {
-    console.error("Admin pages PATCH error:", error);
+    logger.error("api", "Admin pages PATCH error:", error);
     return NextResponse.json({ error: "Failed to update page" }, { status: 500 });
   }
 }
@@ -123,7 +143,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true, id });
   } catch (error) {
-    console.error("Admin pages DELETE error:", error);
+    logger.error("api", "Admin pages DELETE error:", error);
     return NextResponse.json({ error: "Failed to delete page" }, { status: 500 });
   }
 }
