@@ -2,6 +2,7 @@ import { logger } from "@/lib/logger"
 import { NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
 import { checkRateLimit } from "@/lib/rate-limit"
+import { isValidEmail } from "@/lib/auth"
 
 const VALID_TYPES = ["store_activation", "ads_launch", "account_mgmt"] as const
 
@@ -21,6 +22,18 @@ export async function POST(request: NextRequest) {
 
     if (!name || !email) {
       return NextResponse.json({ error: "Name and email are required" }, { status: 400 })
+    }
+
+    if (!isValidEmail(email)) {
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 })
+    }
+
+    if (name.length > 100) {
+      return NextResponse.json({ error: "Name must be at most 100 characters" }, { status: 400 })
+    }
+
+    if (notes && notes.length > 2000) {
+      return NextResponse.json({ error: "Notes must be at most 2000 characters" }, { status: 400 })
     }
 
     if (type && !VALID_TYPES.includes(type)) {

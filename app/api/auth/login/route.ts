@@ -1,7 +1,7 @@
 import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { verifyPassword, createSessionValue, SESSION_MAX_AGE } from "@/lib/auth"
+import { verifyPassword, createSessionValue, SESSION_MAX_AGE, isValidEmail } from "@/lib/auth"
 import { checkRateLimit } from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
@@ -19,6 +19,10 @@ export async function POST(request: Request) {
 
     if (!email || !password) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 })
+    }
+
+    if (!isValidEmail(email)) {
+      return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
 
     const users = await sql`SELECT * FROM users WHERE email = ${email}`
@@ -51,6 +55,15 @@ export async function POST(request: Request) {
 
     response.cookies.set("mt-session", sessionValue, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: SESSION_MAX_AGE,
+    })
+
+    // Non-httpOnly role cookie — allows middleware + client JS to read role
+    response.cookies.set("user_role", user.role, {
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",

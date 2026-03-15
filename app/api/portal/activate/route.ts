@@ -1,14 +1,23 @@
 import { logger } from "@/lib/logger"
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { getSession } from "@/lib/auth";
+import { checkRateLimit } from "@/lib/rate-limit";
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
   try {
     const user = await getSession();
 
     if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const rl = checkRateLimit(`activate:${user.id}`, 3, 60 * 60 * 1000) // 3 activation requests per hour
+    if (!rl.allowed) {
+      return NextResponse.json(
+        { error: "Too many activation requests. Please try again later." },
+        { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } }
+      );
     }
 
     const userId = String(user.id);
@@ -29,6 +38,18 @@ export async function POST(request: Request) {
 
     if (!business_name || !contact_phone) {
       return NextResponse.json({ error: "business_name and contact_phone are required" }, { status: 400 });
+    }
+
+    if (business_name.length > 100) {
+      return NextResponse.json({ error: "Business name must be at most 100 characters" }, { status: 400 });
+    }
+
+    if (contact_phone.length > 20) {
+      return NextResponse.json({ error: "Phone number must be at most 20 characters" }, { status: 400 });
+    }
+
+    if (notes && notes.length > 2000) {
+      return NextResponse.json({ error: "Notes must be at most 2000 characters" }, { status: 400 });
     }
 
     const store = await sql`

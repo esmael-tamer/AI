@@ -52,6 +52,14 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Subject and message are required" }, { status: 400 });
     }
 
+    if (subject.length > 200) {
+      return NextResponse.json({ error: "Subject must be at most 200 characters" }, { status: 400 });
+    }
+
+    if (message.length > 5000) {
+      return NextResponse.json({ error: "Message must be at most 5000 characters" }, { status: 400 });
+    }
+
     const validPriorities = ["low", "medium", "high"];
     const ticketPriority = validPriorities.includes(priority) ? priority : "medium";
 

@@ -6,6 +6,18 @@ const SESSION_COOKIE = "mt-session"
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 7 // 7 days in seconds
 const PBKDF2_ITERATIONS = 100_000
 
+if (process.env.NODE_ENV === "production" && !process.env.SESSION_SECRET) {
+  console.warn(
+    "[auth] SESSION_SECRET env var is not set. Sessions are signed with DATABASE_URL. " +
+    "Set SESSION_SECRET to a random 32+ char string for proper security."
+  )
+}
+
+/** Validates email format (RFC-compatible, rejects whitespace and missing TLD). */
+export function isValidEmail(email: string): boolean {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email) && email.length <= 254
+}
+
 function getSecretMaterial(): string {
   return process.env.SESSION_SECRET || process.env.DATABASE_URL || "mediatrend-session-secret-2024"
 }
@@ -131,6 +143,7 @@ export async function login(email: string, password: string): Promise<{ user: Us
 export async function logout(): Promise<void> {
   const cookieStore = await cookies()
   cookieStore.delete(SESSION_COOKIE)
+  cookieStore.delete("user_role")
 }
 
 export async function getSession(): Promise<User | null> {

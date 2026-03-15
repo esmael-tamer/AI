@@ -27,6 +27,16 @@ export function middleware(request: NextRequest) {
       response.cookies.delete(SESSION_COOKIE)
       return response
     }
+
+    // For admin routes: reject non-admin sessions early using the client role cookie
+    if (isAdminRoute) {
+      const userRole = request.cookies.get("user_role")?.value
+      // If role cookie exists and is explicitly not admin, block immediately.
+      // If absent (e.g. legacy session), fall through — server-side checkAdminAuth() handles it.
+      if (userRole && userRole !== "admin") {
+        return NextResponse.redirect(new URL("/admin/login", request.url))
+      }
+    }
   }
 
   return NextResponse.next()

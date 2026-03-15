@@ -1,7 +1,7 @@
 import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { hashPassword, createSessionValue, SESSION_MAX_AGE } from "@/lib/auth"
+import { hashPassword, createSessionValue, SESSION_MAX_AGE, isValidEmail } from "@/lib/auth"
 import { checkRateLimit } from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
@@ -21,8 +21,24 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 })
     }
 
+    if (!isValidEmail(email)) {
+      return NextResponse.json({ error: "Invalid email address" }, { status: 400 })
+    }
+
     if (password.length < 8) {
       return NextResponse.json({ error: "Password must be at least 8 characters" }, { status: 400 })
+    }
+
+    if (password.length > 128) {
+      return NextResponse.json({ error: "Password must be at most 128 characters" }, { status: 400 })
+    }
+
+    if (name_ar && name_ar.length > 100) {
+      return NextResponse.json({ error: "Name must be at most 100 characters" }, { status: 400 })
+    }
+
+    if (phone && phone.length > 20) {
+      return NextResponse.json({ error: "Phone number must be at most 20 characters" }, { status: 400 })
     }
 
     const existing = await sql`SELECT id FROM users WHERE email = ${email}`
@@ -52,6 +68,14 @@ export async function POST(request: Request) {
 
     response.cookies.set("mt-session", sessionValue, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: SESSION_MAX_AGE,
+    })
+
+    response.cookies.set("user_role", "customer", {
+      httpOnly: false,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
