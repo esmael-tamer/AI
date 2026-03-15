@@ -41,42 +41,55 @@ Key capabilities:
 /
 ├── app/                        # Next.js App Router
 │   ├── layout.tsx              # Root layout (fonts, metadata, bilingual setup)
-│   ├── page.tsx                # Homepage (hero, services, pricing, FAQ)
+│   ├── page.tsx                # Homepage
+│   ├── about/                  # About page
 │   ├── login/                  # User login
 │   ├── signup/                 # User registration
 │   ├── builder/                # AI store builder (conversational UI)
 │   ├── admin/                  # Admin dashboard & login
-│   ├── blog/                   # Blog listing
-│   ├── work/                   # Portfolio / case studies
+│   ├── blog/                   # Blog listing + detail pages
+│   ├── work/                   # Portfolio / case studies + detail pages
 │   ├── team/                   # Team page
-│   ├── About/                  # About page
 │   ├── contact/                # Contact form
+│   ├── faq/                    # FAQ page
 │   ├── services/               # Services overview + sub-pages
 │   ├── checkout/               # Checkout flow
-│   ├── revisions/              # Revision history
+│   ├── portal/                 # Customer portal (stores, tickets, profile)
 │   ├── t&c/                    # Terms & Conditions
 │   ├── s/[slug]/               # Dynamic public store pages
 │   └── api/                    # API routes (see below)
 │
-├── components/                 # React components
-│   ├── ui/                     # shadcn/ui primitives (46 components)
-│   ├── client-layout.tsx       # Root wrapper with LanguageProvider
-│   ├── mt-header.tsx           # Navigation with language switcher
-│   ├── mt-hero.tsx             # Hero section with store builder input
-│   ├── mt-services.tsx         # Services section
-│   ├── pricing.tsx             # Commission plans
-│   ├── faq.tsx                 # FAQ accordion
-│   └── ...                     # ~78 total components
+├── components/
+│   ├── ui/                     # shadcn/ui primitives
+│   ├── layout/                 # Layout components
+│   │   ├── client-layout.tsx   # Root wrapper with LanguageProvider
+│   │   ├── header.tsx          # Navigation with language switcher
+│   │   ├── footer.tsx          # Site footer
+│   │   └── theme-provider.tsx  # Theme context
+│   ├── sections/               # Homepage sections
+│   │   ├── hero.tsx
+│   │   ├── services.tsx
+│   │   ├── pricing.tsx
+│   │   ├── faq.tsx
+│   │   ├── testimonials.tsx
+│   │   ├── demo-showcase.tsx
+│   │   ├── partners.tsx
+│   │   ├── how-it-works.tsx
+│   │   └── cta.tsx
+│   └── ...                     # Other feature components
 │
 ├── lib/
 │   ├── db.ts                   # PostgreSQL connection + TypeScript types
 │   ├── auth.ts                 # Session management, password hashing
+│   ├── admin-auth.ts           # Admin auth helpers (checkAdminAuth, getAdminId)
+│   ├── rate-limit.ts           # In-memory rate limiting utility
 │   ├── builder-engine.ts       # AI store builder configuration & logic
 │   ├── i18n.tsx                # Bilingual Context (Arabic/English)
-│   └── utils.ts                # clsx + tailwind-merge helper
+│   ├── utils.ts                # clsx + tailwind-merge helper
+│   └── services/
+│       └── api.ts              # Client-side API service layer (centralized fetch)
 │
 ├── hooks/                      # Custom React hooks
-├── styles/                     # Global CSS
 ├── scripts/
 │   ├── 001-create-tables.sql   # Database schema (12 tables)
 │   └── 002-seed-data.sql       # Seed data (admin, team, partners, blog)
@@ -128,6 +141,7 @@ Key capabilities:
 | GET | `/api/portal/stores` | User's stores |
 | GET | `/api/portal/tickets` | User's tickets |
 | POST | `/api/portal/activate` | Request service activation |
+| GET/PUT | `/api/portal/profile` | User profile |
 
 ---
 
@@ -165,7 +179,22 @@ psql $DATABASE_URL -f scripts/002-seed-data.sql
 - **Password hashing:** SHA-256 with salt `"mediatrend-salt-2024"` (in `lib/auth.ts`)
 - **Client cookies:** `user_id`, `user_role` (non-httpOnly, readable by client JS)
 - **Middleware** (`middleware.ts`) protects `/admin/*` and `/portal/*` — redirects unauthorized to `/login` or `/admin/login`
-- Use `requireAuth()` and `requireAdmin()` from `lib/auth.ts` in API routes
+
+### In API Routes
+- **Admin routes:** Use `checkAdminAuth()` from `lib/admin-auth.ts`:
+  ```ts
+  import { checkAdminAuth } from "@/lib/admin-auth"
+  const authError = await checkAdminAuth()
+  if (authError) return authError
+  ```
+- **Portal routes:** Use `requireAuth()` from `lib/auth.ts`:
+  ```ts
+  import { requireAuth } from "@/lib/auth"
+  const user = await requireAuth()
+  ```
+
+### Rate Limiting
+`lib/rate-limit.ts` exports `checkRateLimit(key, limit, windowMs)` — use on auth and public endpoints.
 
 ---
 
@@ -185,7 +214,7 @@ The platform is bilingual: **Arabic (ar, RTL, default)** and **English (en, LTR)
 
 ## Design System & Styling
 
-- **Design aesthetic:** Dark premium ("Skitbit style") — black background, `lime-400` accent color
+- **Design aesthetic:** Dark premium — black background, `lime-400` accent color
 - **Color system:** HSL CSS variables defined in Tailwind config (`background`, `foreground`, `card`, `primary`, `secondary`, `accent`, etc.)
 - **Dark mode:** Class-based (`dark:` prefix)
 - **Component library:** shadcn/ui with `new-york` style — import from `@/components/ui/`
@@ -207,10 +236,18 @@ When styling, prefer Tailwind utility classes. Avoid inline styles unless absolu
 
 ### Component Patterns
 - Pages are in `/app/` using Next.js App Router conventions
+- Layout components go in `/components/layout/`
+- Homepage section components go in `/components/sections/`
 - Shared UI primitives go in `/components/ui/` (shadcn/ui)
-- Feature components go in `/components/`
 - Use `'use client'` directive only when hooks or browser APIs are needed
 - Server Components are the default — prefer them for data-fetching pages
+
+### Client-Side API Calls
+Use the centralized service layer in `lib/services/api.ts` for all client-side fetch calls:
+```ts
+import { api } from "@/lib/services/api"
+const posts = await api.getPublishedPosts()
+```
 
 ### Form Handling
 - Use `react-hook-form` + `zod` for all forms
@@ -224,13 +261,13 @@ When styling, prefer Tailwind utility classes. Avoid inline styles unless absolu
 ### API Routes
 - All API route files export named functions: `GET`, `POST`, `PUT`, `DELETE`
 - Return `NextResponse.json(...)` with appropriate HTTP status codes
-- Admin routes must call `requireAdmin()` at the top
-- User routes must call `requireAuth()` at the top
+- Admin routes: use `checkAdminAuth()` from `lib/admin-auth.ts`
+- Portal routes: use `requireAuth()` from `lib/auth.ts`
 
 ### File Naming
 - Pages: `page.tsx` inside named directories (Next.js App Router convention)
-- Components: kebab-case (e.g., `mt-header.tsx`, `client-layout.tsx`)
-- Lib files: kebab-case (e.g., `builder-engine.ts`)
+- Components: kebab-case (e.g., `header.tsx`, `client-layout.tsx`)
+- Lib files: kebab-case (e.g., `builder-engine.ts`, `admin-auth.ts`)
 
 ---
 
@@ -294,6 +331,10 @@ pnpm lint      # ESLint (note: currently not enforced in build)
 
 8. **Tailwind v4** — This project uses Tailwind CSS v4 with `@tailwindcss/postcss` — not the classic `tailwindcss` PostCSS plugin. Syntax and configuration differ slightly from v3.
 
+9. **`lib/admin-auth.ts`** — Admin routes use `checkAdminAuth()` (not `requireAdmin()` directly). This wrapper converts auth exceptions to proper `NextResponse` error objects.
+
+10. **`lib/services/api.ts`** — Centralized client-side API layer. Add new fetch calls here instead of inline in components.
+
 ---
 
 ## Deployment
@@ -312,7 +353,7 @@ The project is designed for **Replit** deployment (PostgreSQL provided automatic
 Create `/app/<page-name>/page.tsx`. Add `'use client'` if needed. Use `useLanguage()` for bilingual text.
 
 **Add a new API endpoint:**
-Create `/app/api/<route>/route.ts`. Export `GET`/`POST`/etc. functions. Call `requireAuth()` or `requireAdmin()` as needed.
+Create `/app/api/<route>/route.ts`. Export `GET`/`POST`/etc. functions. Use `checkAdminAuth()` for admin or `requireAuth()` for portal routes.
 
 **Add a new DB table:**
 Add `CREATE TABLE` to a new migration script in `/scripts/`. Update type definitions in `lib/db.ts`.
@@ -322,3 +363,6 @@ Run `pnpm dlx shadcn@latest add <component>` — it will place the file in `/com
 
 **Add bilingual text:**
 Use `t('النص العربي', 'English text')` from `useLanguage()` hook. Always provide both languages.
+
+**Add a client-side API call:**
+Add a method to `lib/services/api.ts` and import `api` in the component.
