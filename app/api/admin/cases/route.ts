@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { checkAdminAuth } from "@/lib/admin-auth";
 
 export async function GET() {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const cases = await sql`SELECT * FROM case_studies ORDER BY sort_order ASC`;
     return NextResponse.json(cases);
@@ -12,6 +15,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { title_ar, title_en, desc_ar, desc_en, cover_image, gallery, client_name, category, sort_order } = body;
@@ -49,6 +54,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { id, title_ar, title_en, desc_ar, desc_en, cover_image, gallery, client_name, category, sort_order } = body;
@@ -89,6 +96,8 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { id } = body;

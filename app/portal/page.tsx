@@ -119,6 +119,11 @@ export default function PortalPage() {
   const [linkedSlug, setLinkedSlug] = useState<string | null>(null);
 
   const [activatingStore, setActivatingStore] = useState<StoreData | null>(null);
+  const [showNewTicket, setShowNewTicket] = useState(false);
+  const [ticketSubject, setTicketSubject] = useState("");
+  const [ticketMessage, setTicketMessage] = useState("");
+  const [ticketPriority, setTicketPriority] = useState("medium");
+  const [submittingTicket, setSubmittingTicket] = useState(false);
   const [stepperStep, setStepperStep] = useState(1);
   const [selectedServices, setSelectedServices] = useState<string[]>([]);
   const [businessName, setBusinessName] = useState("");
@@ -178,6 +183,33 @@ export default function PortalPage() {
         ? prev.filter((s) => s !== serviceId)
         : [...prev, serviceId]
     );
+  }
+
+  async function handleSubmitTicket() {
+    if (!ticketSubject.trim()) return;
+    setSubmittingTicket(true);
+    try {
+      const res = await fetch("/api/portal/tickets", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          subject: ticketSubject,
+          message: ticketMessage,
+          priority: ticketPriority,
+        }),
+      });
+      if (res.ok) {
+        setShowNewTicket(false);
+        setTicketSubject("");
+        setTicketMessage("");
+        setTicketPriority("medium");
+        fetchData();
+      }
+    } catch (err) {
+      console.error("Ticket submission failed:", err);
+    } finally {
+      setSubmittingTicket(false);
+    }
   }
 
   async function handleSubmitActivation() {
@@ -490,22 +522,26 @@ export default function PortalPage() {
 
                           {(store.status === "live" || store.status === "active") && (
                             <>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="flex-1 border-white/10 text-zinc-300 hover:text-white hover:bg-white/5 gap-2 bg-transparent"
-                              >
-                                <Settings className="w-3 h-3" />
-                                {t("Manage Store", "إدارة المتجر")}
-                              </Button>
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="flex-1 border-white/10 text-zinc-300 hover:text-white hover:bg-white/5 gap-2 bg-transparent"
-                              >
-                                <BarChart3 className="w-3 h-3" />
-                                {t("Analytics", "التحليلات")}
-                              </Button>
+                              <Link href={`/builder?store=${store.slug}`} className="flex-1">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="w-full border-white/10 text-zinc-300 hover:text-white hover:bg-white/5 gap-2 bg-transparent"
+                                >
+                                  <Settings className="w-3 h-3" />
+                                  {t("Manage Store", "إدارة المتجر")}
+                                </Button>
+                              </Link>
+                              <Link href={`/s/${store.slug}`} className="flex-1">
+                                <Button
+                                  variant="outline"
+                                  size="sm"
+                                  className="w-full border-white/10 text-zinc-300 hover:text-white hover:bg-white/5 gap-2 bg-transparent"
+                                >
+                                  <BarChart3 className="w-3 h-3" />
+                                  {t("Analytics", "التحليلات")}
+                                </Button>
+                              </Link>
                             </>
                           )}
                         </div>
@@ -522,7 +558,10 @@ export default function PortalPage() {
                   <h2 className="text-xl font-semibold text-white">
                     {t("Support Tickets", "تذاكر الدعم")}
                   </h2>
-                  <Button className="bg-lime-400 hover:bg-lime-300 text-black font-semibold rounded-xl gap-2">
+                  <Button
+                    onClick={() => setShowNewTicket(true)}
+                    className="bg-lime-400 hover:bg-lime-300 text-black font-semibold rounded-xl gap-2"
+                  >
                     <Plus className="w-4 h-4" />
                     {t("New Ticket", "تذكرة جديدة")}
                   </Button>
@@ -606,6 +645,73 @@ export default function PortalPage() {
           </>
         )}
       </div>
+
+      {/* New Ticket Modal */}
+      {showNewTicket && (
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center">
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" onClick={() => setShowNewTicket(false)} />
+          <div className="relative w-full max-w-lg bg-[#0a0a0a] border border-white/10 rounded-t-2xl sm:rounded-2xl animate-in slide-in-from-bottom duration-300">
+            <div className="p-5 border-b border-white/10 flex items-center justify-between">
+              <h2 className="text-white font-semibold text-lg">{t("New Support Ticket", "تذكرة دعم جديدة")}</h2>
+              <button type="button" onClick={() => setShowNewTicket(false)} className="text-zinc-400 hover:text-white p-1 rounded-lg hover:bg-white/5">
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div>
+                <label className="block text-zinc-300 text-sm mb-1.5">{t("Subject", "الموضوع")} <span className="text-red-400">*</span></label>
+                <input
+                  type="text"
+                  value={ticketSubject}
+                  onChange={(e) => setTicketSubject(e.target.value)}
+                  placeholder={t("Describe your issue briefly", "صف مشكلتك بإيجاز")}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-zinc-600 focus:outline-none focus:border-lime-400/40 transition-colors"
+                />
+              </div>
+              <div>
+                <label className="block text-zinc-300 text-sm mb-1.5">{t("Priority", "الأولوية")}</label>
+                <select
+                  value={ticketPriority}
+                  onChange={(e) => setTicketPriority(e.target.value)}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:outline-none focus:border-lime-400/40 transition-colors appearance-none"
+                >
+                  <option value="low" className="bg-[#0a0a0a]">{t("Low", "منخفضة")}</option>
+                  <option value="medium" className="bg-[#0a0a0a]">{t("Medium", "متوسطة")}</option>
+                  <option value="high" className="bg-[#0a0a0a]">{t("High", "عالية")}</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-zinc-300 text-sm mb-1.5">{t("Message", "الرسالة")}</label>
+                <textarea
+                  value={ticketMessage}
+                  onChange={(e) => setTicketMessage(e.target.value)}
+                  placeholder={t("Provide more details about your issue...", "أضف تفاصيل إضافية حول مشكلتك...")}
+                  rows={4}
+                  className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm placeholder:text-zinc-600 focus:outline-none focus:border-lime-400/40 transition-colors resize-none"
+                />
+              </div>
+            </div>
+            <div className="p-5 border-t border-white/10 flex gap-3 justify-end">
+              <Button variant="ghost" size="sm" onClick={() => setShowNewTicket(false)} className="text-zinc-400 hover:text-white hover:bg-white/5">
+                {t("Cancel", "إلغاء")}
+              </Button>
+              <Button
+                size="sm"
+                onClick={handleSubmitTicket}
+                disabled={submittingTicket || !ticketSubject.trim()}
+                className="bg-lime-400 hover:bg-lime-300 text-black font-semibold gap-2 disabled:opacity-40"
+              >
+                {submittingTicket ? (
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                ) : (
+                  <Check className="w-4 h-4" />
+                )}
+                {t("Submit Ticket", "إرسال التذكرة")}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Activation Stepper Modal */}
       {activatingStore && (

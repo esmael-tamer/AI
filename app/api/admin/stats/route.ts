@@ -1,7 +1,10 @@
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { checkAdminAuth } from "@/lib/admin-auth";
 
 export async function GET() {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const [stores, users, leads, tickets, blog] = await Promise.all([
       sql`SELECT COUNT(*) as count FROM stores`,

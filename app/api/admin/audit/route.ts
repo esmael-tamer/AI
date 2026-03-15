@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { checkAdminAuth } from "@/lib/admin-auth";
 
 export async function GET(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const { searchParams } = new URL(request.url);
     const limit = Math.min(parseInt(searchParams.get("limit") || "50", 10), 200);

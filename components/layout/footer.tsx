@@ -52,7 +52,7 @@ export default function MTFooter() {
                 )}
               </p>
               <a
-                href="https://wa.me/9656566179840"
+                href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "9656566179840"}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 text-sm text-green-400/70 hover:text-green-400 transition-colors"

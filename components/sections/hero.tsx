@@ -122,7 +122,7 @@ export default function MTHero() {
             <ArrowRight className={`w-5 h-5 group-hover:translate-x-1 transition-transform ${isAr ? "rotate-180 group-hover:-translate-x-1" : ""}`} />
           </button>
           <a
-            href="https://wa.me/9656566179840"
+            href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "9656566179840"}`}
             target="_blank"
             rel="noopener noreferrer"
             className="flex items-center gap-2 px-6 py-3.5 text-white/60 font-medium text-sm rounded-full border border-white/10 hover:bg-white/5 hover:border-white/20 transition-all"

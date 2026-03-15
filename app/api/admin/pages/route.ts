@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { checkAdminAuth } from "@/lib/admin-auth";
 
 export async function GET() {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const pages = await sql`SELECT * FROM pages ORDER BY created_at DESC`;
     return NextResponse.json(pages);
@@ -12,6 +15,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { slug, title_ar, title_en, meta_title_ar, meta_title_en, meta_desc_ar, meta_desc_en, content_json, status } = body;
@@ -49,6 +54,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { id, slug, title_ar, title_en, meta_title_ar, meta_title_en, meta_desc_ar, meta_desc_en, content_json, status } = body;
@@ -90,6 +97,8 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { id } = body;

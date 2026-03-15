@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { checkAdminAuth } from "@/lib/admin-auth";
 
 export async function GET(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
@@ -31,6 +34,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { store_id, user_id, lead_id, type, notes } = body;
@@ -64,6 +69,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { id, status, notes } = body;

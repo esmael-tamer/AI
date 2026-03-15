@@ -52,7 +52,7 @@ export default function MTCTA() {
                   <ArrowRight className={`w-5 h-5 group-hover:translate-x-1 transition-transform ${isAr ? "rotate-180 group-hover:-translate-x-1" : ""}`} />
                 </Link>
                 <a
-                  href="https://wa.me/9656566179840"
+                  href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "9656566179840"}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 px-8 py-4 text-white font-medium text-lg rounded-full border border-white/15 hover:bg-white/5 hover:border-white/25 transition-all"

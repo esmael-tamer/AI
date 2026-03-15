@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { sql } from "@/lib/db"
 import { generateSlug, generateSampleProducts } from "@/lib/builder-engine"
+import { checkAdminAuth } from "@/lib/admin-auth"
 
 const DEMO_STORES = [
   {
@@ -33,6 +34,8 @@ const DEMO_STORES = [
 ]
 
 export async function GET() {
+  const authError = await checkAdminAuth()
+  if (authError) return authError
   try {
     const results: { slug: string; created: boolean }[] = []
 

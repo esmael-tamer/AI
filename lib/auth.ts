@@ -4,6 +4,7 @@ import type { User } from "@/types"
 
 const SESSION_COOKIE = "mt-session"
 const SESSION_MAX_AGE = 60 * 60 * 24 * 7 // 7 days
+const PBKDF2_ITERATIONS = 100_000
 
 function generateToken(): string {
   const array = new Uint8Array(32)
@@ -11,18 +12,64 @@ function generateToken(): string {
   return Array.from(array, (b) => b.toString(16).padStart(2, "0")).join("")
 }
 
-async function hashPassword(password: string): Promise<string> {
-  const encoder = new TextEncoder()
-  const data = encoder.encode(password + "mediatrend-salt-2024")
-  const hash = await crypto.subtle.digest("SHA-256", data)
-  return Array.from(new Uint8Array(hash))
-    .map((b) => b.toString(16).padStart(2, "0"))
-    .join("")
+function hexToBytes(hex: string): Uint8Array {
+  const bytes = new Uint8Array(hex.length / 2)
+  for (let i = 0; i < hex.length; i += 2) {
+    bytes[i / 2] = parseInt(hex.slice(i, i + 2), 16)
+  }
+  return bytes
 }
 
-async function verifyPassword(password: string, hash: string): Promise<boolean> {
-  const inputHash = await hashPassword(password)
-  return inputHash === hash
+function bytesToHex(bytes: Uint8Array): string {
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, "0")).join("")
+}
+
+export async function hashPassword(password: string): Promise<string> {
+  const salt = crypto.getRandomValues(new Uint8Array(16))
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"],
+  )
+  const hashBuffer = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt, iterations: PBKDF2_ITERATIONS, hash: "SHA-256" },
+    keyMaterial,
+    256,
+  )
+  return `pbkdf2:${bytesToHex(salt)}:${bytesToHex(new Uint8Array(hashBuffer))}`
+}
+
+export async function verifyPassword(password: string, stored: string): Promise<boolean> {
+  // Support legacy SHA-256 hashes for backwards compatibility
+  if (!stored.startsWith("pbkdf2:")) {
+    const encoder = new TextEncoder()
+    const data = encoder.encode(password + "mediatrend-salt-2024")
+    const hash = await crypto.subtle.digest("SHA-256", data)
+    const legacyHash = bytesToHex(new Uint8Array(hash))
+    return legacyHash === stored
+  }
+
+  const parts = stored.split(":")
+  if (parts.length !== 3) return false
+  const [, saltHex, hashHex] = parts
+
+  const salt = hexToBytes(saltHex)
+  const keyMaterial = await crypto.subtle.importKey(
+    "raw",
+    new TextEncoder().encode(password),
+    "PBKDF2",
+    false,
+    ["deriveBits"],
+  )
+  const hashBuffer = await crypto.subtle.deriveBits(
+    { name: "PBKDF2", salt, iterations: PBKDF2_ITERATIONS, hash: "SHA-256" },
+    keyMaterial,
+    256,
+  )
+  const inputHashHex = bytesToHex(new Uint8Array(hashBuffer))
+  return inputHashHex === hashHex
 }
 
 export async function createUser(
@@ -97,5 +144,3 @@ export async function requireAdmin(): Promise<User> {
   }
   return user
 }
-
-export { hashPassword, verifyPassword }
