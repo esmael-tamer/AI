@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger"
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { checkAdminAuth, getAdminId } from "@/lib/admin-auth";
@@ -28,7 +29,7 @@ export async function GET(request: NextRequest) {
     }
     return NextResponse.json(tickets);
   } catch (error) {
-    console.error("Admin tickets GET error:", error);
+    logger.error("api", "Admin tickets GET error:", error);
     return NextResponse.json({ error: "Failed to fetch tickets" }, { status: 500 });
   }
 }
@@ -64,7 +65,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result[0], { status: 201 });
   } catch (error) {
-    console.error("Admin tickets POST error:", error);
+    logger.error("api", "Admin tickets POST error:", error);
     return NextResponse.json({ error: "Failed to create ticket" }, { status: 500 });
   }
 }
@@ -101,7 +102,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(result[0]);
   } catch (error) {
-    console.error("Admin tickets PATCH error:", error);
+    logger.error("api", "Admin tickets PATCH error:", error);
     return NextResponse.json({ error: "Failed to update ticket" }, { status: 500 });
   }
 }
@@ -124,7 +125,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true, id });
   } catch (error) {
-    console.error("Admin tickets DELETE error:", error);
+    logger.error("api", "Admin tickets DELETE error:", error);
     return NextResponse.json({ error: "Failed to delete ticket" }, { status: 500 });
   }
 }

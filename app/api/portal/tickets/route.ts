@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { getSession } from "@/lib/auth";
@@ -7,7 +8,7 @@ export async function GET() {
     const user = await getSession();
 
     if (!user) {
-      return NextResponse.json([], { status: 200 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const supportTickets = await sql`
@@ -32,8 +33,8 @@ export async function GET() {
 
     return NextResponse.json(allTickets);
   } catch (error) {
-    console.error("Portal tickets error:", error);
-    return NextResponse.json([], { status: 200 });
+    logger.error("api", "Portal tickets error:", error);
+    return NextResponse.json({ error: "Failed to fetch tickets" }, { status: 500 });
   }
 }
 
@@ -62,7 +63,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json(ticket, { status: 201 });
   } catch (error) {
-    console.error("Portal tickets POST error:", error);
+    logger.error("api", "Portal tickets POST error:", error);
     return NextResponse.json({ error: "Failed to create ticket" }, { status: 500 });
   }
 }

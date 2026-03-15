@@ -335,6 +335,10 @@ pnpm lint      # ESLint (note: currently not enforced in build)
 
 10. **`lib/services/api.ts`** — Centralized client-side API layer. Add new fetch calls here instead of inline in components.
 
+11. **HMAC-signed sessions** — Session cookies are signed with HMAC-SHA256 (format: `{userId}:{issuedAt}:{hmac}`). Set `SESSION_SECRET` env var in production. Legacy `{userId}:{token}` cookies are still accepted for backwards compatibility.
+
+12. **`useLang()` hook** — The i18n hook is exported as `useLang` from `lib/i18n.tsx`. All components use `useLang`, not `useLanguage`.
+
 ---
 
 ## Deployment

@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger"
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { checkAdminAuth, getAdminId } from "@/lib/admin-auth";
@@ -9,7 +10,7 @@ export async function GET() {
     const partners = await sql`SELECT * FROM partners ORDER BY sort_order ASC`;
     return NextResponse.json(partners);
   } catch (error) {
-    console.error("Admin partners GET error:", error);
+    logger.error("api", "Admin partners GET error:", error);
     return NextResponse.json({ error: "Failed to fetch partners" }, { status: 500 });
   }
 }
@@ -44,7 +45,7 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json(result[0], { status: 201 });
   } catch (error) {
-    console.error("Admin partners POST error:", error);
+    logger.error("api", "Admin partners POST error:", error);
     return NextResponse.json({ error: "Failed to create partner" }, { status: 500 });
   }
 }
@@ -82,7 +83,7 @@ export async function PATCH(request: NextRequest) {
 
     return NextResponse.json(result[0]);
   } catch (error) {
-    console.error("Admin partners PATCH error:", error);
+    logger.error("api", "Admin partners PATCH error:", error);
     return NextResponse.json({ error: "Failed to update partner" }, { status: 500 });
   }
 }
@@ -112,7 +113,7 @@ export async function DELETE(request: NextRequest) {
 
     return NextResponse.json({ success: true, id });
   } catch (error) {
-    console.error("Admin partners DELETE error:", error);
+    logger.error("api", "Admin partners DELETE error:", error);
     return NextResponse.json({ error: "Failed to delete partner" }, { status: 500 });
   }
 }

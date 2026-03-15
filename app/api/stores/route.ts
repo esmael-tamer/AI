@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server"
 import { sql } from "@/lib/db"
 import type { StoreConfig } from "@/types"
@@ -64,7 +65,7 @@ export async function POST(request: Request) {
       },
     })
   } catch (error) {
-    console.error("Failed to create store:", error)
+    logger.error("api", "Failed to create store:", error)
     return NextResponse.json({ error: "Failed to create store" }, { status: 500 })
   }
 }

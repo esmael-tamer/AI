@@ -3,13 +3,16 @@ import { sql } from "./db"
 import type { User } from "@/types"
 
 const SESSION_COOKIE = "mt-session"
-const SESSION_MAX_AGE = 60 * 60 * 24 * 7 // 7 days
+export const SESSION_MAX_AGE = 60 * 60 * 24 * 7 // 7 days in seconds
 const PBKDF2_ITERATIONS = 100_000
 
-function generateToken(): string {
-  const array = new Uint8Array(32)
-  crypto.getRandomValues(array)
-  return Array.from(array, (b) => b.toString(16).padStart(2, "0")).join("")
+function getSecretMaterial(): string {
+  return process.env.SESSION_SECRET || process.env.DATABASE_URL || "mediatrend-session-secret-2024"
+}
+
+async function getHmacKey(): Promise<CryptoKey> {
+  const keyData = new TextEncoder().encode(getSecretMaterial())
+  return crypto.subtle.importKey("raw", keyData, { name: "HMAC", hash: "SHA-256" }, false, ["sign", "verify"])
 }
 
 function hexToBytes(hex: string): Uint8Array {
@@ -90,7 +93,20 @@ export async function createUser(
   return (result[0] as User) || null
 }
 
-export async function login(email: string, password: string): Promise<{ user: User; token: string } | null> {
+/**
+ * Creates a signed session cookie value for the given user ID.
+ * Format: `{userId}:{issuedAt}:{hmac}` — HMAC-SHA256 over `{userId}:{issuedAt}`.
+ */
+export async function createSessionValue(userId: number): Promise<string> {
+  const issuedAt = Date.now()
+  const key = await getHmacKey()
+  const data = new TextEncoder().encode(`${userId}:${issuedAt}`)
+  const sig = await crypto.subtle.sign("HMAC", key, data)
+  const sigHex = bytesToHex(new Uint8Array(sig))
+  return `${userId}:${issuedAt}:${sigHex}`
+}
+
+export async function login(email: string, password: string): Promise<{ user: User } | null> {
   const result = await sql`SELECT * FROM users WHERE email = ${email}`
   const user = result[0] as User | undefined
   if (!user) return null
@@ -98,10 +114,10 @@ export async function login(email: string, password: string): Promise<{ user: Us
   const valid = await verifyPassword(password, user.password_hash)
   if (!valid) return null
 
-  const token = generateToken()
+  const sessionValue = await createSessionValue(user.id)
 
   const cookieStore = await cookies()
-  cookieStore.set(SESSION_COOKIE, `${user.id}:${token}`, {
+  cookieStore.set(SESSION_COOKIE, sessionValue, {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     sameSite: "lax",
@@ -109,7 +125,7 @@ export async function login(email: string, password: string): Promise<{ user: Us
     path: "/",
   })
 
-  return { user, token }
+  return { user }
 }
 
 export async function logout(): Promise<void> {
@@ -122,10 +138,33 @@ export async function getSession(): Promise<User | null> {
   const session = cookieStore.get(SESSION_COOKIE)
   if (!session) return null
 
-  const [userId] = session.value.split(":")
-  if (!userId) return null
+  const parts = session.value.split(":")
+  // Support signed format `{userId}:{issuedAt}:{hmac}` (new) and legacy `{userId}:{token}` (old)
+  if (parts.length < 2) return null
 
-  const result = await sql`SELECT * FROM users WHERE id = ${parseInt(userId)}`
+  const userId = parseInt(parts[0], 10)
+  if (isNaN(userId)) return null
+
+  // Verify HMAC signature for new-format tokens
+  if (parts.length === 3) {
+    const [, issuedAt, sigHex] = parts
+    const issuedAtMs = parseInt(issuedAt, 10)
+    if (isNaN(issuedAtMs)) return null
+    // Reject expired tokens
+    if (Date.now() - issuedAtMs > SESSION_MAX_AGE * 1000) return null
+
+    try {
+      const key = await getHmacKey()
+      const data = new TextEncoder().encode(`${userId}:${issuedAt}`)
+      const sigBytes = hexToBytes(sigHex)
+      const valid = await crypto.subtle.verify("HMAC", key, sigBytes, data)
+      if (!valid) return null
+    } catch {
+      return null
+    }
+  }
+
+  const result = await sql`SELECT * FROM users WHERE id = ${userId}`
   return (result[0] as User) || null
 }
 

@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { checkAdminAuth } from "@/lib/admin-auth";
@@ -23,7 +24,7 @@ export async function GET() {
       revenue: "SAR 0",
     });
   } catch (error) {
-    console.error("Admin stats error:", error);
+    logger.error("api", "Admin stats error:", error);
     return NextResponse.json({
       stores: 0,
       users: 0,

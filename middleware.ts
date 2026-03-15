@@ -14,9 +14,18 @@ export function middleware(request: NextRequest) {
 
   if (isAdminRoute || isPortalRoute) {
     const session = request.cookies.get(SESSION_COOKIE)
+    const redirectTo = isAdminRoute ? "/admin/login" : "/login"
+
     if (!session?.value) {
-      const redirectTo = isAdminRoute ? "/admin/login" : "/login"
       return NextResponse.redirect(new URL(redirectTo, request.url))
+    }
+
+    // Basic format validation: signed tokens have 3 parts, legacy tokens have 2
+    const parts = session.value.split(":")
+    if (parts.length < 2 || isNaN(parseInt(parts[0], 10))) {
+      const response = NextResponse.redirect(new URL(redirectTo, request.url))
+      response.cookies.delete(SESSION_COOKIE)
+      return response
     }
   }
 

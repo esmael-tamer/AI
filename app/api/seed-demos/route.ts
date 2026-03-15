@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server"
 import { sql } from "@/lib/db"
 import { generateSlug, generateSampleProducts } from "@/lib/builder-engine"
@@ -79,7 +80,7 @@ export async function GET() {
 
     return NextResponse.json({ success: true, results })
   } catch (error) {
-    console.error("Seed demos error:", error)
+    logger.error("api", "Seed demos error:", error)
     return NextResponse.json({ error: "Failed to seed demo stores" }, { status: 500 })
   }
 }

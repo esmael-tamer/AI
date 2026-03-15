@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { getSession } from "@/lib/auth";
@@ -7,7 +8,7 @@ export async function GET() {
     const user = await getSession();
 
     if (!user) {
-      return NextResponse.json([], { status: 200 });
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const stores = await sql`
@@ -19,7 +20,7 @@ export async function GET() {
 
     return NextResponse.json(stores);
   } catch (error) {
-    console.error("Portal stores error:", error);
-    return NextResponse.json([], { status: 200 });
+    logger.error("api", "Portal stores error:", error);
+    return NextResponse.json({ error: "Failed to fetch stores" }, { status: 500 });
   }
 }

@@ -1,3 +1,4 @@
+import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server";
 import { sql } from "@/lib/db";
 import { getSession } from "@/lib/auth";
@@ -88,7 +89,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ lead, tickets });
   } catch (error) {
-    console.error("Activation error:", error);
+    logger.error("api", "Activation error:", error);
     return NextResponse.json({ error: "Failed to process activation" }, { status: 500 });
   }
 }

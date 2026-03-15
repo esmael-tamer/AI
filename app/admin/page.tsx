@@ -70,7 +70,7 @@ export default function AdminDashboard() {
     blog: 0,
     revenue: "0",
   });
-  const [data, setData] = useState<Record<string, unknown[]>>({});
+  const [data, setData] = useState<Record<string, Record<string, unknown>[]>>({});
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [deletingId, setDeletingId] = useState<number | null>(null);
@@ -91,7 +91,7 @@ export default function AdminDashboard() {
     try {
       const res = await fetch(`/api/admin/${sec}`);
       if (res.ok) {
-        const d = await res.json();
+        const d: Record<string, unknown>[] = await res.json();
         setData((prev) => ({ ...prev, [sec]: d }));
       }
     } catch (err) {
@@ -134,7 +134,7 @@ export default function AdminDashboard() {
       if (res.ok) {
         setData((prev) => ({
           ...prev,
-          [sec]: (prev[sec] || []).filter((item) => (item as Record<string, unknown>).id !== id),
+          [sec]: (prev[sec] || []).filter((item) => item.id !== id),
         }));
       }
     } catch (err) {

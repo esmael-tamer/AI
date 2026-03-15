@@ -1,9 +1,20 @@
-import { NextResponse } from "next/server"
+import { logger } from "@/lib/logger"
+import { NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
+import { checkRateLimit } from "@/lib/rate-limit"
 
 const VALID_TYPES = ["store_activation", "ads_launch", "account_mgmt"] as const
 
-export async function POST(request: Request) {
+export async function POST(request: NextRequest) {
+  const ip = request.headers.get("x-forwarded-for")?.split(",")[0].trim() || "unknown"
+  const rl = checkRateLimit(`leads:${ip}`, 10, 60 * 60 * 1000) // 10 leads per hour per IP
+  if (!rl.allowed) {
+    return NextResponse.json(
+      { error: "Too many requests. Please try again later." },
+      { status: 429, headers: { "Retry-After": String(Math.ceil(rl.retryAfterMs / 1000)) } }
+    )
+  }
+
   try {
     const body = await request.json()
     const { name, phone, email, type, payload_json, notes } = body
@@ -27,11 +38,7 @@ export async function POST(request: Request) {
 
     return NextResponse.json({ success: true, lead: result[0] })
   } catch (error) {
-    console.error("Failed to create lead:", error)
+    logger.error("api", "Failed to create lead:", error)
     return NextResponse.json({ error: "Failed to submit" }, { status: 500 })
   }
-}
-
-export async function GET() {
-  return NextResponse.json({ leads: [] })
 }

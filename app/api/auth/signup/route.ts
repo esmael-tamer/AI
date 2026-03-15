@@ -1,6 +1,7 @@
+import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { hashPassword } from "@/lib/auth"
+import { hashPassword, createSessionValue, SESSION_MAX_AGE } from "@/lib/auth"
 import { checkRateLimit } from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
@@ -46,24 +47,20 @@ export async function POST(request: Request) {
       `
     }
 
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-    const tokenArray = new Uint8Array(32)
-    crypto.getRandomValues(tokenArray)
-    const token = Array.from(tokenArray, (b) => b.toString(16).padStart(2, "0")).join("")
+    const sessionValue = await createSessionValue(user.id)
+    const response = NextResponse.json({ user }, { status: 201 })
 
-    const response = NextResponse.json({ user, token }, { status: 201 })
-
-    response.cookies.set("mt-session", `${user.id}:${token}`, {
+    response.cookies.set("mt-session", sessionValue, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      expires: expiresAt,
+      maxAge: SESSION_MAX_AGE,
     })
 
     return response
   } catch (error) {
-    console.error("Signup error:", error)
+    logger.error("api", "Signup error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }

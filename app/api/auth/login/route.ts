@@ -1,6 +1,7 @@
+import { logger } from "@/lib/logger"
 import { NextResponse } from "next/server"
 import { sql } from "@/lib/db"
-import { verifyPassword } from "@/lib/auth"
+import { verifyPassword, createSessionValue, SESSION_MAX_AGE } from "@/lib/auth"
 import { checkRateLimit } from "@/lib/rate-limit"
 
 export async function POST(request: Request) {
@@ -36,11 +37,7 @@ export async function POST(request: Request) {
 
     await sql`UPDATE users SET updated_at = NOW() WHERE id = ${user.id}`
 
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-    const tokenArray = new Uint8Array(32)
-    crypto.getRandomValues(tokenArray)
-    const token = Array.from(tokenArray, (b) => b.toString(16).padStart(2, "0")).join("")
-
+    const sessionValue = await createSessionValue(user.id)
     const response = NextResponse.json({
       user: {
         id: user.id,
@@ -50,20 +47,19 @@ export async function POST(request: Request) {
         role: user.role,
         phone: user.phone,
       },
-      token,
     })
 
-    response.cookies.set("mt-session", `${user.id}:${token}`, {
+    response.cookies.set("mt-session", sessionValue, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
       path: "/",
-      expires: expiresAt,
+      maxAge: SESSION_MAX_AGE,
     })
 
     return response
   } catch (error) {
-    console.error("Login error:", error)
+    logger.error("api", "Login error:", error)
     return NextResponse.json({ error: "Internal server error" }, { status: 500 })
   }
 }
