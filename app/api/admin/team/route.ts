@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { checkAdminAuth, getAdminId } from "@/lib/admin-auth";
 
 export async function GET() {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const members = await sql`SELECT * FROM team_members ORDER BY sort_order ASC`;
     return NextResponse.json(members);
@@ -12,6 +15,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { name_ar, name_en, role_ar, role_en, photo_url, department, sort_order } = body;
@@ -34,9 +39,10 @@ export async function POST(request: NextRequest) {
       RETURNING *
     `;
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('create', 'team_member', ${result[0].id}, ${JSON.stringify({ name_en, name_ar })})
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'create', 'team_member', ${result[0].id}, ${JSON.stringify({ name_en, name_ar })})
     `;
 
     return NextResponse.json(result[0], { status: 201 });
@@ -47,6 +53,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { id, name_ar, name_en, role_ar, role_en, photo_url, department, sort_order } = body;
@@ -72,9 +80,10 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Team member not found" }, { status: 400 });
     }
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('update', 'team_member', ${id}, ${JSON.stringify({ name_en, name_ar })})
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'update', 'team_member', ${id}, ${JSON.stringify({ name_en, name_ar })})
     `;
 
     return NextResponse.json(result[0]);
@@ -85,6 +94,8 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { id } = body;
@@ -99,9 +110,10 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Team member not found" }, { status: 400 });
     }
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('delete', 'team_member', ${id}, '{}')
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'delete', 'team_member', ${id}, '{}')
     `;
 
     return NextResponse.json({ success: true, id });

@@ -1,8 +1,8 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import MTHeader from "@/components/mt-header"
-import MTFooter from "@/components/mt-footer"
+import MTHeader from "@/components/layout/header"
+import MTFooter from "@/components/layout/footer"
 import { ArrowRight } from "lucide-react"
 import Link from "next/link"
 import { useLang } from "@/lib/i18n"
@@ -24,7 +24,7 @@ export default function WorkPage() {
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([])
 
   useEffect(() => {
-    fetch("/api/admin/cases")
+    fetch("/api/admin/cases?status=published")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setCaseStudies(data)
@@ -56,7 +56,7 @@ export default function WorkPage() {
           {caseStudies.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {caseStudies.map((study) => (
-                <div key={study.id} className="group glass-border rounded-2xl overflow-hidden hover:scale-[1.02] transition-all">
+                <Link key={study.id} href={`/work/${study.id}`} className="group glass-border rounded-2xl overflow-hidden hover:scale-[1.02] transition-all block">
                   <div className="aspect-video bg-white/5 relative">
                     {study.cover_image && (
                       <img src={study.cover_image || "/placeholder.svg"} alt={(isAr ? study.title_ar : study.title_en) || ""} className="w-full h-full object-cover" />
@@ -75,7 +75,7 @@ export default function WorkPage() {
                       </p>
                     )}
                   </div>
-                </div>
+                </Link>
               ))}
             </div>
           ) : (

@@ -1,15 +1,16 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { sql } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 
 export async function POST(request: Request) {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get("user_id")?.value;
+    const user = await getSession();
 
-    if (!userId) {
+    if (!user) {
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
+
+    const userId = String(user.id);
 
     const body = await request.json();
     const { store_id, services, business_name, business_type, contact_phone, notes } = body;

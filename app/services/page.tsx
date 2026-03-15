@@ -1,8 +1,8 @@
 "use client"
 
 import Link from "next/link"
-import MTHeader from "@/components/mt-header"
-import MTFooter from "@/components/mt-footer"
+import MTHeader from "@/components/layout/header"
+import MTFooter from "@/components/layout/footer"
 import {
   Store,
   Palette,

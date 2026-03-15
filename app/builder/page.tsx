@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, Sparkles, Send, Check, Loader2, Store, ArrowRight } from "lucide-react"
 import { builderSteps, getAIResponse } from "@/lib/builder-engine"
-import type { StoreConfig } from "@/lib/builder-engine"
+import type { StoreConfig } from "@/types"
 import { useLang } from "@/lib/i18n"
 
 type Message = {
@@ -149,6 +149,11 @@ export default function BuilderPage() {
 
       if (data.success) {
         setStoreSlug(data.store.slug)
+        // Save sessionId so signup can link this store to the new account
+        if (data.store.sessionId) {
+          localStorage.setItem("mt_session_id", data.store.sessionId)
+          localStorage.setItem("mt_store_slug", data.store.slug)
+        }
         setTimeout(() => {
           const completeMessage: Message = {
             id: "complete",

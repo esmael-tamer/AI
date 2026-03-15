@@ -1,20 +1,19 @@
 import { NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { sql } from "@/lib/db";
+import { getSession } from "@/lib/auth";
 
 export async function GET() {
   try {
-    const cookieStore = await cookies();
-    const userId = cookieStore.get("user_id")?.value;
+    const user = await getSession();
 
-    if (!userId) {
+    if (!user) {
       return NextResponse.json([], { status: 200 });
     }
 
     const supportTickets = await sql`
       SELECT id, subject, status, priority, created_at, 'support' as ticket_type
       FROM support_tickets
-      WHERE user_id = ${userId}
+      WHERE user_id = ${user.id}
       ORDER BY created_at DESC
     `;
 
@@ -23,7 +22,7 @@ export async function GET() {
              s.name_en as store_name_en, s.name_ar as store_name_ar
       FROM tickets t
       LEFT JOIN stores s ON t.store_id = s.id
-      WHERE t.user_id = ${userId}
+      WHERE t.user_id = ${user.id}
       ORDER BY t.created_at DESC
     `;
 
@@ -35,5 +34,35 @@ export async function GET() {
   } catch (error) {
     console.error("Portal tickets error:", error);
     return NextResponse.json([], { status: 200 });
+  }
+}
+
+export async function POST(request: Request) {
+  try {
+    const user = await getSession();
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { subject, message, priority } = await request.json();
+
+    if (!subject || !message) {
+      return NextResponse.json({ error: "Subject and message are required" }, { status: 400 });
+    }
+
+    const validPriorities = ["low", "medium", "high"];
+    const ticketPriority = validPriorities.includes(priority) ? priority : "medium";
+
+    const [ticket] = await sql`
+      INSERT INTO support_tickets (user_id, subject, message, priority, status)
+      VALUES (${user.id}, ${subject}, ${message}, ${ticketPriority}, 'open')
+      RETURNING *
+    `;
+
+    return NextResponse.json(ticket, { status: 201 });
+  } catch (error) {
+    console.error("Portal tickets POST error:", error);
+    return NextResponse.json({ error: "Failed to create ticket" }, { status: 500 });
   }
 }

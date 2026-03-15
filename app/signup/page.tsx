@@ -29,10 +29,13 @@ export default function SignupPage() {
     setError("");
 
     try {
+      const sessionId = localStorage.getItem("mt_session_id") || undefined;
+      const storeSlug = localStorage.getItem("mt_store_slug") || undefined;
+
       const res = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(form),
+        body: JSON.stringify({ ...form, session_id: sessionId }),
       });
 
       const data = await res.json();
@@ -42,7 +45,16 @@ export default function SignupPage() {
         return;
       }
 
-      router.push("/portal");
+      // Clear saved session after linking
+      localStorage.removeItem("mt_session_id");
+      localStorage.removeItem("mt_store_slug");
+
+      // If they came from building a demo store, show them their store first
+      if (storeSlug) {
+        router.push(`/portal?linked=${storeSlug}`);
+      } else {
+        router.push("/portal");
+      }
     } catch {
       setError(t("Something went wrong", "حدث خطأ ما"));
     } finally {
@@ -147,9 +159,9 @@ export default function SignupPage() {
                 type="password"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                placeholder={t("Min 6 characters", "6 أحرف على الأقل")}
+                placeholder={t("Min 8 characters", "8 أحرف على الأقل")}
                 required
-                minLength={6}
+                minLength={8}
                 className="bg-white/5 border-white/10 text-white placeholder:text-zinc-500 focus:border-lime-400/50"
               />
             </div>

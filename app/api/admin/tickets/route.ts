@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { checkAdminAuth, getAdminId } from "@/lib/admin-auth";
 
 export async function GET(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const { searchParams } = new URL(request.url);
     const status = searchParams.get("status");
@@ -31,6 +34,8 @@ export async function GET(request: NextRequest) {
 }
 
 export async function POST(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { store_id, user_id, lead_id, type, notes } = body;
@@ -51,9 +56,10 @@ export async function POST(request: NextRequest) {
       RETURNING *
     `;
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('create', 'ticket', ${result[0].id}, ${JSON.stringify({ store_id, type })})
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'create', 'ticket', ${result[0].id}, ${JSON.stringify({ store_id, type })})
     `;
 
     return NextResponse.json(result[0], { status: 201 });
@@ -64,6 +70,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { id, status, notes } = body;
@@ -85,14 +93,38 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Ticket not found" }, { status: 400 });
     }
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('update', 'ticket', ${id}, ${JSON.stringify({ status, notes })})
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'update', 'ticket', ${id}, ${JSON.stringify({ status, notes })})
     `;
 
     return NextResponse.json(result[0]);
   } catch (error) {
     console.error("Admin tickets PATCH error:", error);
     return NextResponse.json({ error: "Failed to update ticket" }, { status: 500 });
+  }
+}
+
+export async function DELETE(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
+  try {
+    const { id } = await request.json();
+    if (!id) return NextResponse.json({ error: "ID is required" }, { status: 400 });
+
+    const result = await sql`DELETE FROM tickets WHERE id = ${id} RETURNING id`;
+    if (result.length === 0) return NextResponse.json({ error: "Ticket not found" }, { status: 404 });
+
+    const adminId = await getAdminId()
+    await sql`
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'delete', 'ticket', ${id}, '{}')
+    `;
+
+    return NextResponse.json({ success: true, id });
+  } catch (error) {
+    console.error("Admin tickets DELETE error:", error);
+    return NextResponse.json({ error: "Failed to delete ticket" }, { status: 500 });
   }
 }

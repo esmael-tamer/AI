@@ -2,8 +2,8 @@
 
 import React from "react"
 
-import MTHeader from "@/components/mt-header"
-import MTFooter from "@/components/mt-footer"
+import MTHeader from "@/components/layout/header"
+import MTFooter from "@/components/layout/footer"
 import { Mail, Phone, MapPin, Send } from "lucide-react"
 import { useState } from "react"
 import { useLang } from "@/lib/i18n"
@@ -13,19 +13,26 @@ export default function ContactPage() {
   const [formState, setFormState] = useState({ name: "", email: "", phone: "", message: "", service: "" })
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
+  const [submitError, setSubmitError] = useState(false)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     setSubmitting(true)
+    setSubmitError(false)
     try {
       const res = await fetch("/api/leads", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(formState),
       })
-      if (res.ok) setSubmitted(true)
+      if (res.ok) {
+        setSubmitted(true)
+        setFormState({ name: "", email: "", phone: "", message: "", service: "" })
+      } else {
+        setSubmitError(true)
+      }
     } catch {
-      // handle error
+      setSubmitError(true)
     } finally {
       setSubmitting(false)
     }
@@ -143,6 +150,11 @@ export default function ContactPage() {
                       placeholder={t("Tell us about your project...", "أخبرنا عن مشروعك...")}
                     />
                   </div>
+                  {submitError && (
+                    <p className="text-red-400 text-sm text-center">
+                      {t("Something went wrong. Please try again.", "حدث خطأ ما. يرجى المحاولة مرة أخرى.")}
+                    </p>
+                  )}
                   <button
                     type="submit"
                     disabled={submitting}

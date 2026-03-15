@@ -1,8 +1,8 @@
 "use client"
 
 import { useState } from "react"
-import MtHeader from "@/components/mt-header"
-import MtFooter from "@/components/mt-footer"
+import MtHeader from "@/components/layout/header"
+import MTFooter from "@/components/layout/footer"
 import { useLang } from "@/lib/i18n"
 import {
   Megaphone,
@@ -459,7 +459,7 @@ export default function AdCampaignsPage() {
         </div>
       </section>
 
-      <MtFooter />
+      <MTFooter />
     </div>
   )
 }

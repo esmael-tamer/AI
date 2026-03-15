@@ -1,7 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import { sql } from "@/lib/db";
+import { checkAdminAuth, getAdminId } from "@/lib/admin-auth";
 
 export async function GET() {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const partners = await sql`SELECT * FROM partners ORDER BY sort_order ASC`;
     return NextResponse.json(partners);
@@ -12,6 +15,8 @@ export async function GET() {
 }
 
 export async function POST(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { name, logo_url, website, sort_order } = body;
@@ -31,9 +36,10 @@ export async function POST(request: NextRequest) {
       RETURNING *
     `;
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('create', 'partner', ${result[0].id}, ${JSON.stringify({ name })})
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'create', 'partner', ${result[0].id}, ${JSON.stringify({ name })})
     `;
 
     return NextResponse.json(result[0], { status: 201 });
@@ -44,6 +50,8 @@ export async function POST(request: NextRequest) {
 }
 
 export async function PATCH(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { id, name, logo_url, website, sort_order } = body;
@@ -66,9 +74,10 @@ export async function PATCH(request: NextRequest) {
       return NextResponse.json({ error: "Partner not found" }, { status: 400 });
     }
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('update', 'partner', ${id}, ${JSON.stringify({ name })})
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'update', 'partner', ${id}, ${JSON.stringify({ name })})
     `;
 
     return NextResponse.json(result[0]);
@@ -79,6 +88,8 @@ export async function PATCH(request: NextRequest) {
 }
 
 export async function DELETE(request: NextRequest) {
+  const authError = await checkAdminAuth();
+  if (authError) return authError;
   try {
     const body = await request.json();
     const { id } = body;
@@ -93,9 +104,10 @@ export async function DELETE(request: NextRequest) {
       return NextResponse.json({ error: "Partner not found" }, { status: 400 });
     }
 
+    const adminId = await getAdminId()
     await sql`
-      INSERT INTO audit_logs (action, entity_type, entity_id, details_json)
-      VALUES ('delete', 'partner', ${id}, '{}')
+      INSERT INTO audit_logs (admin_id, action, entity_type, entity_id, details_json)
+      VALUES (${adminId}, 'delete', 'partner', ${id}, '{}')
     `;
 
     return NextResponse.json({ success: true, id });

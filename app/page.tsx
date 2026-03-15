@@ -1,27 +1,31 @@
 "use client"
 
-import MTHeader from "@/components/mt-header"
-import MTHero from "@/components/mt-hero"
-import HowItWorks from "@/components/how-it-works"
-import MTServices from "@/components/mt-services"
-import MTPartners from "@/components/mt-partners"
-import { Pricing } from "@/components/pricing"
-import FAQ from "@/components/faq"
-import MTCTA from "@/components/mt-cta"
-import MTFooter from "@/components/mt-footer"
+import Header from "@/components/layout/header"
+import Hero from "@/components/sections/hero"
+import HowItWorks from "@/components/sections/how-it-works"
+import DemoShowcase from "@/components/sections/demo-showcase"
+import Services from "@/components/sections/services"
+import Partners from "@/components/sections/partners"
+import Testimonials from "@/components/sections/testimonials"
+import { Pricing } from "@/components/sections/pricing"
+import FAQ from "@/components/sections/faq"
+import CTA from "@/components/sections/cta"
+import Footer from "@/components/layout/footer"
 
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-black">
-      <MTHeader />
-      <MTHero />
+      <Header />
+      <Hero />
       <HowItWorks />
-      <MTServices />
-      <MTPartners />
+      <DemoShowcase />
+      <Services />
+      <Partners />
+      <Testimonials />
       <Pricing />
       <FAQ />
-      <MTCTA />
-      <MTFooter />
+      <CTA />
+      <Footer />
     </main>
   )
 }

@@ -72,6 +72,8 @@ export default function AdminDashboard() {
   });
   const [data, setData] = useState<Record<string, unknown[]>>({});
   const [loading, setLoading] = useState(true);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [deletingId, setDeletingId] = useState<number | null>(null);
 
   const fetchStats = useCallback(async () => {
     try {
@@ -106,6 +108,41 @@ export default function AdminDashboard() {
       fetchSection(section);
     }
   }, [section, fetchSection]);
+
+  async function handleDelete(sec: string, id: number) {
+    if (!confirm(`Are you sure you want to delete this item?`)) return;
+    setDeletingId(id);
+    try {
+      const endpointMap: Record<string, string> = {
+        blog: "blog",
+        team: "team",
+        partners: "partners",
+        cases: "cases",
+        pages: "pages",
+        stores: "stores",
+        users: "users",
+        leads: "leads",
+        tickets: "tickets",
+      };
+      const endpoint = endpointMap[sec];
+      if (!endpoint) return;
+      const res = await fetch(`/api/admin/${endpoint}`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id }),
+      });
+      if (res.ok) {
+        setData((prev) => ({
+          ...prev,
+          [sec]: (prev[sec] || []).filter((item) => (item as Record<string, unknown>).id !== id),
+        }));
+      }
+    } catch (err) {
+      console.error(`Delete ${sec} error:`, err);
+    } finally {
+      setDeletingId(null);
+    }
+  }
 
   async function handleLogout() {
     await fetch("/api/auth/logout", { method: "POST" });
@@ -171,74 +208,93 @@ export default function AdminDashboard() {
     }
   };
 
+  const DELETABLE_SECTIONS = ["blog", "team", "partners", "cases", "pages", "stores", "users", "leads", "tickets"];
+
   const renderTable = (
     items: Record<string, unknown>[],
-    columns: { key: string; label: string; render?: (v: unknown, row: Record<string, unknown>) => React.ReactNode }[]
-  ) => (
-    <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b border-white/10">
-              {columns.map((col) => (
-                <th
-                  key={col.key}
-                  className="text-left px-4 py-3 text-xs font-medium text-zinc-400 uppercase tracking-wider"
-                >
-                  {col.label}
-                </th>
-              ))}
-              <th className="text-right px-4 py-3 text-xs font-medium text-zinc-400 uppercase tracking-wider">
-                Actions
-              </th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-white/5">
-            {items.map((item, i) => (
-              <tr
-                key={String(item.id || i)}
-                className="hover:bg-white/5 transition-colors"
-              >
+    columns: { key: string; label: string; render?: (v: unknown, row: Record<string, unknown>) => React.ReactNode }[],
+    sectionKey?: string
+  ) => {
+    const filtered = searchQuery.trim()
+      ? items.filter((item) =>
+          Object.values(item).some((v) =>
+            String(v || "").toLowerCase().includes(searchQuery.toLowerCase())
+          )
+        )
+      : items;
+
+    return (
+      <div className="bg-white/5 border border-white/10 rounded-xl overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b border-white/10">
                 {columns.map((col) => (
-                  <td
+                  <th
                     key={col.key}
-                    className="px-4 py-3 text-sm text-zinc-300"
+                    className="text-left px-4 py-3 text-xs font-medium text-zinc-400 uppercase tracking-wider"
                   >
-                    {col.render
-                      ? col.render(item[col.key], item)
-                      : String(item[col.key] || "-")}
-                  </td>
+                    {col.label}
+                  </th>
                 ))}
-                <td className="px-4 py-3 text-right">
-                  <div className="flex items-center justify-end gap-1">
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 w-7 p-0 text-zinc-400 hover:text-white hover:bg-white/10"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                    </Button>
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      className="h-7 w-7 p-0 text-zinc-400 hover:text-red-400 hover:bg-red-400/10"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </div>
-                </td>
+                <th className="text-right px-4 py-3 text-xs font-medium text-zinc-400 uppercase tracking-wider">
+                  Actions
+                </th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      {items.length === 0 && (
-        <div className="py-12 text-center text-zinc-500 text-sm">
-          No data found
+            </thead>
+            <tbody className="divide-y divide-white/5">
+              {filtered.map((item, i) => (
+                <tr
+                  key={String(item.id || i)}
+                  className="hover:bg-white/5 transition-colors"
+                >
+                  {columns.map((col) => (
+                    <td
+                      key={col.key}
+                      className="px-4 py-3 text-sm text-zinc-300"
+                    >
+                      {col.render
+                        ? col.render(item[col.key], item)
+                        : String(item[col.key] || "-")}
+                    </td>
+                  ))}
+                  <td className="px-4 py-3 text-right">
+                    <div className="flex items-center justify-end gap-1">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-7 w-7 p-0 text-zinc-400 hover:text-white hover:bg-white/10"
+                        title="View"
+                      >
+                        <Eye className="w-3.5 h-3.5" />
+                      </Button>
+                      {sectionKey && DELETABLE_SECTIONS.includes(sectionKey) && (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          disabled={deletingId === Number(item.id)}
+                          onClick={() => handleDelete(sectionKey, Number(item.id))}
+                          className="h-7 w-7 p-0 text-zinc-400 hover:text-red-400 hover:bg-red-400/10 disabled:opacity-50"
+                          title="Delete"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
-      )}
-    </div>
-  );
+        {filtered.length === 0 && (
+          <div className="py-12 text-center text-zinc-500 text-sm">
+            {searchQuery ? "No results match your search" : "No data found"}
+          </div>
+        )}
+      </div>
+    );
+  };
 
   return (
     <div className="min-h-screen bg-[#0a0a0a] flex">
@@ -327,6 +383,8 @@ export default function AdminDashboard() {
               <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-zinc-500" />
               <Input
                 placeholder="Search..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-9 bg-white/5 border-white/10 text-white placeholder:text-zinc-500 w-64 h-9 focus:border-lime-400/30"
               />
             </div>
@@ -555,7 +613,8 @@ export default function AdminDashboard() {
                         render: (v) =>
                           new Date(String(v)).toLocaleDateString(),
                       },
-                    ]
+                    ],
+                    "stores"
                   )}
                 </div>
               )}
@@ -595,7 +654,8 @@ export default function AdminDashboard() {
                         render: (v) =>
                           new Date(String(v)).toLocaleDateString(),
                       },
-                    ]
+                    ],
+                    "users"
                   )}
                 </div>
               )}
@@ -627,7 +687,8 @@ export default function AdminDashboard() {
                         render: (v) =>
                           new Date(String(v)).toLocaleDateString(),
                       },
-                    ]
+                    ],
+                    "leads"
                   )}
                 </div>
               )}
@@ -666,7 +727,8 @@ export default function AdminDashboard() {
                         render: (v) =>
                           new Date(String(v)).toLocaleDateString(),
                       },
-                    ]
+                    ],
+                    "tickets"
                   )}
                 </div>
               )}
@@ -705,7 +767,8 @@ export default function AdminDashboard() {
                         render: (v) =>
                           new Date(String(v)).toLocaleDateString(),
                       },
-                    ]
+                    ],
+                    "blog"
                   )}
                 </div>
               )}
@@ -743,7 +806,8 @@ export default function AdminDashboard() {
                         key: "display_order",
                         label: "Order",
                       },
-                    ]
+                    ],
+                    "team"
                   )}
                 </div>
               )}
@@ -781,7 +845,8 @@ export default function AdminDashboard() {
                             <XCircle className="w-4 h-4 text-zinc-500" />
                           ),
                       },
-                    ]
+                    ],
+                    "partners"
                   )}
                 </div>
               )}
@@ -824,7 +889,8 @@ export default function AdminDashboard() {
                             <span className="text-zinc-500 text-xs">No</span>
                           ),
                       },
-                    ]
+                    ],
+                    "cases"
                   )}
                 </div>
               )}
@@ -862,7 +928,8 @@ export default function AdminDashboard() {
                             <XCircle className="w-4 h-4 text-zinc-500" />
                           ),
                       },
-                    ]
+                    ],
+                    "pages"
                   )}
                 </div>
               )}
@@ -889,7 +956,8 @@ export default function AdminDashboard() {
                         render: (v) =>
                           new Date(String(v)).toLocaleString(),
                       },
-                    ]
+                    ],
+                    "audit"
                   )}
                 </div>
               )}
