@@ -24,7 +24,7 @@ export default function WorkPage() {
   const [caseStudies, setCaseStudies] = useState<CaseStudy[]>([])
 
   useEffect(() => {
-    fetch("/api/admin/cases")
+    fetch("/api/admin/cases?status=published")
       .then((res) => res.json())
       .then((data) => {
         if (Array.isArray(data)) setCaseStudies(data)

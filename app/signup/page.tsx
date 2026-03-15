@@ -159,9 +159,9 @@ export default function SignupPage() {
                 type="password"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                placeholder={t("Min 6 characters", "6 أحرف على الأقل")}
+                placeholder={t("Min 8 characters", "8 أحرف على الأقل")}
                 required
-                minLength={6}
+                minLength={8}
                 className="bg-white/5 border-white/10 text-white placeholder:text-zinc-500 focus:border-lime-400/50"
               />
             </div>
