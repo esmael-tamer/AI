@@ -33,7 +33,7 @@ export async function POST(request: Request) {
 
     const newUser = await sql`
       INSERT INTO users (email, password_hash, name_ar, name_en, phone, role)
-      VALUES (${email}, ${passwordHash}, ${name_ar || ""}, ${name_en || ""}, ${phone || ""}, 'customer')
+      VALUES (${email}, ${passwordHash}, ${name_ar || null}, ${name_en || null}, ${phone || null}, 'customer')
       RETURNING id, email, name_ar, name_en, role, phone
     `
 

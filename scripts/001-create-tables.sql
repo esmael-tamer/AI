@@ -4,7 +4,8 @@
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
   id SERIAL PRIMARY KEY,
-  name VARCHAR(255) NOT NULL,
+  name_ar VARCHAR(255),
+  name_en VARCHAR(255),
   email VARCHAR(255) UNIQUE NOT NULL,
   password_hash VARCHAR(255) NOT NULL,
   phone VARCHAR(50),
@@ -58,7 +59,9 @@ CREATE TABLE IF NOT EXISTS leads (
   phone VARCHAR(50),
   email VARCHAR(255),
   country VARCHAR(50),
+  type VARCHAR(50) DEFAULT 'store_activation',
   selected_activations JSON DEFAULT '[]',
+  payload_json JSON DEFAULT '{}',
   notes TEXT,
   status VARCHAR(20) NOT NULL DEFAULT 'new' CHECK (status IN ('new', 'contacted', 'qualified', 'closed')),
   assigned_to INTEGER REFERENCES users(id) ON DELETE SET NULL,
