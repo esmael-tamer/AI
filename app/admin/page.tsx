@@ -587,7 +587,7 @@ export default function AdminDashboard() {
                             <p className="text-white font-medium">
                               {String(v || row.name_ar || "-")}
                             </p>
-                            {row.name_ar && (
+                            {row.name_ar != null && (
                               <p className="text-zinc-500 text-xs" dir="rtl">
                                 {String(row.name_ar)}
                               </p>

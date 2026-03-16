@@ -557,12 +557,14 @@ export default function CheckoutPage() {
                           <div className="font-semibold text-white text-base group-hover:text-[#C6FF3A] transition-colors sm:text-lg">
                             {option.title}
                           </div>
-                          {option.price && (
-                            <div className="text-[#C6FF3A] font-bold text-sm sm:text-base">{option.price}</div>
+                            {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                          {(option as any).price && (
+                            <div className="text-[#C6FF3A] font-bold text-sm sm:text-base">{String((option as any).price)}</div>
                           )}
                         </div>
-                        {option.subtitle && (
-                          <div className="text-neutral-400 text-sm mt-1 sm:text-base">{option.subtitle}</div>
+                        {/* eslint-disable-next-line @typescript-eslint/no-explicit-any */}
+                        {(option as any).subtitle && (
+                          <div className="text-neutral-400 text-sm mt-1 sm:text-base">{String((option as any).subtitle)}</div>
                         )}
                       </div>
                       <ArrowRight className="h-5 w-5 text-neutral-600 group-hover:text-[#C6FF3A] transition-colors flex-shrink-0 sm:h-6 sm:w-6 sm:ml-3" />

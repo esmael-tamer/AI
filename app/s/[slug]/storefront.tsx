@@ -206,7 +206,7 @@ export default function DemoStorefront({ store, products }: { store: Store; prod
             {categories.slice(0, 5).map(cat => (
               <button
                 key={cat}
-                onClick={() => setActiveCat(cat)}
+                onClick={() => setActiveCat(cat ?? "")}
                 className="text-sm transition-colors"
                 style={{ color: activeCat === cat ? accent : "#555", fontWeight: activeCat === cat ? 700 : 400 }}
               >
@@ -288,7 +288,7 @@ export default function DemoStorefront({ store, products }: { store: Store; prod
             {categories.map(cat => (
               <button
                 key={cat}
-                onClick={() => { setActiveCat(cat); setMenuOpen(false) }}
+                onClick={() => { setActiveCat(cat ?? ""); setMenuOpen(false) }}
                 className="text-sm font-medium px-3 py-1.5 rounded-full"
                 style={{ backgroundColor: activeCat === cat ? accent : "#f5f5f5", color: activeCat === cat ? "#fff" : "#555" }}
               >
@@ -384,7 +384,7 @@ export default function DemoStorefront({ store, products }: { store: Store; prod
                 return (
                   <button
                     key={cat}
-                    onClick={() => setActiveCat(cat)}
+                    onClick={() => setActiveCat(cat ?? "")}
                     className={`relative shrink-0 snap-start rounded-2xl overflow-hidden transition-all hover:scale-105 ${activeCat === cat ? "ring-2 ring-offset-2" : ""}`}
                     style={{
                       width: 130,
@@ -393,7 +393,7 @@ export default function DemoStorefront({ store, products }: { store: Store; prod
                     } as React.CSSProperties}
                   >
                     {catImg ? (
-                      <Image src={catImg} alt={cat} fill className="object-cover" unoptimized />
+                      <Image src={catImg!} alt={cat ?? ""} fill className="object-cover" unoptimized />
                     ) : (
                       <div className="w-full h-full" style={{ backgroundColor: accent + "20" }} />
                     )}

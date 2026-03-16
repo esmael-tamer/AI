@@ -1,0 +1,8 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(grep -r User[0] app/api --include=*.ts)",
+      "mcp__claude_ai_Vercel__get_project"
+    ]
+  }
+}
