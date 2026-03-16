@@ -8,6 +8,8 @@ export async function GET(request: Request) {
     const { searchParams } = new URL(request.url)
     const token = searchParams.get("token")
     const sid = searchParams.get("sid") || ""
+    // Ignore sid if suspiciously long (session IDs are short UUIDs)
+    const safeSid = sid.length <= 128 ? sid : ""
 
     if (!token) {
       return NextResponse.redirect(new URL("/verify-email?error=invalid", request.url))
@@ -45,11 +47,11 @@ export async function GET(request: Request) {
     `
 
     // Link guest store if sid provided — use the CORRECT column name from the schema
-    if (sid) {
+    if (safeSid) {
       await sql`
         UPDATE stores
         SET owner_id = ${user.id}
-        WHERE session_id = ${sid} AND owner_id IS NULL
+        WHERE session_id = ${safeSid} AND owner_id IS NULL
       `
     }
 
@@ -60,7 +62,7 @@ export async function GET(request: Request) {
     redirectResponse.cookies.set("mt-session", sessionValue, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
-      sameSite: "strict",
+      sameSite: "lax",
       path: "/",
       maxAge: SESSION_MAX_AGE,
     })
