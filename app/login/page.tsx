@@ -33,7 +33,12 @@ export default function LoginPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        setError(data.error || t("Login failed", "فشل تسجيل الدخول"));
+        if (res.status === 403 && data.error === "email_not_verified") {
+          sessionStorage.setItem("mt_pending_email", email)
+          setError("email_not_verified")
+        } else {
+          setError(data.error || t("فشل تسجيل الدخول", "Login failed"))
+        }
         return;
       }
 
@@ -71,11 +76,30 @@ export default function LoginPage() {
         {/* Login Card */}
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-            {error && (
+            {error === "email_not_verified" ? (
+              <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 text-amber-400 text-sm text-center">
+                {t("حسابك غير مفعّل. تحقق من بريدك أو ", "Your account is not activated. Check your email or ")}
+                <button
+                  type="button"
+                  onClick={async () => {
+                    await fetch("/api/auth/resend-verification", {
+                      method: "POST",
+                      headers: { "Content-Type": "application/json" },
+                      body: JSON.stringify({ email }),
+                    })
+                    sessionStorage.setItem("mt_pending_email", email)
+                    router.push("/verify-email")
+                  }}
+                  className="underline hover:text-amber-300 transition-colors"
+                >
+                  {t("أعد إرسال رابط التأكيد", "resend verification link")}
+                </button>
+              </div>
+            ) : error ? (
               <div className="bg-red-500/10 border border-red-500/20 rounded-lg p-3 text-red-400 text-sm text-center">
                 {error}
               </div>
-            )}
+            ) : null}
 
             <div className="flex flex-col gap-2">
               <Label htmlFor="email" className="text-zinc-300 text-sm">
