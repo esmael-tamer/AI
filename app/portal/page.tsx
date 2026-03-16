@@ -117,6 +117,7 @@ export default function PortalPage() {
   const [tickets, setTickets] = useState<TicketData[]>([]);
   const [loading, setLoading] = useState(true);
   const [linkedSlug, setLinkedSlug] = useState<string | null>(null);
+  const [showWelcomeBanner, setShowWelcomeBanner] = useState(false);
 
   const [activatingStore, setActivatingStore] = useState<StoreData | null>(null);
   const [showNewTicket, setShowNewTicket] = useState(false);
@@ -162,6 +163,14 @@ export default function PortalPage() {
   }, [fetchData, searchParams]);
 
   useEffect(() => {
+    const isWelcome = searchParams.get("welcome") === "1";
+    const dismissed = typeof window !== "undefined" && localStorage.getItem("portal_welcome_dismissed");
+    if (isWelcome && !dismissed) {
+      setShowWelcomeBanner(true);
+    }
+  }, [searchParams]);
+
+  useEffect(() => {
     if (activeTab === "settings" && !profileNameAr && !profileNameEn && !profilePhone) {
       fetch("/api/portal/profile")
         .then((r) => r.ok ? r.json() : null)
@@ -194,6 +203,11 @@ export default function PortalPage() {
     } finally {
       setSavingProfile(false);
     }
+  }
+
+  function dismissWelcomeBanner() {
+    localStorage.setItem("portal_welcome_dismissed", "1");
+    setShowWelcomeBanner(false);
   }
 
   async function handleLogout() {
@@ -363,6 +377,39 @@ export default function PortalPage() {
               {t("View Store", "عرض المتجر")}
               <ExternalLink className="w-3.5 h-3.5" />
             </Link>
+          </div>
+        )}
+
+        {/* Welcome banner */}
+        {showWelcomeBanner && (
+          <div className="mb-6 bg-lime-400/10 border border-lime-400/20 rounded-xl px-5 py-4 flex items-center justify-between gap-4">
+            <div className="flex-1">
+              <p className="text-lime-400 font-semibold text-sm">
+                {isAr
+                  ? "🎉 مرحباً! متجرك التجريبي جاهز. اطلب التفعيل لبدأ البيع الحقيقي."
+                  : "🎉 Welcome! Your demo store is ready. Request activation to start selling."}
+              </p>
+            </div>
+            <div className="flex items-center gap-2 shrink-0">
+              <Button
+                size="sm"
+                className="bg-lime-400 hover:bg-lime-300 text-black font-semibold rounded-xl text-xs"
+                onClick={() => {
+                  dismissWelcomeBanner();
+                  if (stores.length > 0) openStepper(stores[0]);
+                }}
+              >
+                {isAr ? "اطلب التفعيل الآن" : "Request Activation"}
+              </Button>
+              <button
+                type="button"
+                onClick={dismissWelcomeBanner}
+                className="text-zinc-400 hover:text-white transition-colors p-1 rounded"
+                aria-label={isAr ? "إغلاق" : "Dismiss"}
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
           </div>
         )}
 

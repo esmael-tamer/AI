@@ -29,3 +29,6 @@ replit.nix
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# git worktrees
+.worktrees/

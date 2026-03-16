@@ -39,6 +39,11 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
 
+    // Block unverified customer accounts
+    if (!user.email_verified && user.role === "customer") {
+      return NextResponse.json({ error: "email_not_verified" }, { status: 403 })
+    }
+
     await sql`UPDATE users SET updated_at = NOW() WHERE id = ${user.id}`
 
     const sessionValue = await createSessionValue(user.id)
