@@ -67,12 +67,12 @@ export default function VerifyEmailPage() {
                 <AlertCircle className="w-7 h-7 text-red-400" />
               </div>
               <h2 className="text-xl font-bold text-white mb-2">
-                {t("رابط غير صالح", "Invalid Link")}
+                {t("Invalid Link", "رابط غير صالح")}
               </h2>
               <p className="text-white/50 text-sm mb-6">
                 {t(
-                  "هذا الرابط غير صالح أو تم استخدامه مسبقاً.",
-                  "This verification link is invalid or has already been used."
+                  "This verification link is invalid or has already been used.",
+                  "هذا الرابط غير صالح أو تم استخدامه مسبقاً."
                 )}
               </p>
             </>
@@ -82,12 +82,12 @@ export default function VerifyEmailPage() {
                 <AlertCircle className="w-7 h-7 text-amber-400" />
               </div>
               <h2 className="text-xl font-bold text-white mb-2">
-                {t("رابط منتهي الصلاحية", "Link Expired")}
+                {t("Link Expired", "رابط منتهي الصلاحية")}
               </h2>
               <p className="text-white/50 text-sm mb-6">
                 {t(
-                  "انتهت صلاحية هذا الرابط. اطلب رابطاً جديداً أدناه.",
-                  "This verification link has expired. Request a new one below."
+                  "This verification link has expired. Request a new one below.",
+                  "انتهت صلاحية هذا الرابط. اطلب رابطاً جديداً أدناه."
                 )}
               </p>
             </>
@@ -97,10 +97,10 @@ export default function VerifyEmailPage() {
                 <Mail className="w-7 h-7 text-lime-400" />
               </div>
               <h2 className="text-xl font-bold text-white mb-2">
-                {t("تحقق من بريدك", "Check your email")}
+                {t("Check your email", "تحقق من بريدك")}
               </h2>
               <p className="text-white/50 text-sm mb-1">
-                {t("أرسلنا رابط التأكيد إلى", "We sent a verification link to")}
+                {t("We sent a verification link to", "أرسلنا رابط التأكيد إلى")}
               </p>
               {email && (
                 <p className="text-lime-400 text-sm font-medium mb-6 break-all">{email}</p>
@@ -112,12 +112,12 @@ export default function VerifyEmailPage() {
           <div className="border-t border-white/[0.06] pt-5">
             {resendStatus === "sent" ? (
               <p className="text-lime-400 text-sm font-medium">
-                {t("تم الإرسال! تحقق من صندوق الوارد.", "Sent! Check your inbox.")}
+                {t("Sent! Check your inbox.", "تم الإرسال! تحقق من صندوق الوارد.")}
               </p>
             ) : (
               <>
                 <p className="text-white/30 text-xs mb-3">
-                  {t("لم تستلم البريد؟", "Didn't receive the email?")}
+                  {t("Didn't receive the email?", "لم تستلم البريد؟")}
                 </p>
                 <button
                   onClick={handleResend}
@@ -126,12 +126,12 @@ export default function VerifyEmailPage() {
                 >
                   <RefreshCw className={`w-4 h-4 ${resendStatus === "sending" ? "animate-spin" : ""}`} />
                   {cooldown > 0
-                    ? t(`إعادة الإرسال بعد ${cooldown}ث`, `Resend in ${cooldown}s`)
-                    : t("إعادة إرسال رابط التأكيد", "Resend verification email")}
+                    ? t(`Resend in ${cooldown}s`, `إعادة الإرسال بعد ${cooldown}ث`)
+                    : t("Resend verification email", "إعادة إرسال رابط التأكيد")}
                 </button>
                 {resendStatus === "error" && (
                   <p className="text-red-400 text-xs mt-2">
-                    {t("فشل الإرسال. حاول لاحقاً.", "Failed to send. Try again later.")}
+                    {t("Failed to send. Try again later.", "فشل الإرسال. حاول لاحقاً.")}
                   </p>
                 )}
               </>
@@ -140,7 +140,7 @@ export default function VerifyEmailPage() {
 
           <div className="mt-5">
             <Link href="/login" className="text-white/30 text-xs hover:text-white/60 transition-colors">
-              {t("← العودة لتسجيل الدخول", "← Back to login")}
+              {t("← Back to login", "← العودة لتسجيل الدخول")}
             </Link>
           </div>
         </div>

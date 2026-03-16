@@ -12,7 +12,7 @@ import { useLang } from "@/lib/i18n";
 
 export default function LoginPage() {
   const router = useRouter();
-  const { t, isAr } = useLang();
+  const { t } = useLang();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -78,7 +78,7 @@ export default function LoginPage() {
           <form onSubmit={handleSubmit} className="flex flex-col gap-5">
             {error === "email_not_verified" ? (
               <div className="bg-amber-500/10 border border-amber-500/20 rounded-lg p-3 text-amber-400 text-sm text-center">
-                {t("حسابك غير مفعّل. تحقق من بريدك أو ", "Your account is not activated. Check your email or ")}
+                {t("Your account is not activated. Check your email or ", "حسابك غير مفعّل. تحقق من بريدك أو ")}
                 <button
                   type="button"
                   onClick={async () => {
@@ -92,7 +92,7 @@ export default function LoginPage() {
                   }}
                   className="underline hover:text-amber-300 transition-colors"
                 >
-                  {t("أعد إرسال رابط التأكيد", "resend verification link")}
+                  {t("resend verification link", "أعد إرسال رابط التأكيد")}
                 </button>
               </div>
             ) : error ? (

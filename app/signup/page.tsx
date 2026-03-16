@@ -41,9 +41,9 @@ export default function SignupPage() {
 
       if (!res.ok) {
         if (res.status === 409) {
-          setError(t("البريد الإلكتروني مسجّل مسبقاً", "Email already registered"))
+          setError(t("Email already registered", "البريد الإلكتروني مسجّل مسبقاً"))
         } else {
-          setError(data.error || t("فشل إنشاء الحساب", "Signup failed"))
+          setError(data.error || t("Signup failed", "فشل إنشاء الحساب"))
         }
         return
       }
@@ -52,7 +52,7 @@ export default function SignupPage() {
       sessionStorage.setItem("mt_pending_email", form.email)
       router.push("/verify-email")
     } catch {
-      setError(t("حدث خطأ ما", "Something went wrong"))
+      setError(t("Something went wrong", "حدث خطأ ما"))
     } finally {
       setLoading(false)
     }
@@ -71,7 +71,7 @@ export default function SignupPage() {
               Media<span className="text-lime-400">Trend</span>
             </h1>
           </Link>
-          <p className="text-zinc-400 mt-2 text-sm">{t("أنشئ حسابك", "Create your account")}</p>
+          <p className="text-zinc-400 mt-2 text-sm">{t("Create your account", "أنشئ حسابك")}</p>
         </div>
 
         <div className="bg-white/5 backdrop-blur-xl border border-white/10 rounded-2xl p-8">
@@ -84,7 +84,7 @@ export default function SignupPage() {
 
             <div className="flex flex-col gap-2">
               <Label htmlFor="name_ar" className="text-zinc-300 text-sm">
-                {t("الاسم", "Name")}
+                {t("Name", "الاسم")}
               </Label>
               <Input
                 id="name_ar"
@@ -99,7 +99,7 @@ export default function SignupPage() {
 
             <div className="flex flex-col gap-2">
               <Label htmlFor="email" className="text-zinc-300 text-sm">
-                {t("البريد الإلكتروني", "Email")}
+                {t("Email", "البريد الإلكتروني")}
               </Label>
               <Input
                 id="email"
@@ -114,7 +114,7 @@ export default function SignupPage() {
 
             <div className="flex flex-col gap-2">
               <Label htmlFor="phone" className="text-zinc-300 text-sm">
-                {t("الهاتف", "Phone")}
+                {t("Phone", "الهاتف")}
               </Label>
               <Input
                 id="phone"
@@ -129,14 +129,14 @@ export default function SignupPage() {
 
             <div className="flex flex-col gap-2">
               <Label htmlFor="password" className="text-zinc-300 text-sm">
-                {t("كلمة المرور", "Password")}
+                {t("Password", "كلمة المرور")}
               </Label>
               <Input
                 id="password"
                 type="password"
                 value={form.password}
                 onChange={(e) => setForm({ ...form, password: e.target.value })}
-                placeholder={t("8 أحرف على الأقل", "Min 8 characters")}
+                placeholder={t("Min 8 characters", "8 أحرف على الأقل")}
                 required
                 minLength={8}
                 className="bg-white/5 border-white/10 text-white placeholder:text-zinc-500 focus:border-lime-400/50"
@@ -151,19 +151,19 @@ export default function SignupPage() {
               {loading ? (
                 <span className="flex items-center gap-2">
                   <span className="w-4 h-4 border-2 border-black/30 border-t-black rounded-full animate-spin" />
-                  {t("جاري الإنشاء...", "Creating account...")}
+                  {t("Creating account...", "جاري الإنشاء...")}
                 </span>
               ) : (
-                t("إنشاء الحساب", "Create Account")
+                t("Create Account", "إنشاء الحساب")
               )}
             </Button>
           </form>
 
           <div className="mt-6 text-center">
             <p className="text-zinc-500 text-sm">
-              {t("لديك حساب بالفعل؟ ", "Already have an account? ")}
+              {t("Already have an account? ", "لديك حساب بالفعل؟ ")}
               <Link href="/login" className="text-lime-400 hover:text-lime-300 transition-colors">
-                {t("تسجيل الدخول", "Sign In")}
+                {t("Sign In", "تسجيل الدخول")}
               </Link>
             </p>
           </div>
