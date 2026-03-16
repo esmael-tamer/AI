@@ -25,7 +25,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })
     }
 
-    const users = await sql`SELECT * FROM users WHERE email = ${email}`
+    const users = await sql`SELECT id, email, name_ar, name_en, role, phone, password_hash, email_verified FROM users WHERE email = ${email}`
 
     if (users.length === 0) {
       return NextResponse.json({ error: "Invalid credentials" }, { status: 401 })

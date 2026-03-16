@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { sql } from "@/lib/db"
 import { checkRateLimit, getClientIp } from "@/lib/rate-limit"
 import { isValidEmail } from "@/lib/auth"
+import { checkAdminAuth } from "@/lib/admin-auth"
 
 const VALID_TYPES = ["store_activation", "ads_launch", "account_mgmt"] as const
 
@@ -53,5 +54,22 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     logger.error("api", "Failed to create lead:", error)
     return NextResponse.json({ error: "Failed to submit" }, { status: 500 })
+  }
+}
+
+export async function GET() {
+  const authError = await checkAdminAuth()
+  if (authError) return authError
+
+  try {
+    const leads = await sql`
+      SELECT id, name, email, phone, type, status, notes, created_at
+      FROM leads
+      ORDER BY created_at DESC
+    `
+    return NextResponse.json({ leads })
+  } catch (error) {
+    logger.error("api", "Failed to fetch leads:", error)
+    return NextResponse.json({ error: "Failed to fetch leads" }, { status: 500 })
   }
 }
