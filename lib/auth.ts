@@ -6,6 +6,11 @@ import type { User } from "@/types"
 const SESSION_COOKIE = "mt-session"
 export const SESSION_MAX_AGE = 60 * 60 * 24 * 7 // 7 days in seconds
 
+/** Validates E.164 phone format e.g. +96512345678 */
+export function isValidPhone(phone: string): boolean {
+  return /^\+[1-9]\d{7,14}$/.test(phone)
+}
+
 /** Sets non-httpOnly identity cookies (user_role + user_id) readable by client JS and middleware. */
 export function setClientIdentityCookies(response: NextResponse, userId: number, role: string): void {
   const opts = {
