@@ -8,12 +8,17 @@ const resend = new Resend(process.env.RESEND_API_KEY)
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:5000"
 
+if (!process.env.RESEND_API_KEY && process.env.NODE_ENV !== "test") {
+  console.warn("[email] RESEND_API_KEY is not set — verification emails will not be sent")
+}
+
 /**
  * Sends a bilingual email verification link to the user.
  * @param to      Recipient email address
  * @param token   64-char hex verification token
  * @param sid     Builder session ID (may be empty string or null)
  * @param lang    User's preferred language
+ * @throws Will throw if the Resend API call fails. Callers must wrap in try/catch.
  */
 export async function sendVerificationEmail(
   to: string,
@@ -21,7 +26,9 @@ export async function sendVerificationEmail(
   sid: string | null,
   lang: "ar" | "en"
 ): Promise<void> {
-  const link = `${APP_URL}/api/auth/verify-email?token=${token}&sid=${sid ?? ""}`
+  const params = new URLSearchParams({ token, sid: sid ?? "" })
+  const link = `${APP_URL}/api/auth/verify-email?${params.toString()}`
+  const safeLink = link.replace(/&/g, "&amp;").replace(/"/g, "&quot;")
 
   const subject =
     lang === "ar"
@@ -50,7 +57,7 @@ export async function sendVerificationEmail(
             : "<p>Hello,</p><p>Click the button below to verify your email address and activate your Media Trend account.</p><p>This link expires in 24 hours.</p>"}
         </td></tr>
         <tr><td align="center" style="padding:32px 0;">
-          <a href="${link}" style="display:inline-block;background:#a3e635;color:#000;font-weight:700;font-size:15px;padding:14px 36px;border-radius:100px;text-decoration:none;">
+          <a href="${safeLink}" style="display:inline-block;background:#a3e635;color:#000;font-weight:700;font-size:15px;padding:14px 36px;border-radius:100px;text-decoration:none;">
             ${lang === "ar" ? "تأكيد البريد الإلكتروني" : "Verify Email"}
           </a>
         </td></tr>
