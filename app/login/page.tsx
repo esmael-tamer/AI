@@ -37,7 +37,7 @@ export default function LoginPage() {
           sessionStorage.setItem("mt_pending_email", email)
           setError("email_not_verified")
         } else {
-          setError(data.error || t("فشل تسجيل الدخول", "Login failed"))
+          setError(data.error || t("Login failed", "فشل تسجيل الدخول"))
         }
         return;
       }
