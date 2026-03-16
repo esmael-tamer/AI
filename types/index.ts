@@ -16,6 +16,9 @@ export type User = {
   phone: string | null
   role: UserRole
   lang_pref: string
+  email_verified: boolean
+  email_verification_token: string | null
+  email_verification_expires: string | null
   created_at: string
   updated_at: string
 }
