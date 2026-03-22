@@ -1,150 +1,183 @@
 "use client"
 
+import Link from "next/link"
 import { useRouter } from "next/navigation"
-import { ArrowRight, Sparkles, Mic, Send, MessageCircle } from "lucide-react"
-import { useState, useEffect, useRef } from "react"
+import { ArrowRight, Sparkles, MessageCircle, ShoppingBag, Star, Package, CreditCard, TrendingUp } from "lucide-react"
+import { useState, useEffect } from "react"
 import { useLang } from "@/lib/i18n"
 
 export default function MTHero() {
   const { t, isAr } = useLang()
   const router = useRouter()
-  const [idea, setIdea] = useState("")
-  const sectionRef = useRef<HTMLDivElement>(null)
   const [visible, setVisible] = useState(false)
 
   useEffect(() => {
-    const timer = setTimeout(() => setVisible(true), 100)
+    const timer = setTimeout(() => setVisible(true), 80)
     return () => clearTimeout(timer)
   }, [])
 
-  function handleGenerate(e?: React.FormEvent) {
-    e?.preventDefault()
-    router.push("/builder")
-  }
-
   return (
-    <section ref={sectionRef} className="relative min-h-screen flex items-center justify-center px-4 pt-28 pb-20 bg-[#0a0a0a] overflow-hidden">
+    <section className="relative min-h-screen flex flex-col items-center justify-center px-4 pt-32 pb-0 bg-[#050505] overflow-hidden">
+
+      {/* ── Central glow orb (Visuo-style) ── */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-20 left-1/4 w-[600px] h-[600px] bg-lime-400/[0.07] rounded-full blur-[150px]" />
-        <div className="absolute bottom-20 right-1/4 w-[400px] h-[400px] bg-emerald-400/[0.05] rounded-full blur-[120px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-lime-400/[0.03] rounded-full blur-[200px]" />
+        {/* Main central orb */}
+        <div className="absolute left-1/2 top-[30%] -translate-x-1/2 -translate-y-1/2 w-[700px] h-[700px] rounded-full"
+          style={{ background: "radial-gradient(ellipse at center, rgba(163,230,53,0.18) 0%, rgba(52,211,153,0.08) 40%, transparent 70%)" }} />
+        {/* Elongated vertical beam */}
+        <div className="absolute left-1/2 top-0 -translate-x-1/2 w-[2px] h-full"
+          style={{ background: "linear-gradient(to bottom, transparent, rgba(163,230,53,0.08) 30%, rgba(163,230,53,0.15) 50%, rgba(163,230,53,0.06) 70%, transparent)" }} />
+        {/* Secondary halo */}
+        <div className="absolute left-1/2 top-[35%] -translate-x-1/2 -translate-y-1/2 w-[1000px] h-[500px] rounded-full opacity-40"
+          style={{ background: "radial-gradient(ellipse at center, rgba(163,230,53,0.06) 0%, transparent 60%)" }} />
       </div>
 
-      <div className="absolute inset-0 pointer-events-none" style={{
-        backgroundImage: `radial-gradient(rgba(163, 230, 53, 0.06) 1px, transparent 1px)`,
-        backgroundSize: '40px 40px',
-      }} />
+      {/* Content */}
+      <div className="relative max-w-4xl mx-auto w-full text-center flex flex-col items-center">
 
-      <div className="max-w-5xl mx-auto text-center relative">
-        <div className={`transition-all duration-700 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-lime-400/10 border border-lime-400/20 mb-8 backdrop-blur-sm">
-            <Sparkles className="w-4 h-4 text-lime-400" />
-            <span className="text-lime-400 text-sm font-medium">
-              {t("AI-Powered Platform", "منصة مدعومة بالذكاء الاصطناعي")}
+        {/* Badge */}
+        <div className={`transition-all duration-600 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-4"}`}>
+          <div className="inline-flex items-center gap-2 px-5 py-2 rounded-full border border-white/10 bg-white/[0.04] backdrop-blur-sm mb-10">
+            <Sparkles className="w-3.5 h-3.5 text-lime-400" />
+            <span className="text-white/60 text-sm font-medium">
+              {t("AI-Powered E-commerce Platform", "منصة تجارة إلكترونية بالذكاء الاصطناعي")}
             </span>
           </div>
         </div>
 
-        <h1 className={`text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black tracking-tight text-white leading-tight transition-all duration-700 delay-150 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+        {/* Headline */}
+        <h1 className={`text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black tracking-tight text-white leading-[1.08] transition-all duration-700 delay-100 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
           {isAr ? (
             <>
-              <span className="block">ابنِ متجرك الإلكتروني</span>
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-lime-400 via-emerald-400 to-lime-300">بالذكاء الاصطناعي</span>
-              <span className="block text-2xl sm:text-3xl md:text-4xl mt-2 text-white/80">…وشوفه قدامك خلال دقائق</span>
+              <span className="block">ابنِ متجرك</span>
+              <span className="block mt-1 text-transparent bg-clip-text bg-gradient-to-r from-lime-400 via-emerald-300 to-lime-300">
+                بالذكاء الاصطناعي
+              </span>
             </>
           ) : (
             <>
-              <span className="block">Build your ecommerce store</span>
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-lime-400 via-emerald-400 to-lime-300">with AI</span>
-              <span className="block text-2xl sm:text-3xl md:text-4xl mt-2 text-white/80">— see a live demo in minutes</span>
+              <span className="block">Build your store</span>
+              <span className="block mt-1 text-transparent bg-clip-text bg-gradient-to-r from-lime-400 via-emerald-300 to-lime-300">
+                with AI
+              </span>
             </>
           )}
         </h1>
 
-        <p className={`mt-6 text-base sm:text-lg text-white/40 max-w-2xl mx-auto leading-relaxed transition-all duration-700 delay-300 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+        {/* Subheadline */}
+        <p className={`mt-7 text-base sm:text-lg text-white/40 max-w-xl mx-auto leading-relaxed transition-all duration-700 delay-200 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
           {t(
-            "Type or speak your idea. Our AI generates an interactive demo store with no signup. If you like it, log in and submit your request so our team can activate payments, shipping, and fulfillment.",
-            "اكتب أو تكلم بفكرتك، ومساعدنا الذكي يجهّز لك متجر تجريبي تفاعلي بدون تسجيل. لو عجبك، سجّل دخولك وكمّل الطلب عشان يوصلنا ونفعّل لك الدفع والشحن والتخزين."
+            "Generate a live interactive store demo in minutes. No subscriptions — commission on sales only after activation.",
+            "جهّز متجرك التجريبي التفاعلي في دقائق. بدون اشتراكات — عمولة على المبيعات فقط بعد التفعيل."
           )}
         </p>
 
-        <div className={`mt-4 inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/[0.04] border border-white/[0.06] transition-all duration-700 delay-[400ms] ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
-          <span className="text-xs sm:text-sm text-lime-400/70 font-medium">
-            {t(
-              "No subscriptions — commission on sales only (after activation)",
-              "بدون اشتراكات — عمولة على المبيعات فقط بعد التفعيل"
-            )}
-          </span>
-        </div>
-
-        <form onSubmit={handleGenerate} className={`mt-10 max-w-2xl mx-auto transition-all duration-700 delay-500 ease-out ${visible ? "opacity-100 translate-y-0 scale-100" : "opacity-0 translate-y-8 scale-95"}`}>
-          <div className="flex items-center gap-2 bg-white/[0.06] border border-white/10 rounded-2xl px-4 py-3 backdrop-blur-xl hover:border-white/15 transition-all focus-within:border-lime-400/30">
-            <input
-              type="text"
-              value={idea}
-              onChange={(e) => setIdea(e.target.value)}
-              placeholder={t(
-                "Example: Perfume store for Kuwait, fast delivery, local payments",
-                "مثال: أبي متجر عطور في الكويت + توصيل سريع + دفع محلي"
-              )}
-              className="flex-1 bg-transparent text-white text-sm placeholder:text-white/25 focus:outline-none py-1"
-              dir={isAr ? "rtl" : "ltr"}
-            />
-            <button
-              type="button"
-              className="p-2.5 rounded-xl bg-white/[0.06] text-white/40 hover:text-white hover:bg-white/10 transition-colors"
-              title={t("Voice input", "إدخال صوتي")}
-            >
-              <Mic className="w-4 h-4" />
-            </button>
-            <button
-              type="submit"
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-lime-400 text-black font-semibold text-sm hover:bg-lime-300 transition-all hover:shadow-[0_0_20px_rgba(163,230,53,0.3)]"
-            >
-              <Send className={`w-4 h-4 ${isAr ? "rotate-180" : ""}`} />
-              {t("Generate", "ابدأ")}
-            </button>
-          </div>
-          <p className="mt-3 text-xs text-white/25">
-            {t(
-              "Up to 8 quick questions, then we generate your demo store.",
-              "حتى ٨ أسئلة قصيرة ثم نعرض المتجر التجريبي."
-            )}
-          </p>
-        </form>
-
-        <div className={`mt-8 flex flex-col sm:flex-row items-center justify-center gap-4 transition-all duration-700 delay-[600ms] ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
+        {/* CTAs */}
+        <div className={`mt-10 flex flex-col sm:flex-row items-center justify-center gap-3 transition-all duration-700 delay-300 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-6"}`}>
           <button
             onClick={() => router.push("/builder")}
-            className="group flex items-center gap-2 px-8 py-3.5 bg-lime-400 text-black font-bold text-base rounded-full hover:bg-lime-300 transition-all hover:scale-105 hover:shadow-[0_0_40px_rgba(163,230,53,0.3)]"
+            className="group flex items-center gap-2.5 px-8 py-3.5 bg-lime-400 text-black font-bold text-base rounded-full hover:bg-lime-300 transition-all hover:scale-[1.03] hover:shadow-[0_0_40px_rgba(163,230,53,0.35)]"
           >
-            {t("Start building for free", "ابدأ البناء مجانًا")}
-            <ArrowRight className={`w-5 h-5 group-hover:translate-x-1 transition-transform ${isAr ? "rotate-180 group-hover:-translate-x-1" : ""}`} />
+            {t("Get started free", "ابدأ مجانًا")}
+            <ArrowRight className={`w-4 h-4 group-hover:translate-x-0.5 transition-transform ${isAr ? "rotate-180 group-hover:-translate-x-0.5" : ""}`} />
           </button>
           <a
             href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "9656566179840"}`}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-6 py-3.5 text-white/60 font-medium text-sm rounded-full border border-white/10 hover:bg-white/5 hover:border-white/20 transition-all"
+            className="flex items-center gap-2.5 px-8 py-3.5 text-white/60 font-medium text-base rounded-full border border-white/10 hover:bg-white/[0.05] hover:border-white/20 hover:text-white/80 transition-all"
           >
             <MessageCircle className="w-4 h-4 text-green-400" />
             {t("Talk to our team", "تكلم مع فريقنا")}
           </a>
         </div>
 
-        {/* Stats bar */}
-        <div className={`mt-14 grid grid-cols-2 sm:grid-cols-4 gap-px rounded-2xl overflow-hidden border border-white/[0.06] bg-white/[0.06] transition-all duration-700 delay-[700ms] ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-8"}`}>
-          {[
-            { value: "500+", labelEn: "Stores built", labelAr: "متجر تم بناؤه" },
-            { value: "8", labelEn: "MENA countries", labelAr: "دول خليجية" },
-            { value: "< 3 min", labelEn: "Average build time", labelAr: "وقت البناء" },
-            { value: "0%", labelEn: "Monthly fees", labelAr: "رسوم شهرية" },
-          ].map((stat) => (
-            <div key={stat.value} className="bg-[#0a0a0a] px-6 py-5 text-center">
-              <p className="text-2xl font-black text-white">{stat.value}</p>
-              <p className="text-xs text-white/30 mt-1">{isAr ? stat.labelAr : stat.labelEn}</p>
+        {/* No-fee note */}
+        <p className={`mt-5 text-xs text-white/20 transition-all duration-700 delay-[400ms] ease-out ${visible ? "opacity-100" : "opacity-0"}`}>
+          {t("No credit card required · Commission only after activation", "بدون بطاقة ائتمان · عمولة فقط بعد التفعيل")}
+        </p>
+      </div>
+
+      {/* ── Store Mockup (Visuo dashboard-style) ── */}
+      <div className={`relative w-full max-w-5xl mx-auto mt-16 transition-all duration-1000 delay-500 ease-out ${visible ? "opacity-100 translate-y-0" : "opacity-0 translate-y-12"}`}>
+        {/* Fade overlay at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-[#050505] to-transparent z-10 pointer-events-none" />
+        {/* Side fade overlays */}
+        <div className="absolute inset-y-0 left-0 w-20 bg-gradient-to-r from-[#050505] to-transparent z-10 pointer-events-none" />
+        <div className="absolute inset-y-0 right-0 w-20 bg-gradient-to-l from-[#050505] to-transparent z-10 pointer-events-none" />
+
+        {/* The mockup card */}
+        <div className="rounded-t-2xl border border-white/[0.08] bg-[#0e0e0e] overflow-hidden shadow-[0_-8px_60px_rgba(163,230,53,0.07)]">
+          {/* Window bar */}
+          <div className="flex items-center gap-2 px-5 py-3.5 border-b border-white/[0.06] bg-[#0a0a0a]">
+            <div className="w-3 h-3 rounded-full bg-white/10" />
+            <div className="w-3 h-3 rounded-full bg-white/10" />
+            <div className="w-3 h-3 rounded-full bg-lime-400/40" />
+            <div className="flex-1 mx-4">
+              <div className="mx-auto w-48 h-6 rounded-lg bg-white/[0.04] border border-white/[0.06] flex items-center justify-center">
+                <span className="text-white/20 text-xs">mediatrend.store/my-store</span>
+              </div>
             </div>
-          ))}
+          </div>
+
+          {/* Store content */}
+          <div className="p-6 grid grid-cols-12 gap-4 min-h-[320px]">
+            {/* Sidebar */}
+            <div className="col-span-2 space-y-2">
+              <div className="flex items-center gap-2 px-3 py-2.5 rounded-xl bg-lime-400/10 border border-lime-400/15">
+                <ShoppingBag className="w-3.5 h-3.5 text-lime-400" />
+                <span className="text-lime-400 text-xs font-medium">{t("Store", "المتجر")}</span>
+              </div>
+              {[Package, CreditCard, TrendingUp, Star].map((Icon, i) => (
+                <div key={i} className="flex items-center gap-2 px-3 py-2.5 rounded-xl hover:bg-white/[0.03] cursor-pointer">
+                  <Icon className="w-3.5 h-3.5 text-white/20" />
+                  <div className="h-2 rounded bg-white/[0.06]" style={{ width: `${40 + i * 10}%` }} />
+                </div>
+              ))}
+            </div>
+
+            {/* Main content */}
+            <div className="col-span-10 space-y-4">
+              {/* Stats row */}
+              <div className="grid grid-cols-4 gap-3">
+                {[
+                  { label: t("Revenue", "الإيرادات"), value: "KD 4,820", color: "lime" },
+                  { label: t("Orders", "الطلبات"), value: "148", color: "emerald" },
+                  { label: t("Products", "المنتجات"), value: "32", color: "white" },
+                  { label: t("Visitors", "الزوار"), value: "1,204", color: "white" },
+                ].map((stat, i) => (
+                  <div key={i} className="rounded-xl border border-white/[0.06] bg-white/[0.02] p-3">
+                    <p className="text-white/30 text-xs mb-1">{stat.label}</p>
+                    <p className={`text-base font-bold ${stat.color === "lime" ? "text-lime-400" : stat.color === "emerald" ? "text-emerald-400" : "text-white"}`}>
+                      {stat.value}
+                    </p>
+                  </div>
+                ))}
+              </div>
+
+              {/* Product grid */}
+              <div className="grid grid-cols-3 gap-3">
+                {[
+                  { name: isAr ? "عطر خيال" : "Khayal Perfume", price: "KD 28", tag: t("Best seller", "الأكثر مبيعاً"), color: "#c9a84c" },
+                  { name: isAr ? "فستان أناقة" : "Elegance Dress", price: "KD 45", tag: t("New", "جديد"), color: "#ec4899" },
+                  { name: isAr ? "سيروم غلو" : "Glow Serum", price: "KD 18", tag: t("Sale", "تخفيض"), color: "#8b5cf6" },
+                ].map((p, i) => (
+                  <div key={i} className="rounded-xl border border-white/[0.06] bg-white/[0.02] overflow-hidden">
+                    <div className="h-24 flex items-center justify-center" style={{ background: `${p.color}12` }}>
+                      <div className="w-10 h-10 rounded-full" style={{ background: `${p.color}30`, border: `1px solid ${p.color}40` }} />
+                    </div>
+                    <div className="p-2.5">
+                      <div className="flex items-start justify-between gap-1">
+                        <p className="text-white/70 text-xs font-medium leading-tight">{p.name}</p>
+                        <span className="shrink-0 text-xs px-1.5 py-0.5 rounded-full text-black font-semibold" style={{ backgroundColor: p.color + "cc" }}>{p.tag}</span>
+                      </div>
+                      <p className="text-white/40 text-xs mt-1">{p.price}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
